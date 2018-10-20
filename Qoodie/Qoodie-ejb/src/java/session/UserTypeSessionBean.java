@@ -23,17 +23,19 @@ public class UserTypeSessionBean implements UserTypeSessionBeanLocal {
 
     @Override
     public void createUserType(UserType u) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        em.persist(u);
     }
 
     @Override
     public UserType readUserType(Long uId) throws UserTypeNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        UserType u = em.find(UserType.class, uId);
+        if (u == null) throw new UserTypeNotFoundException("user type not found");
+        return u;
     }
 
     @Override
     public List<UserType> readAllUserType() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return em.createQuery("SELECT u from UserType u").getResultList();
     }
 
   
