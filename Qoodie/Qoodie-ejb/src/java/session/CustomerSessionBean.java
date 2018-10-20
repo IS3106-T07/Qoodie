@@ -8,6 +8,7 @@ package session;
 import entity.Customer;
 import entity.CustomerOrder;
 import error.CustomerNotFoundException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
@@ -24,11 +25,12 @@ public class CustomerSessionBean implements CustomerSessionBeanLocal {
     @PersistenceContext(unitName = "Qoodie-ejbPU")
     private EntityManager em;
 
-    @EJB
-    CustomerOrderSessionBean customerOrderSessionBean;
+    //@EJB
+    //CustomerOrderSessionBean customerOrderSessionBean;
     @Override
     public void createCustomer(Customer c) {
         c.setCreated(new Date());
+        c.setCustomerOrders(new ArrayList<>());
         em.persist(c);
     }
 
