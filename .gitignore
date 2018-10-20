@@ -7,3 +7,7 @@
 /Qoodie/dist/
 /Qoodie/nbdist/
 /Qoodie/.nb-gradle/
+/Qoodie/Qoodie-ejb/build/
+/Qoodie/Qoodie-ejb/dist/
+/Qoodie/Qoodie-war/build/
+/Qoodie/Qoodie-war/dist/
