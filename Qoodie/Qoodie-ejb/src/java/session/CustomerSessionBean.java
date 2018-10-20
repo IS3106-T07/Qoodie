@@ -8,6 +8,7 @@ package session;
 import entity.Customer;
 import entity.CustomerOrder;
 import error.CustomerNotFoundException;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -27,6 +28,7 @@ public class CustomerSessionBean implements CustomerSessionBeanLocal {
     CustomerOrderSessionBean customerOrderSessionBean;
     @Override
     public void createCustomer(Customer c) {
+        c.setCreated(new Date());
         em.persist(c);
     }
 
