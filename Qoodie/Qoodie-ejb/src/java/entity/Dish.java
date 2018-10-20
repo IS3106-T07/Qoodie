@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -32,7 +33,7 @@ public class Dish implements Serializable {
     @ManyToOne
     private DishType dishType;
     @OneToMany
-    private OrderDish orderDish;
+    private List<OrderDish> orderDishes;
     
     public Long getId() {
         return id;
@@ -115,12 +116,14 @@ public class Dish implements Serializable {
         this.dishType = dishType;
     }
 
-    public OrderDish getOrderDish() {
-        return orderDish;
+    public List<OrderDish> getOrderDishes() {
+        return orderDishes;
     }
 
-    public void setOrderDish(OrderDish orderDish) {
-        this.orderDish = orderDish;
+    public void setOrderDishes(List<OrderDish> orderDishes) {
+        this.orderDishes = orderDishes;
     }
+
+    
     
 }
