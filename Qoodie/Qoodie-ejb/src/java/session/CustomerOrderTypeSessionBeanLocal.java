@@ -5,6 +5,8 @@
  */
 package session;
 
+import entity.CustomerOrderType;
+import java.util.List;
 import javax.ejb.Local;
 
 /**
@@ -13,5 +15,7 @@ import javax.ejb.Local;
  */
 @Local
 public interface CustomerOrderTypeSessionBeanLocal {
-    
+    public void createCustomerOrderType(CustomerOrderType c);
+    public CustomerOrderType readCustomerOrderType(Long cId);
+    public List<CustomerOrderType> readAllCustomerOrderType(); //for init bean 
 }
