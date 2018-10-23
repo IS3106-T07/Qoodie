@@ -22,4 +22,5 @@ public interface CustomerSessionBeanLocal {
     public void deleteCustomer(Customer c)throws CustomerNotFoundException;
     
     public List<Customer> readAllCustomer();//for admin
+    public List<Customer> readCustomerByEmail(String email);
 }
