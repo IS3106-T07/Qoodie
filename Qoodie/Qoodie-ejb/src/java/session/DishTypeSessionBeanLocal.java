@@ -5,6 +5,9 @@
  */
 package session;
 
+import entity.DishType;
+import error.DishNotFoundException;
+import java.util.List;
 import javax.ejb.Local;
 
 /**
@@ -14,4 +17,7 @@ import javax.ejb.Local;
 @Local
 public interface DishTypeSessionBeanLocal {
     
+    public void createDishType();
+    public DishType readDishType() throws DishNotFoundException;
+    public List<DishType> readAllDishType();//for init
 }

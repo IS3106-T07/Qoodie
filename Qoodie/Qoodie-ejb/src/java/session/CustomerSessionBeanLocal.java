@@ -5,6 +5,9 @@
  */
 package session;
 
+import entity.Customer;
+import error.CustomerNotFoundException;
+import java.util.List;
 import javax.ejb.Local;
 
 /**
@@ -13,5 +16,11 @@ import javax.ejb.Local;
  */
 @Local
 public interface CustomerSessionBeanLocal {
+    public void createCustomer(Customer c);
+    public Customer readCustomer(Long cId) throws CustomerNotFoundException;
+    public void updateCustoemr(Customer c) throws CustomerNotFoundException;
+    public void deleteCustomer(Customer c)throws CustomerNotFoundException;
     
+    public List<Customer> readAllCustomer();//for admin
+    public List<Customer> readCustomerByEmail(String email);
 }

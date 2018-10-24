@@ -5,7 +5,12 @@
  */
 package session;
 
+import entity.CuisineType;
+import error.CuisineTypeNotFoundException;
+import java.util.List;
 import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 /**
  *
@@ -13,7 +18,25 @@ import javax.ejb.Stateless;
  */
 @Stateless
 public class CuisineTypeSessionBean implements CuisineTypeSessionBeanLocal {
+    
+    @PersistenceContext(unitName = "Qoodie-ejbPU")
+    private EntityManager em;
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
+    @Override
+    public void createCuisineType(CuisineType c) {
+        em.persist(c);
+    }
+
+    @Override
+    public CuisineType readCuisineType(Long cId) throws CuisineTypeNotFoundException {
+        CuisineType c = em.find(CuisineType.class, cId);
+        if ( c == null ) throw new CuisineTypeNotFoundException("cuisine type not found");
+        return c;
+    }
+
+    @Override
+    public List<CuisineType> readAllCuisineType() {
+        return (em.createQuery("SELECT f FROM CuisineType f").getResultList());
+    }
+
 }

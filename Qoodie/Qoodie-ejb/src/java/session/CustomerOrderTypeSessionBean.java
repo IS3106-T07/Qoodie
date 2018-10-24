@@ -5,7 +5,11 @@
  */
 package session;
 
+import entity.CustomerOrderType;
+import java.util.List;
 import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 /**
  *
@@ -13,7 +17,26 @@ import javax.ejb.Stateless;
  */
 @Stateless
 public class CustomerOrderTypeSessionBean implements CustomerOrderTypeSessionBeanLocal {
+    @PersistenceContext(unitName = "Qoodie-ejbPU")
+    private EntityManager em;
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
+    @Override
+    public void createCustomerOrderType(CustomerOrderType c) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public CustomerOrderType readCustomerOrderType(Long cId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<CustomerOrderType> readAllCustomerOrderType() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void persist(Object object) {
+        em.persist(object);
+    }
+
 }

@@ -5,6 +5,9 @@
  */
 package session;
 
+import entity.UserType;
+import error.UserTypeNotFoundException;
+import java.util.List;
 import javax.ejb.Local;
 
 /**
@@ -13,5 +16,7 @@ import javax.ejb.Local;
  */
 @Local
 public interface UserTypeSessionBeanLocal {
-    
+    public void createUserType(UserType u);
+    public UserType readUserType(Long uId) throws UserTypeNotFoundException;
+    public List<UserType> readAllUserType();//for init
 }

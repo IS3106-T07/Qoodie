@@ -5,6 +5,9 @@
  */
 package session;
 
+import entity.CuisineType;
+import error.CuisineTypeNotFoundException;
+import java.util.List;
 import javax.ejb.Local;
 
 /**
@@ -13,5 +16,7 @@ import javax.ejb.Local;
  */
 @Local
 public interface CuisineTypeSessionBeanLocal {
-    
+    public void createCuisineType(CuisineType c);
+    public CuisineType readCuisineType(Long cId) throws CuisineTypeNotFoundException;
+    public List<CuisineType> readAllCuisineType(); //for init
 }
