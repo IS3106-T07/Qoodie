@@ -25,7 +25,7 @@ public class DishType implements Serializable {
     private Long id;
     private String name;
     @OneToMany(mappedBy = "dishType")
-    List<Dish> dishes;
+    private List<Dish> dishes;
             
             
     public Long getId() {
@@ -59,6 +59,22 @@ public class DishType implements Serializable {
     @Override
     public String toString() {
         return "entity.DishType[ id=" + id + " ]";
+    }
+
+    public List<Dish> getDishes() {
+        return dishes;
+    }
+
+    public void setDishes(List<Dish> dishes) {
+        this.dishes = dishes;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
     
 }
