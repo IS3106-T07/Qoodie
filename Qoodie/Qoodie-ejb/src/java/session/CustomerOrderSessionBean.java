@@ -44,8 +44,7 @@ public class CustomerOrderSessionBean implements CustomerOrderSessionBeanLocal {
 
     @Override
     public void deleteCustomerOrder(CustomerOrder c) throws CustomerOrderNotFoundException {
-        CustomerOrder co = readCustomerOrder(c.getId());
-        em.remove(c);
+        em.remove(readCustomerOrder(c.getId()));
     }
 
     @Override
