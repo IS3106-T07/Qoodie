@@ -1,8 +1,8 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+* To change this license header, choose License Headers in Project Properties.
+* To change this template file, choose Tools | Templates
+* and open the template in the editor.
+*/
 package session;
 
 import entity.CuisineType;
@@ -21,22 +21,34 @@ public class CuisineTypeSessionBean implements CuisineTypeSessionBeanLocal {
     
     @PersistenceContext(unitName = "Qoodie-ejbPU")
     private EntityManager em;
-
+    
     @Override
     public void createCuisineType(CuisineType c) {
         em.persist(c);
     }
-
+    
     @Override
     public CuisineType readCuisineType(Long cId) throws CuisineTypeNotFoundException {
         CuisineType c = em.find(CuisineType.class, cId);
         if ( c == null ) throw new CuisineTypeNotFoundException("cuisine type not found");
         return c;
     }
-
+    
     @Override
     public List<CuisineType> readAllCuisineType() {
         return (em.createQuery("SELECT f FROM CuisineType f").getResultList());
     }
-
+    
+    @Override
+    public void updateCuisineType(CuisineType c) throws CuisineTypeNotFoundException {
+        CuisineType oldC = readCuisineType(c.getId());
+        oldC.setName(c.getName());
+        oldC.setStores(c.getStores());
+    }
+    
+    @Override
+    public void deleteCuisineType(CuisineType c) throws CuisineTypeNotFoundException {
+        em.remove((readCuisineType(c.getId())));   
+    }
+    
 }
