@@ -31,12 +31,14 @@ public class InitializeSessionBean {
             UserTypeSessionBeanLocal userTypeSessionBeanLocal;
     @EJB
             CustomerSessionBeanLocal customerSessionBeanLocal;
-    
+    @EJB
+            StoreSessionBeanLocal storeSessionBeanLocal;
     @PostConstruct
     public void init(){
         initializeCuisineType();
         initializeUserType();
         initializeUsers();
+        initializeStores();
     }
     
     public void initializeCuisineType(){
@@ -73,16 +75,35 @@ public class InitializeSessionBean {
             c.setName("Alice");
             c.setPassword("password");
             c.setPhone("88888888");
-            c.setUserType(userTypeSessionBeanLocal.readAllUserType().get(0));   
+            c.setUserType(userTypeSessionBeanLocal.readAllUserType().get(0));
             customerSessionBeanLocal.createCustomer(c);
             c = new Customer();
             c.setName("Bob");
             c.setEmail("bob@gmail.com");
-            c.setUserType(userTypeSessionBeanLocal.readAllUserType().get(1));   
+            c.setUserType(userTypeSessionBeanLocal.readAllUserType().get(1));
             c.setPhone("66666666");
             c.setAddress("31 Sungei Kadut Loop S 729509, Singapore");
             c.setPassword("password");
             customerSessionBeanLocal.createCustomer(c);
+        }
+    }
+    
+    private void initializeStores() {
+        List<Store> list = storeSessionBeanLocal.readAllStore();
+        if (list.isEmpty()){
+            Store s = new Store();
+            s.setDishes(new ArrayList<>());
+            s.setName("Yong Tou Fu"); 
+            s.setPassword("password");
+            s.setVendorEmail("vendor1@gmail.com");
+            storeSessionBeanLocal.createStore(s);
+            
+            s = new Store();
+            s.setDishes(new ArrayList<>());
+            s.setName("Western"); 
+            s.setPassword("password");
+            s.setVendorEmail("vendor2@gmail.com");
+            storeSessionBeanLocal.createStore(s);
         }
     }
 }
