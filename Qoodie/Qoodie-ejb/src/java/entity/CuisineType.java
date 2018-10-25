@@ -11,6 +11,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.WebTarget;
 
 /**
  *
@@ -23,6 +27,7 @@ public class CuisineType implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
+    @OneToMany(mappedBy = "cuisineType")
     private List<Store> stores;
     
     public Long getId() {

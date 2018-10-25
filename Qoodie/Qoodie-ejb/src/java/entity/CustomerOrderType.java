@@ -6,10 +6,12 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -22,7 +24,17 @@ public class CustomerOrderType implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
-    
+    @OneToMany(mappedBy = "customerOrderType")
+    private List<CustomerOrder> customerOrders;
+
+    public List<CustomerOrder> getCustomerOrders() {
+        return customerOrders;
+    }
+
+    public void setCustomerOrders(List<CustomerOrder> customerOrders) {
+        this.customerOrders = customerOrders;
+    }
+
     public String getName() {
         return name;
     }

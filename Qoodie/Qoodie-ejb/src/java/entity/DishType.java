@@ -6,10 +6,12 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -22,6 +24,10 @@ public class DishType implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
+    @OneToMany(mappedBy = "dishType")
+    List<Dish> dishes;
+            
+            
     public Long getId() {
         return id;
     }
