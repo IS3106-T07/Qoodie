@@ -5,6 +5,9 @@
  */
 package session;
 
+import entity.OrderDish;
+import error.OrderDishNotFoundException;
+import java.util.List;
 import javax.ejb.Local;
 
 /**
@@ -13,5 +16,12 @@ import javax.ejb.Local;
  */
 @Local
 public interface OrderDishSessionBeanLocal {
+    
+   public void createOrderDish(OrderDish d);
+    public OrderDish readOrderDish(Long cId) throws OrderDishNotFoundException;
+    public void updateOrderDish(OrderDish d) throws OrderDishNotFoundException;
+    public void deleteOrderDish(OrderDish d) throws OrderDishNotFoundException;
+    
+    public List<OrderDish> readAllOrderDish();//for init
     
 }
