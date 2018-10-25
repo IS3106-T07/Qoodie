@@ -6,6 +6,8 @@
 package session;
 
 import entity.CustomerOrderType;
+import error.CustomerOrderTypeNotFoundException;
+import java.util.HashSet;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -22,21 +24,30 @@ public class CustomerOrderTypeSessionBean implements CustomerOrderTypeSessionBea
 
     @Override
     public void createCustomerOrderType(CustomerOrderType c) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        em.persist(c);
     }
 
     @Override
-    public CustomerOrderType readCustomerOrderType(Long cId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public CustomerOrderType readCustomerOrderType(Long cId) throws CustomerOrderTypeNotFoundException {
+        CustomerOrderType c = em.find(CustomerOrderType.class, cId);
+        if (c==null) throw new CustomerOrderTypeNotFoundException("custoemr order type not found");
+        return c;
     }
 
+    @Override
+    public void updateCustomerOrderType(CustomerOrderType c) throws CustomerOrderTypeNotFoundException {
+        CustomerOrderType OldC = readCustomerOrderType(c.getId());
+        OldC.setCustomerOrders(c.getCustomerOrders());
+        OldC.setName(c.getName());
+    }
+
+    @Override
+    public void deleteCustomerOrderType(CustomerOrderType c) throws CustomerOrderTypeNotFoundException {
+        em.remove(readCustomerOrderType(c.getId()));
+    }
+    
     @Override
     public List<CustomerOrderType> readAllCustomerOrderType() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return em.createQuery("SELECT c From CustomerOrderType c").getResultList();
     }
-
-    public void persist(Object object) {
-        em.persist(object);
-    }
-
 }
