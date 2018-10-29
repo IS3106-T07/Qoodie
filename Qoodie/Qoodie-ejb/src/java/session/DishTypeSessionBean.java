@@ -6,7 +6,7 @@
 package session;
 
 import entity.DishType;
-import error.DishNotFoundException;
+import error.DishTypeNotFoundException;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -21,18 +21,35 @@ public class DishTypeSessionBean implements DishTypeSessionBeanLocal {
 @PersistenceContext(unitName = "Qoodie-ejbPU")
     private EntityManager em;
     @Override
-    public void createDishType() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    
+    public void createDishType(DishType d) {
+        em.persist(d);
     }
 
     @Override
-    public DishType readDishType() throws DishNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public DishType readDishType(Long cId) throws DishTypeNotFoundException {
+        DishType c = em.find(DishType.class, cId);
+        if ( c == null ) throw new DishTypeNotFoundException("dish type not found");
+        return c;
     }
 
+    @Override
+    public void updateDishType(DishType d) throws DishTypeNotFoundException {
+        DishType oldD = readDishType(d.getId());
+        oldD.setName(d.getName());
+        oldD.setDishes(d.getDishes());
+    }
+
+    @Override
+    public void deleteDishType(DishType d) throws DishTypeNotFoundException {
+       em.remove(readDishType(d.getId()));
+    }
+    
+    
     @Override
     public List<DishType> readAllDishType() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return em.createQuery("SELECT f FROM DishType f").getResultList();
     }
 
+    
 }

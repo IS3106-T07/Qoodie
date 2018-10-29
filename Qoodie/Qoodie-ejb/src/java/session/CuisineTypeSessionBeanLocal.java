@@ -18,5 +18,8 @@ import javax.ejb.Local;
 public interface CuisineTypeSessionBeanLocal {
     public void createCuisineType(CuisineType c);
     public CuisineType readCuisineType(Long cId) throws CuisineTypeNotFoundException;
+    public void updateCuisineType(CuisineType c)throws CuisineTypeNotFoundException;
+    public void deleteCuisineType(CuisineType c)throws CuisineTypeNotFoundException;
+    
     public List<CuisineType> readAllCuisineType(); //for init
 }

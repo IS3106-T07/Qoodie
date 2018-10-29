@@ -6,6 +6,7 @@
 package session;
 
 import entity.CustomerOrderType;
+import error.CustomerOrderTypeNotFoundException;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -16,6 +17,9 @@ import javax.ejb.Local;
 @Local
 public interface CustomerOrderTypeSessionBeanLocal {
     public void createCustomerOrderType(CustomerOrderType c);
-    public CustomerOrderType readCustomerOrderType(Long cId);
+    public CustomerOrderType readCustomerOrderType(Long cId) throws CustomerOrderTypeNotFoundException;
+    public void updateCustomerOrderType(CustomerOrderType c) throws CustomerOrderTypeNotFoundException;
+    public void deleteCustomerOrderType(CustomerOrderType c) throws CustomerOrderTypeNotFoundException;
+    
     public List<CustomerOrderType> readAllCustomerOrderType(); //for init bean 
 }

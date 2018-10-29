@@ -18,5 +18,8 @@ import javax.ejb.Local;
 public interface UserTypeSessionBeanLocal {
     public void createUserType(UserType u);
     public UserType readUserType(Long uId) throws UserTypeNotFoundException;
+    public void updateUserType(UserType u) throws UserTypeNotFoundException; 
+    public void  deleteUserType(UserType u) throws UserTypeNotFoundException;
+    
     public List<UserType> readAllUserType();//for init
 }

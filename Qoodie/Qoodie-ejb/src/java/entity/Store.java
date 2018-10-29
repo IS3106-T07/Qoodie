@@ -29,7 +29,7 @@ public class Store implements Serializable {
     private String password;
     @OneToMany
     private List<Dish> dishes;
-    
+    private CuisineType cuisineType;
     public Long getId() {
         return id;
     }
@@ -93,6 +93,14 @@ public class Store implements Serializable {
 
     public void setDishes(List<Dish> dishes) {
         this.dishes = dishes;
+    }
+
+    public CuisineType getCuisineType() {
+        return cuisineType;
+    }
+
+    public void setCuisineType(CuisineType cuisineType) {
+        this.cuisineType = cuisineType;
     }
     
 }

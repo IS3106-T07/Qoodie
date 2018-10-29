@@ -5,7 +5,12 @@
  */
 package session;
 
+import entity.OrderDish;
+import error.OrderDishNotFoundException;
+import java.util.List;
 import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 /**
  *
@@ -13,7 +18,37 @@ import javax.ejb.Stateless;
  */
 @Stateless
 public class OrderDishSessionBean implements OrderDishSessionBeanLocal {
+    @PersistenceContext(unitName = "Qoodie-ejbPU")
+    private EntityManager em;
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
+    @Override
+    public void createOrderDish(OrderDish d) {
+       em.persist(d);
+    }
+
+    @Override
+    public OrderDish readOrderDish(Long cId) throws OrderDishNotFoundException {
+        OrderDish c = em.find(OrderDish.class, cId);
+        if ( c == null ) throw new OrderDishNotFoundException("order dish not found");
+        return c;
+    }
+
+    @Override
+    public void updateOrderDish(OrderDish d) throws OrderDishNotFoundException {
+        OrderDish oldC = readOrderDish(d.getId());
+        oldC.setAmount(d.getAmount());
+        oldC.setCustomerOrder(d.getCustomerOrder());
+        oldC.setDish(d.getDish());
+    }
+
+    @Override
+    public void deleteOrderDish(OrderDish d) throws OrderDishNotFoundException {
+        em.remove(readOrderDish(d.getId()));
+    }
+
+    @Override
+    public List<OrderDish> readAllOrderDish() {
+        return (em.createQuery("SELECT f FROM OrderDish f").getResultList());
+    }
+
 }
