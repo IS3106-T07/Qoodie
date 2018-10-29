@@ -28,6 +28,14 @@ public class UserType implements Serializable {
     @OneToMany(mappedBy = "userType")
     private List<Customer> customers;
 
+    public List<Customer> getCustomers() {
+        return customers;
+    }
+
+    public void setCustomers(List<Customer> customers) {
+        this.customers = customers;
+    }
+
     public Long getId() {
         return id;
     }

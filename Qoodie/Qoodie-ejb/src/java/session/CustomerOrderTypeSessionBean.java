@@ -7,7 +7,6 @@ package session;
 
 import entity.CustomerOrderType;
 import error.CustomerOrderTypeNotFoundException;
-import java.util.HashSet;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;

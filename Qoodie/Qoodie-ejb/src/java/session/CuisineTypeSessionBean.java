@@ -34,10 +34,6 @@ public class CuisineTypeSessionBean implements CuisineTypeSessionBeanLocal {
         return c;
     }
     
-    @Override
-    public List<CuisineType> readAllCuisineType() {
-        return (em.createQuery("SELECT f FROM CuisineType f").getResultList());
-    }
     
     @Override
     public void updateCuisineType(CuisineType c) throws CuisineTypeNotFoundException {
@@ -48,7 +44,11 @@ public class CuisineTypeSessionBean implements CuisineTypeSessionBeanLocal {
     
     @Override
     public void deleteCuisineType(CuisineType c) throws CuisineTypeNotFoundException {
-        em.remove((readCuisineType(c.getId())));   
+        em.remove((readCuisineType(c.getId())));
     }
     
+    @Override
+    public List<CuisineType> readAllCuisineType() {
+        return (em.createQuery("SELECT f FROM CuisineType f").getResultList());
+    }
 }

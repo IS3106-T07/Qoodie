@@ -6,7 +6,6 @@
 package session;
 
 import entity.DishType;
-import error.DishNotFoundException;
 import error.DishTypeNotFoundException;
 import java.util.List;
 import javax.ejb.Stateless;
@@ -22,6 +21,7 @@ public class DishTypeSessionBean implements DishTypeSessionBeanLocal {
 @PersistenceContext(unitName = "Qoodie-ejbPU")
     private EntityManager em;
     @Override
+    
     public void createDishType(DishType d) {
         em.persist(d);
     }
@@ -50,5 +50,6 @@ public class DishTypeSessionBean implements DishTypeSessionBeanLocal {
     public List<DishType> readAllDishType() {
         return em.createQuery("SELECT f FROM DishType f").getResultList();
     }
+
     
 }
