@@ -153,31 +153,31 @@ public class InitializeSessionBean {
     private void initializeStores() throws StoreNotFoundException, DishNotFoundException {
         List<Store> list = storeSessionBeanLocal.readAllStore();
         List<Dish> dishes = initializeDish();
-        if (list.isEmpty()){
-            Store s = new Store();
-            s.setDishes(dishes);
-            s.setName("Yong Tou Fu");
-            s.setPassword("password");
-            s.setVendorEmail("vendor1@gmail.com");
-            storeSessionBeanLocal.createStore(s);
-        }
-        else
-        {
-            Store s = storeSessionBeanLocal.readStore(Long.valueOf("13"));
-            if (s.getDishes() == null) s.setDishes(new ArrayList<>());
-            if (s.getDishes().isEmpty())
-            {
-                for (Dish d: dishes){
-                    s.getDishes().add(d);
-                    d.setStore(s);
-                    storeSessionBeanLocal.updateStore(s);
-                    dishSessionBeanLocal.updateDish(d);
-                }
-            }
-            
-            
-        }
         
+        Store s = new Store();
+        s.setName("Yong Tou Fu");
+        s.setPassword("password");
+        s.setVendorEmail("vendor1@gmail.com");
+        
+        
+        boolean canInit = true;
+        for (Store store : storeSessionBeanLocal.readAllStore()){
+            if (store.getVendorEmail().equals("vendor1@gmail.com")){
+                s = store;
+                canInit = false;
+            }
+        }
+        if (canInit) storeSessionBeanLocal.createStore(s);
+        
+        if (s.getDishes() == null) s.setDishes(new ArrayList<>());
+        if (s.getDishes().isEmpty()){
+            for (Dish d: dishes){
+                s.getDishes().add(d);
+                d.setStore(s);                
+                storeSessionBeanLocal.updateStore(s);
+                dishSessionBeanLocal.createDish(d);
+            }
+        }
     }
     
     private List<Dish> initializeDish() {
@@ -188,7 +188,6 @@ public class InitializeSessionBean {
         d.setIsAvailable(true);
         d.setName("Bak Choy");
         d.setPrice(.50);
-        dishSessionBeanLocal.createDish(d);
         dishes.add(d);
         
         Dish d2 = new Dish();
@@ -197,7 +196,6 @@ public class InitializeSessionBean {
         d2.setName("Ham");
         d2.setPrice(1.0);
         dishes.add(d2);
-        dishSessionBeanLocal.createDish(d2);
         
         Dish d3 = new Dish();
         d3.setDescription("crispy and green");
@@ -205,7 +203,6 @@ public class InitializeSessionBean {
         d3.setName("Seaweed");
         d3.setPrice(.4);
         dishes.add(d3);
-        dishSessionBeanLocal.createDish(d3);
         
         Dish d4 = new Dish();
         d4.setDescription("cheesy and white");
@@ -213,15 +210,15 @@ public class InitializeSessionBean {
         d4.setName("Cheese Tofu");
         d4.setPrice(.4);
         dishes.add(d4);
-        dishSessionBeanLocal.createDish(d4);
         
         Dish d5 = new Dish();
         d5.setDescription("the best noodles in the world");
         d5.setIsAvailable(true);
         d5.setName("Maggie noodles");
         d5.setPrice(.4);
+        d5.setDishType(null);
         dishes.add(d5);
-        dishSessionBeanLocal.createDish(d5);
+        
         
         return dishes;
     }
