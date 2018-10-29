@@ -29,6 +29,8 @@ public class CustomerOrder implements Serializable {
     private Long id;
     @Temporal(TemporalType.TIME)
     private Date created;
+    @Temporal(TemporalType.TIME)
+    private Date lastUpdate;
     private Boolean isAccepted;
     @ManyToOne
     private Customer customer;
@@ -43,6 +45,14 @@ public class CustomerOrder implements Serializable {
     
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 
     public Customer getCustomer() {
