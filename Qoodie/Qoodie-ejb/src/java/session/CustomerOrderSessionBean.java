@@ -57,7 +57,6 @@ public class CustomerOrderSessionBean implements CustomerOrderSessionBeanLocal {
         c.setLastUpdate(new Date());
         c.setCustomer(newC.getCustomer());
         c.setCustomerOrderType(newC.getCustomerOrderType());
-        c.setIsAccepted(newC.getIsAccepted());
         c.setOrderDishes(newC.getOrderDishes());
     }
     
