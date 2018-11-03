@@ -13,4 +13,10 @@
             30
         </session-timeout>
     </session-config>
+    <ejb-local-ref>
+        <ejb-ref-name>CustomerSessionBeanLocal</ejb-ref-name>
+        <ejb-ref-type>Session</ejb-ref-type>
+        <local>session.CustomerSessionBeanLocal</local>
+        <ejb-link>Qoodie-ejb.jar#CustomerSessionBean</ejb-link>
+    </ejb-local-ref>
 </web-app>
