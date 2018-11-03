@@ -5,6 +5,7 @@
 */
 package session;
 
+import entity.Canteen;
 import entity.CuisineType;
 import entity.Customer;
 import entity.CustomerOrderType;
@@ -12,6 +13,7 @@ import entity.Dish;
 import entity.DishType;
 import entity.Store;
 import entity.UserType;
+import error.CanteenNotFoundException;
 import error.CuisineTypeNotFoundException;
 import error.CustomerOrderTypeNotFoundException;
 import error.DishNotFoundException;
@@ -41,7 +43,7 @@ public class InitializeSessionBean {
     private static final String[] dishTypeArr = {"HALAL", "VEGETARIAN"};
     private static final String[] userTypeArr = {"ADMIN", "USER"};
     private static final String[] cuisineTypesArr = {"KOREAN", "JAPANESE", "CHINESE", "WESTERN", "DRINK", "FRUIT", "INDIAN", "MALAY"};
-    private static final String[] customerOrderTypesArr = {"IN BASKET", "PAID"};
+    private static final String[] customerOrderTypesArr = {"IN BASKET", "PAID", "DELIVERED"};
     
     
     @EJB
@@ -58,6 +60,8 @@ public class InitializeSessionBean {
             DishTypeSessionBeanLocal dishTypeSessionBeanLocal;
     @EJB
             CustomerOrderTypeSessionBeanLocal customerOrderTypeSessionBeanLocal;
+    @EJB
+            CanteenSessionBeanLocal canteenSessionBeanLocal;
     
     
     @PostConstruct
@@ -84,7 +88,7 @@ public class InitializeSessionBean {
             initializeUsers();
             initializeStores();
             
-        } catch (StoreNotFoundException | DishNotFoundException ex) {
+        } catch (StoreNotFoundException | DishNotFoundException | CanteenNotFoundException ex) {
             Logger.getLogger(InitializeSessionBean.class.getName()).log(Level.SEVERE, null, ex);
         }
         
@@ -150,10 +154,13 @@ public class InitializeSessionBean {
         }
     }
     
-    private void initializeStores() throws StoreNotFoundException, DishNotFoundException {
+    private void initializeStores() throws StoreNotFoundException, DishNotFoundException, CanteenNotFoundException {
         List<Store> list = storeSessionBeanLocal.readAllStore();
         List<Dish> dishes = initializeDish();
-        
+        Canteen c1 = new Canteen();
+        c1.setName("finefood");
+        c1.setStores(new ArrayList<>());
+        canteenSessionBeanLocal.createCanteen(c1);
         Store s = new Store();
         s.setName("Yong Tou Fu");
         s.setPassword("password");
@@ -167,13 +174,18 @@ public class InitializeSessionBean {
                 canInit = false;
             }
         }
+        c1.getStores().add(s);
+        s.setCanteen(c1);
+        canteenSessionBeanLocal.updateCanteen(c1);
+        
         if (canInit) storeSessionBeanLocal.createStore(s);
         
-        if (s.getDishes() == null) s.setDishes(new ArrayList<>());
+        if (s.getDishes() == null)
+            s.setDishes(new ArrayList<>());
         if (s.getDishes().isEmpty()){
             for (Dish d: dishes){
                 s.getDishes().add(d);
-                d.setStore(s);                
+                d.setStore(s);
                 storeSessionBeanLocal.updateStore(s);
                 dishSessionBeanLocal.createDish(d);
             }
