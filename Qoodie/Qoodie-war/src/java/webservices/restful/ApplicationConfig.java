@@ -6,15 +6,16 @@
 package webservices.restful;
 
 
-import java.util.Set;
-
 import javax.ws.rs.core.Application;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
  * @author alex_zy
  */
-@javax.ws.rs.ApplicationPath("")
+@javax.ws.rs.ApplicationPath("Resource")
 public class ApplicationConfig extends Application {
     
     
@@ -25,6 +26,14 @@ public class ApplicationConfig extends Application {
         return resources;
     }
     
+    @Override
+    public Map<String, Object> getProperties() {
+        Map<String, Object> props = new HashMap<>();
+        props.put("jersey.config.server.provider.classnames",
+                "org.glassfish.jersey.media.multipart.MultiPartFeature");
+        return props;
+    }
+    
     /**
      * Do not modify addRestResourceClasses() method.
      * It is automatically populated with
@@ -32,8 +41,10 @@ public class ApplicationConfig extends Application {
      * If required, comment out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
+        resources.add(webservices.restful.CORSFilter.class);
         resources.add(webservices.restful.CustomersResource.class);
         resources.add(webservices.restful.StoresResources.class);
+        resources.add(webservices.restful.VendorResource.class);
     }
     
     

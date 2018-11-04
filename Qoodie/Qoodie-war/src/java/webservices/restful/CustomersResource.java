@@ -11,22 +11,16 @@ import error.CustomerNotFoundException;
 import error.CustomerOrderAlreadyPaidException;
 import error.CustomerOrderNotFoundException;
 import error.CustomerOrderTypeNotFoundException;
-import java.util.List;
+import session.CustomerOrderSessionBeanLocal;
+import session.CustomerSessionBeanLocal;
+
 import javax.ejb.EJB;
 import javax.json.Json;
 import javax.json.JsonObject;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.Produces;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PUT;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import session.CustomerOrderSessionBeanLocal;
-import session.CustomerSessionBeanLocal;
+import java.util.List;
 
 /**
  * REST Web Service
@@ -36,9 +30,9 @@ import session.CustomerSessionBeanLocal;
 @Path("customers")
 public class CustomersResource {
     @EJB
-            CustomerSessionBeanLocal customerSessionBeanLocal;
+    CustomerSessionBeanLocal customerSessionBeanLocal;
     @EJB
-            CustomerOrderSessionBeanLocal customerOrderSessionBeanLocal;
+    CustomerOrderSessionBeanLocal customerOrderSessionBeanLocal;
     
     //1 admin get all customers
     @GET
