@@ -1,17 +1,20 @@
 /*
-* To change this license header, choose License Headers in Project Properties.
-* To change this template file, choose Tools | Templates
-* and open the template in the editor.
-*/
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package webservices.restful;
 
 import entity.Customer;
 import entity.CustomerOrder;
+import entity.OrderDish;
 import error.CustomerNotFoundException;
 import error.CustomerOrderAlreadyPaidException;
 import error.CustomerOrderNotFoundException;
 import error.CustomerOrderTypeNotFoundException;
+import java.util.Base64;
 import java.util.List;
+import java.util.StringTokenizer;
 import javax.ejb.EJB;
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -20,6 +23,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PUT;
@@ -83,16 +87,16 @@ public class CustomersResource {
         customerSessionBeanLocal.createCustomer(c);
         return Response.status(204).build();
     }
-    
+
     //3 get a customer
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Response getCustomer(@PathParam("id") Long cId)  {
+    public Response getCustomer(@PathParam("id") Long cId) {
         try {
             Customer c = customerSessionBeanLocal.readCustomer(cId);
             return Response.status(200).entity(
-                    c
+                    flattenUser(c)
             ).type(MediaType.APPLICATION_JSON).build();
         } catch (CustomerNotFoundException ex) {
             JsonObject exception = Json.createObjectBuilder()
@@ -102,7 +106,7 @@ public class CustomersResource {
                     .type(MediaType.APPLICATION_JSON).build();
         }
     }
-    
+
     //4
     @PUT
     @Path("/{id}")
@@ -121,7 +125,7 @@ public class CustomersResource {
                     .type(MediaType.APPLICATION_JSON).build();
         }
     }
-    
+
     //5
     @DELETE
     @Path("/{id}")
@@ -138,14 +142,13 @@ public class CustomersResource {
             return Response.status(404).entity(exception).build();
         }
     }
-    
-    
+
     //6 create a cusotomer Order (type: in baseket)for a customer
     @POST
     @Path("/{customer_id}/orders")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addCustomerOrder(@PathParam("customer_id") Long cId, CustomerOrder o)  {
+    public Response addCustomerOrder(@PathParam("customer_id") Long cId, CustomerOrder o) {
         try {
             customerOrderSessionBeanLocal.createCustomerOrder(o);
             Customer customer = customerSessionBeanLocal.readCustomer(cId);
@@ -155,14 +158,14 @@ public class CustomersResource {
             //update both entities
             customerOrderSessionBeanLocal.updateCustomerOrder(o);
             customerSessionBeanLocal.updateCustoemr(customer);
-            return Response.status(200).entity(customer).build();
-        } catch (CustomerNotFoundException ex){
+            return Response.status(200).entity(flattenUser(customer)).build();
+        } catch (CustomerNotFoundException ex) {
             JsonObject exception = Json.createObjectBuilder()
                     .add("error", "Customer not found")
                     .build();
             return Response.status(404).entity(exception).build();
         } catch (CustomerOrderTypeNotFoundException ex) {
-             JsonObject exception = Json.createObjectBuilder()
+            JsonObject exception = Json.createObjectBuilder()
                     .add("error", "Customer  order type not found")
                     .build();
             return Response.status(404).entity(exception).build();
@@ -173,7 +176,7 @@ public class CustomersResource {
             return Response.status(404).entity(exception).build();
         }
     }
-    
+
     //7 update tthe cusotmer order type to : PAID
     @GET
     @Path("/{order_id}/pay")
@@ -181,7 +184,7 @@ public class CustomersResource {
         try {
             CustomerOrder o = customerOrderSessionBeanLocal.readCustomerOrder(oId);
             customerOrderSessionBeanLocal.payCustomerOrder(o);
-            return Response.status(200).entity(o).build();
+            return Response.status(200).entity(flattenCustomerOrder(o)).build();
         } catch (CustomerOrderNotFoundException ex) {
             JsonObject exception = Json.createObjectBuilder()
                     .add("message", "order not found")
@@ -202,5 +205,45 @@ public class CustomersResource {
                     .type(MediaType.APPLICATION_JSON).build();
         }
     }
-    
+
+    @GET
+    @Path("/login")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response login(@HeaderParam("Authorization") String authHeader) {
+        if (authHeader == null || authHeader.length() == 0) { // CASE: no auth token in the header
+            JsonObject exception = Json.createObjectBuilder()
+                    .add("message", "authentication informaiton not found")
+                    .build();
+            return Response.status(404).entity(exception)
+                    .type(MediaType.APPLICATION_JSON).build();
+        } else {
+            String authToken = authHeader.replaceFirst(AUTHORIZATION_HEADER_PREFIX, "");
+            String decodedString = new String(Base64.getDecoder().decode(authToken));
+            StringTokenizer tokenizer = new StringTokenizer(decodedString, ":");
+            String email = tokenizer.nextToken();
+            String password = tokenizer.nextToken();
+
+            List<Customer> customerList = customerSessionBeanLocal.readCustomerByEmail(email);
+            if (customerList.isEmpty()) //CASE: wrong email or password
+            {
+                JsonObject exception = Json.createObjectBuilder()
+                        .add("message", "user not found")
+                        .build();
+                return Response.status(404).entity(exception)
+                        .type(MediaType.APPLICATION_JSON).build();
+            } else {
+                Customer customer = customerList.get(0);
+                if (customer.getPassword().equals(password)) {
+                    return Response.status(200).entity(flattenUser(customer))
+                            .type(MediaType.APPLICATION_JSON).build();
+                }else{
+                    JsonObject exception = Json.createObjectBuilder()
+                        .add("message", "wrong passord")
+                        .build();
+                return Response.status(401).entity(exception)
+                        .type(MediaType.APPLICATION_JSON).build();
+                }
+            }
+        }
+    }
 }
