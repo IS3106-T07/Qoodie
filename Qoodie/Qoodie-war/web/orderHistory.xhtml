@@ -1,25 +1,31 @@
-<?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-                template="./newTemplate.xhtml"
-                xmlns:p="http://xmlns.jcp.org/jsf/passthrough"
-                xmlns:h="http://xmlns.jcp.org/jsf/html">
-                    
-
-    <ui:define name="top">
-        top
-    </ui:define>
-
-    <ui:define name="content">
-          <p:commandButton value="test"/>
-               <h:panelGrid columns="2" cellpadding="5">  
-          <p:outputLabel for="inline" value="Select Date" />  
-          <p:calendar id="inline" value="#{viewOrders.date}" mode="popup" />  
-                </h:panelGrid>  
-    </ui:define>
-
-    <ui:define name="bottom">
-        bottom
-    </ui:define>
-
-</ui:composition>
+<?xml version='1.0' encoding='UTF-8' ?>  
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
+<html xmlns="http://www.w3.org/1999/xhtml"  
+      xmlns:h="http://xmlns.jcp.org/jsf/html"  
+      xmlns:p="http://primefaces.org/ui">  
+    <h:head>  
+        <title>Calendar Example</title>  
+    </h:head>  
+    <h:body>  
+        <div class="container">
+            <div class="row">
+                <div class='col-sm-6'>
+                    <div class="form-group">
+                        <div class='input-group date' id='datetimepicker1'>
+                            <input type='text' class="form-control" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <script type="text/javascript">
+                    $(function () {
+                        $('#datetimepicker1').datetimepicker();
+                    });
+                </script>
+            </div>
+        </div>
+    </h:body>  
+</html>  

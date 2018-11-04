@@ -10,8 +10,16 @@
     </ui:define>
     
     <ui:define name="content">
-        <h:outputLabel class="title">  Incoming Orders </h:outputLabel> <button onclick="showTable()"> <i class="arrow down" ></i></button>
+        
+        
+        <h:outputLabel class="title">  Incoming Orders </h:outputLabel> <button class="btn btn-warning" type="button" data-toggle="collapse" 
+                                                                                data-target="#collapseExample1" aria-expanded="false" 
+                                                                                aria-controls="collapseExample"> <i class="arrow down" ></i></button>
+        
+       
         <div class="table">
+             <div class="collapse" id="collapseExample1">
+            <div class="card card-body">
             <h:dataTable value="#{viewOrders.incoming}" var="item" >
                 <h:column> 
                     #{item.dish.name}
@@ -21,11 +29,19 @@
                 </h:column>
             </h:dataTable>
         </div>
+        </div>
+        </div>
 
 
         <br></br> <br></br>
-        <h:outputLabel class="title">  Completed Orders </h:outputLabel>   <button onclick="showTable()"> <i class="arrow down" ></i></button>
+        <h:outputLabel class="title">  Completed Orders </h:outputLabel>  <button class="btn btn-warning" type="button" data-toggle="collapse" 
+                                                                                  data-target="#collapseExample2" aria-expanded="false" 
+                                                                                  aria-controls="collapseExample"> <i class="arrow down" ></i></button>
+           
         <div class="table">
+            
+        <div class="collapse" id="collapseExample2">
+            <div class="card card-body">
             <h:dataTable value="#{viewOrders.completed}" var="item" >
                 <h:column> 
                     #{item.dish.name}
@@ -34,7 +50,11 @@
                     #{item.amount}
                 </h:column>
             </h:dataTable>
+         </div>
         </div>
+        </div>
+        <h:button outcome="orderHistory.xhtml"></h:button>
+
     </ui:define>
 
 
@@ -42,18 +62,7 @@
     <ui:define name="bottom">
 
     </ui:define>
-    <h:outputScript library="js" name="common.js" >
-        function showTable()
-        {
-        var x = var x = document.getElementById("incoming");
-        if (x.style.display === "none") {
-        x.style.display = "block";
-        } else {
-        x.style.display = "none";
-        }
-        }
-
-    </h:outputScript>
+  
 
 </ui:composition>
 
