@@ -47,12 +47,13 @@ public class Flattener {
         if (s.getCuisineType() != null) {
             s.getCuisineType().setStores(null);
         }
-        
-
         for (Dish d : s.getDishes()) {
-            d = flatten(d);
+            if(d.getDishType() != null)
+                d.getDishType().setDishes(null);
             d.setStore(null);
+            d.setOrderDishes(null);
         }
+       
 
         return s;
     }
