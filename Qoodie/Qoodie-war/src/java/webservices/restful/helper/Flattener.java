@@ -43,7 +43,8 @@ public class Flattener {
     }
 
     public static Store flatten(Store s) {
-        s.getCanteen().setStores(null);
+        if (s.getCanteen() != null)
+            s.getCanteen().setStores(null);
         if (s.getCuisineType() != null) {
             s.getCuisineType().setStores(null);
         }
