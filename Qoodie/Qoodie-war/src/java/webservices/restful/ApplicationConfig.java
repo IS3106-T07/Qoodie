@@ -32,6 +32,7 @@ public class ApplicationConfig extends Application {
      * If required, comment out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
+        resources.add(webservices.restful.CanteensResources.class);
         resources.add(webservices.restful.CustomersResource.class);
         resources.add(webservices.restful.StoresResources.class);
     }
