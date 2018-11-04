@@ -93,4 +93,11 @@ public class StoresResources {
         }
     }
 
+    //13 create store
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response createStore(Store s) {
+        storeSessionBeanLocal.createStore(s);
+        return Response.status(204).build();
+    }
 }
