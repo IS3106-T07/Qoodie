@@ -42,13 +42,11 @@ public class StoresResources {
     //8  get all stores
     @GET
     @Produces("application/json")
-    public List<Store> getAllCustomers() {
+    public List<Store> getAllStores() {
         System.out.println("***** reading all stores *****");
         List<Store> stores = storeSessionBeanLocal.readAllStore();
         for (Store s : stores) {
-            for (Dish d : s.getDishes()) {
-                d.setStore(null);
-            }
+            s = Flattener.flatten(s);
         }
         return stores;
     }
