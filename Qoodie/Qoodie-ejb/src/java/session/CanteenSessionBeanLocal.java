@@ -23,5 +23,6 @@ public interface CanteenSessionBeanLocal {
     public void deleteCanteen(Long cId) throws CanteenNotFoundException;
     
     public List<Canteen> readAllCanteen();
+    public List<Canteen> readCanteenByName(String name);
     
 }

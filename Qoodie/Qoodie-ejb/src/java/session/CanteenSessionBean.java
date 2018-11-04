@@ -54,4 +54,9 @@ public class CanteenSessionBean implements CanteenSessionBeanLocal {
         return em.createQuery("SELECT c FROM Canteen c").getResultList();
     }
 
+    @Override
+    public List<Canteen> readCanteenByName(String name) {
+        return em.createQuery("SELECT c FROM Canteen c WHERE c.name = \"" + name+"\"").getResultList();   
+    }
+
 }
