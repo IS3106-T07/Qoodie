@@ -12,5 +12,5 @@
 /Qoodie/Qoodie-war/build/
 /Qoodie/Qoodie-war/dist/
 
-.iml
-./idea
+*.iml
+.idea
