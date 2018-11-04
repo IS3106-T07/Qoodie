@@ -11,3 +11,6 @@
 /Qoodie/Qoodie-ejb/dist/
 /Qoodie/Qoodie-war/build/
 /Qoodie/Qoodie-war/dist/
+
+.iml
+./idea
