@@ -21,7 +21,7 @@ public interface OrderDishSessionBeanLocal {
     public OrderDish readOrderDish(Long cId) throws OrderDishNotFoundException;
     public void updateOrderDish(OrderDish d) throws OrderDishNotFoundException;
     public void deleteOrderDish(OrderDish d) throws OrderDishNotFoundException;
-    
+      public List<OrderDish> getStoreOrder(Long storeId);
     public List<OrderDish> readAllOrderDish();//for init
     
 }

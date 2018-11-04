@@ -14,7 +14,7 @@ import javax.ws.rs.core.Application;
  *
  * @author alex_zy
  */
-@javax.ws.rs.ApplicationPath("")
+@javax.ws.rs.ApplicationPath("Resources")
 public class ApplicationConfig extends Application {
     
     

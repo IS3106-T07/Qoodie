@@ -6,6 +6,7 @@
 package session;
 
 import entity.CustomerOrder;
+import entity.OrderDish;
 import error.CustomerOrderAlreadyPaidException;
 import error.CustomerOrderNotFoundException;
 import error.CustomerOrderTypeNotFoundException;
@@ -23,7 +24,7 @@ public interface CustomerOrderSessionBeanLocal {
     public CustomerOrder readCustomerOrder(Long cId) throws CustomerOrderNotFoundException;
     public void updateCustomerOrder(CustomerOrder newC) throws CustomerOrderNotFoundException;
     public void deleteCustomerOrder(CustomerOrder c) throws CustomerOrderNotFoundException, CustomerOrderTypeNotFoundException;
-    
+
     public List<CustomerOrder> readAllCustomerOrder();
     
     public void payCustomerOrder(CustomerOrder c)

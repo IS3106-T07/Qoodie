@@ -6,6 +6,7 @@
 package session;
 
 import entity.CustomerOrder;
+import entity.OrderDish;
 import entity.CustomerOrderType;
 import error.CustomerOrderAlreadyPaidException;
 import error.CustomerOrderNotFoundException;
@@ -16,6 +17,7 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -50,6 +52,8 @@ public class CustomerOrderSessionBean implements CustomerOrderSessionBeanLocal {
         if (c==null) throw new CustomerOrderNotFoundException("customer order not found");
         return c;
     }
+    
+    
     
     @Override
     public void updateCustomerOrder(CustomerOrder newC) throws CustomerOrderNotFoundException {
