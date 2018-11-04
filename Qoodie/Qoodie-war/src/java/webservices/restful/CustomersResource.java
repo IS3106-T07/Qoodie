@@ -31,6 +31,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import session.CustomerOrderSessionBeanLocal;
 import session.CustomerSessionBeanLocal;
+import webservices.restful.helper.Flattener;
 
 /**
  * REST Web Service
@@ -45,28 +46,8 @@ public class CustomersResource {
     @EJB
     CustomerOrderSessionBeanLocal customerOrderSessionBeanLocal;
 
-    private static final String AUTHORIZATION_HEADER = "Authorization"; //the key we will be looking for in the header
     private static final String AUTHORIZATION_HEADER_PREFIX = "Basic ";
-
-    private Customer flattenUser(Customer c){
-        c.getUserType().setCustomers(null);
-        List<CustomerOrder> orders = c.getCustomerOrders();
-        for (CustomerOrder co : orders){
-            co.setCustomer(null);
-        }
-        return c;
-    }
-    
-    private CustomerOrder flattenCustomerOrder(CustomerOrder co){
-        co.getCustomer().setCustomerOrders(null);
-        co.getCustomerOrderType().setCustomerOrders(null);
-        List<OrderDish> orderDishes =  co.getOrderDishes();
-        for (OrderDish od : orderDishes ){
-            od.setCustomerOrder(null);
-        }
-        return co;
-    }
-
+  
     //1 admin get all customers
     @GET
     @Produces("application/json")
@@ -74,7 +55,7 @@ public class CustomersResource {
         System.out.println("***************reading all customers************");
         List<Customer> customers = customerSessionBeanLocal.readAllCustomer();
         for (Customer c: customers){
-            c=flattenUser(c);
+            c=Flattener.flatten(c);
         }
         return customers;
     }
@@ -96,7 +77,7 @@ public class CustomersResource {
         try {
             Customer c = customerSessionBeanLocal.readCustomer(cId);
             return Response.status(200).entity(
-                    flattenUser(c)
+                    Flattener.flatten(c)
             ).type(MediaType.APPLICATION_JSON).build();
         } catch (CustomerNotFoundException ex) {
             JsonObject exception = Json.createObjectBuilder()
@@ -158,7 +139,7 @@ public class CustomersResource {
             //update both entities
             customerOrderSessionBeanLocal.updateCustomerOrder(o);
             customerSessionBeanLocal.updateCustoemr(customer);
-            return Response.status(200).entity(flattenUser(customer)).build();
+            return Response.status(200).entity(Flattener.flatten(customer)).build();
         } catch (CustomerNotFoundException ex) {
             JsonObject exception = Json.createObjectBuilder()
                     .add("error", "Customer not found")
@@ -184,7 +165,7 @@ public class CustomersResource {
         try {
             CustomerOrder o = customerOrderSessionBeanLocal.readCustomerOrder(oId);
             customerOrderSessionBeanLocal.payCustomerOrder(o);
-            return Response.status(200).entity(flattenCustomerOrder(o)).build();
+            return Response.status(200).entity(Flattener.flatten(o)).build();
         } catch (CustomerOrderNotFoundException ex) {
             JsonObject exception = Json.createObjectBuilder()
                     .add("message", "order not found")
@@ -206,7 +187,7 @@ public class CustomersResource {
         }
     }
 
-    @GET
+    @POST
     @Path("/login")
     @Produces(MediaType.APPLICATION_JSON)
     public Response login(@HeaderParam("Authorization") String authHeader) {
@@ -234,7 +215,7 @@ public class CustomersResource {
             } else {
                 Customer customer = customerList.get(0);
                 if (customer.getPassword().equals(password)) {
-                    return Response.status(200).entity(flattenUser(customer))
+                    return Response.status(200).entity(Flattener.flatten(customer))
                             .type(MediaType.APPLICATION_JSON).build();
                 }else{
                     JsonObject exception = Json.createObjectBuilder()
