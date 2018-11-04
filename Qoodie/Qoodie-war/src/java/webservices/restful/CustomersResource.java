@@ -35,19 +35,46 @@ import session.CustomerSessionBeanLocal;
  */
 @Path("customers")
 public class CustomersResource {
+
     @EJB
-            CustomerSessionBeanLocal customerSessionBeanLocal;
+    CustomerSessionBeanLocal customerSessionBeanLocal;
     @EJB
-            CustomerOrderSessionBeanLocal customerOrderSessionBeanLocal;
+    CustomerOrderSessionBeanLocal customerOrderSessionBeanLocal;
+
+    private static final String AUTHORIZATION_HEADER = "Authorization"; //the key we will be looking for in the header
+    private static final String AUTHORIZATION_HEADER_PREFIX = "Basic ";
+
+    private Customer flattenUser(Customer c){
+        c.getUserType().setCustomers(null);
+        List<CustomerOrder> orders = c.getCustomerOrders();
+        for (CustomerOrder co : orders){
+            co.setCustomer(null);
+        }
+        return c;
+    }
     
+    private CustomerOrder flattenCustomerOrder(CustomerOrder co){
+        co.getCustomer().setCustomerOrders(null);
+        co.getCustomerOrderType().setCustomerOrders(null);
+        List<OrderDish> orderDishes =  co.getOrderDishes();
+        for (OrderDish od : orderDishes ){
+            od.setCustomerOrder(null);
+        }
+        return co;
+    }
+
     //1 admin get all customers
     @GET
     @Produces("application/json")
-    public List<Customer> getAllCustomers(){
+    public List<Customer> getAllCustomers() {
         System.out.println("***************reading all customers************");
-        return customerSessionBeanLocal.readAllCustomer();
+        List<Customer> customers = customerSessionBeanLocal.readAllCustomer();
+        for (Customer c: customers){
+            c=flattenUser(c);
+        }
+        return customers;
     }
-    
+
     //2 Create a new Customer by using the request body data.
     //Should return empty payload if the creation is successful (204)
     @POST
