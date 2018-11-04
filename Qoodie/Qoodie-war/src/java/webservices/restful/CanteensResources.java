@@ -21,6 +21,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import session.CanteenSessionBeanLocal;
+import webservices.restful.helper.Flattener;
 
 /**
  * REST Web Service
@@ -33,27 +34,13 @@ public class CanteensResources {
     @EJB
     CanteenSessionBeanLocal canteenSessionBeanLocal;
 
-    private Canteen flattenCanteen(Canteen c) {
-        for (Store s : c.getStores()) {
-            s.setCanteen(null);
-            for (Dish d : s.getDishes()) {
-                d.setStore(null);
-            }
-        }
-        return c;
-    }
-
-    private Store flattenStore(Store s) {
-
-    }
-
     //10
     @GET
     @Produces("application/json")
     public List<Canteen> getAllCanteens() {
         List<Canteen> canteens = canteenSessionBeanLocal.readAllCanteen();
         for (Canteen c : canteens) {
-            c = flattenCanteen(c);
+            c = Flattener.flatten(c);
         }
         return canteens;
     }
@@ -65,7 +52,7 @@ public class CanteensResources {
         try {
             Canteen c = canteenSessionBeanLocal.readCanteen(cId);
             return Response.status(200).entity(
-                    flattenCanteen(c)
+                    Flattener.flatten(c)
             ).type(MediaType.APPLICATION_JSON).build();
         } catch (CanteenNotFoundException ex) {
             JsonObject exception = Json.createObjectBuilder()

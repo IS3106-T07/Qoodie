@@ -19,6 +19,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import session.StoreSessionBeanLocal;
+import webservices.restful.helper.Flattener;
 
 /**
  * REST Web Service
@@ -31,14 +32,6 @@ public class StoresResources {
     @EJB
             StoreSessionBeanLocal storeSessionBeanLocal;
     
-    private Store flattenStore(Store s) {
-        s.getCanteen().setStores(null);
-        s.getCuisineType().setStores(null);
-        for (Dish d: s.getDishes())
-            d.setStore(null);
-        
-        return s;
-    }
     
     //8  get all stores
     @GET
@@ -60,11 +53,8 @@ public class StoresResources {
     public Response getAllDishes(@PathParam("id") Long sId){
         try {
             Store s = storeSessionBeanLocal.readStore(sId);
-            //flatten the dish objects
-            for (Dish d :s.getDishes()){
-                d.setStore(null);
-            }
-            return Response.status(200).entity(s).type(MediaType.APPLICATION_JSON).build();
+            
+            return Response.status(200).entity(Flattener.flatten(s)).type(MediaType.APPLICATION_JSON).build();
         } catch (StoreNotFoundException ex){
             JsonObject exception = Json.createObjectBuilder()
                     .add("message", "store not found")
