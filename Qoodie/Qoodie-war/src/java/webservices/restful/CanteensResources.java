@@ -33,17 +33,27 @@ public class CanteensResources {
     @EJB
     CanteenSessionBeanLocal canteenSessionBeanLocal;
 
-    //10 
+    private Canteen flattenCanteen(Canteen c) {
+        for (Store s : c.getStores()) {
+            s.setCanteen(null);
+            for (Dish d : s.getDishes()) {
+                d.setStore(null);
+            }
+        }
+        return c;
+    }
+
+    private Store flattenStore(Store s) {
+
+    }
+
+    //10
     @GET
     @Produces("application/json")
     public List<Canteen> getAllCanteens() {
         List<Canteen> canteens = canteenSessionBeanLocal.readAllCanteen();
         for (Canteen c : canteens) {
-            for (Store s : c.getStores()) {
-                s.setCanteen(null);
-                for(Dish d: s.getDishes())
-                    d.setStore(null);
-            }
+            c = flattenCanteen(c);
         }
         return canteens;
     }
@@ -54,15 +64,8 @@ public class CanteensResources {
     public Response getCanteen(@PathParam("id") Long cId) {
         try {
             Canteen c = canteenSessionBeanLocal.readCanteen(cId);
-            for (Store s : c.getStores()) {
-                s.setCanteen(null);
-                s.setPassword(null);
-                s.setVendorEmail(null);
-                for(Dish d: s.getDishes())
-                    d.setStore(null);
-            }
             return Response.status(200).entity(
-                    c
+                    flattenCanteen(c)
             ).type(MediaType.APPLICATION_JSON).build();
         } catch (CanteenNotFoundException ex) {
             JsonObject exception = Json.createObjectBuilder()

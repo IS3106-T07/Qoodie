@@ -36,6 +36,15 @@ public class StoresResources {
     @EJB
             StoreSessionBeanLocal storeSessionBeanLocal;
     
+    private Store flattenStore(Store s) {
+        s.getCanteen().setStores(null);
+        s.getCuisineType().setStores(null);
+        for (Dish d: s.getDishes())
+            d.setStore(null);
+        
+        return s;
+    }
+    
     //8  get all stores
     @GET
     @Produces("application/json")
