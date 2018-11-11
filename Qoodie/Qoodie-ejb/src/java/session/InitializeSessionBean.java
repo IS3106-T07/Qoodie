@@ -173,7 +173,7 @@ public class InitializeSessionBean {
 
         boolean canInit = true;
         for (Store store : storeSessionBeanLocal.readAllStore()) {
-            if (store.getVendorEmail().equals("vendor1@gmail.com")) {
+            if (store.getVendorEmail() != null && store.getVendorEmail().equals("vendor1@gmail.com")) {
                 s = store;
                 canInit = false;
             }
