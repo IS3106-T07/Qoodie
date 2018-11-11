@@ -5,7 +5,7 @@
     color: black;
     padding: 5px;
     margin: 0px 0px 10px 0px;
-     text-align: center;
+    text-align: center;
 }
 i{
     border: solid black;
@@ -28,7 +28,7 @@ i{
     background-color: #FFFFFF;
     padding: 5px;
     margin: 10px 0px 0px 0px;
-     text-align: center;
+    text-align: center;
 }
 
 #left {
@@ -48,10 +48,23 @@ i{
     font-size: 25px;
 }
 
+.ui-datalist {
+    width:300px;
+    margin-bottom: 20px;
+}
+
+.ui-datalist-item {
+    padding:3px;
+}
+
+.paginated .ui-datalist-data {
+    padding-left: 20px;
+}
+
 .table{
-      position: relative;
-      left: 700px;
-    
+    position: relative;
+    left: 700px;
+
 }
 
 .center_content {
@@ -74,15 +87,15 @@ i{
 }
 
 #top a:link, #top a:visited {
-  color: white;
-  font-weight : bold;
-  text-decoration: none;
+    color: white;
+    font-weight : bold;
+    text-decoration: none;
 }
 
 #top a:link:hover, #top a:visited:hover  {
-  color: black;
-  font-weight : bold;
-  text-decoration : underline;
+    color: black;
+    font-weight : bold;
+    text-decoration : underline;
 }
 
 
