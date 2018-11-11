@@ -54,7 +54,7 @@ public class Flattener {
             d.setStore(null);
             d.setOrderDishes(null);
         }
-       
+        
 
         return s;
     }
