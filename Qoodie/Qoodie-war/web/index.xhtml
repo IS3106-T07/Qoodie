@@ -4,7 +4,7 @@
                 template="./newTemplate.xhtml"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns="http://www.w3.org/1999/xhtml"
->
+                >
 
     <ui:define name="top">
 
@@ -15,50 +15,50 @@
 
         <h:outputLabel class="title">  Incoming Orders </h:outputLabel> <button class="btn btn-warning btn-sm" type="button" data-toggle="collapse" 
                                                                                 data-target="#collapseExample1" aria-expanded="false" aria-controls="collapseExample1">
-                                                                         <i class="arrow down"></i>  </button>
+            <i class="arrow down"></i>  </button>
         <div class="collapse" id="collapseExample1">
-             <div class="card card-body">
-        <div class="table">
-            <h:dataTable value="#{viewOrders.incomingOrders}" var="item" >
-                <h:column> 
-                    #{item.dish.name} &nbsp;
-                </h:column>
-                <h:column >
-                    #{item.amount}
-                </h:column>
-            </h:dataTable>
-        </div>
-        </div>
+            <div class="card card-body">
+                <div class="table">
+                    <h:dataTable value="#{viewOrders.incomingOrders}" var="item" >
+                        <h:column> 
+                            #{item.dish.name} &nbsp;
+                        </h:column>
+                        <h:column >
+                            #{item.amount}
+                        </h:column>
+                    </h:dataTable>
+                </div>
+            </div>
         </div>
 
         <br></br> <br></br>
         <h:outputLabel class="title"> Completed orders </h:outputLabel> <button class="btn btn-warning btn-sm" type="button" data-toggle="collapse" 
                                                                                 data-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample2">
-                                                                         <i class="arrow down"></i>  </button>
-         <div class="collapse" id="collapseExample2">
-             <div class="card card-body">
-        <div class="table">
+            <i class="arrow down"></i>  </button>
+        <div class="collapse" id="collapseExample2">
+            <div class="card card-body">
+                <div class="table">
 
-            <h:dataTable value="#{viewOrders.completed}" var="item" >
-                <h:column> 
-                    #{item.dish.name} &nbsp;
-                </h:column>
-                <h:column >
-                    #{item.amount}
-                </h:column>
-            </h:dataTable>
-        </div>
-             </div>
+                    <h:dataTable value="#{viewOrders.completed}" var="item" >
+                        <h:column> 
+                            #{item.dish.name} &nbsp;
+                        </h:column>
+                        <h:column >
+                            #{item.amount}
+                        </h:column>
+                    </h:dataTable>
+                </div>
+            </div>
         </div>
         <br/>
-<!--        <h:button outcome="orderHistory.xhtml"></h:button>-->
+        
 
     </ui:define>
 
 
 
     <ui:define name="bottom">
-        
+                <h:button outcome="orderHistory.xhtml"></h:button>
     </ui:define>
 
 
