@@ -143,7 +143,8 @@ public class CustomerOrderSessionBean implements CustomerOrderSessionBeanLocal {
         storeOrders.addAll(hs);
         //filter for dates
         for (CustomerOrder customerOrder : storeOrders) {
-            if (customerOrder.getCreated().after(start) && customerOrder.getCreated().before(end)) {
+            if (customerOrder.getCreated().after(start) || customerOrder.getCreated().equals(start)
+                    && (customerOrder.getCreated().before(end)) || customerOrder.getCreated().equals(start)) {
                 revenue += customerOrder.getPrice();
             }
         }
