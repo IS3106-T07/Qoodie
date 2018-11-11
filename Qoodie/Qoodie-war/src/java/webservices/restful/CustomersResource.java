@@ -31,6 +31,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import session.CustomerOrderSessionBeanLocal;
 import session.CustomerSessionBeanLocal;
+import webservices.restful.helper.Base64AuthenticationHeaderHelper;
 import webservices.restful.helper.Flattener;
 
 /**
@@ -47,15 +48,15 @@ public class CustomersResource {
     CustomerOrderSessionBeanLocal customerOrderSessionBeanLocal;
 
     private static final String AUTHORIZATION_HEADER_PREFIX = "Basic ";
-  
+
     //1 admin get all customers
     @GET
     @Produces("application/json")
     public List<Customer> getAllCustomers() {
         System.out.println("***************reading all customers************");
         List<Customer> customers = customerSessionBeanLocal.readAllCustomer();
-        for (Customer c: customers){
-            c=Flattener.flatten(c);
+        for (Customer c : customers) {
+            c = Flattener.flatten(c);
         }
         return customers;
     }
@@ -88,30 +89,62 @@ public class CustomersResource {
         }
     }
 
-    //4
+    //4 edit a customer . 
     @PUT
-    @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response editCustomer(@PathParam("id") Long cId, Customer c) {
-        c.setId(cId);
-        try {
-            customerSessionBeanLocal.updateCustoemr(c);
-            return Response.status(204).build();
-        } catch (CustomerNotFoundException e) {
+    public Response editCustomer(@HeaderParam("Authorization") String authHeader, Customer newC) {
+
+        String email = Base64AuthenticationHeaderHelper.
+                getUsernameOrErrorResponseString(authHeader);
+        if (email.toLowerCase().contains("not found")) {
             JsonObject exception = Json.createObjectBuilder()
-                    .add("error", "Not found")
+                    .add("message", "authentication informaiton not found")
                     .build();
             return Response.status(404).entity(exception)
                     .type(MediaType.APPLICATION_JSON).build();
         }
+        String password = Base64AuthenticationHeaderHelper.
+                getPasswordOrErrorResponseString(authHeader);
+        
+        List<Customer> customerList = customerSessionBeanLocal.readCustomerByEmail(email);
+        if (customerList.isEmpty()) //CASE: email not in database
+        {
+            JsonObject exception = Json.createObjectBuilder()
+                    .add("message", "user not found")
+                    .build();
+            return Response.status(404).entity(exception)
+                    .type(MediaType.APPLICATION_JSON).build();
+        }
+        
+        Customer c = customerList.get(0);
+        newC.setId(c.getId());
+        if (c.getPassword().equals(password)) { //correct credantial. can edit
+            try {
+                customerSessionBeanLocal.updateCustoemr(newC);
+                return Response.status(204).build();
+            } catch (CustomerNotFoundException e) {
+                JsonObject exception = Json.createObjectBuilder()
+                        .add("error", "Not found")
+                        .build();
+                return Response.status(404).entity(exception)
+                        .type(MediaType.APPLICATION_JSON).build();
+            }
+        } else {
+            JsonObject exception = Json.createObjectBuilder()
+                    .add("message", "wrong passord")
+                    .build();
+            return Response.status(401).entity(exception)
+                    .type(MediaType.APPLICATION_JSON).build();
+        }
     }
 
-    //5
+    // 5 
     @DELETE
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteCustomer(@PathParam("id") Long cId) {
+    public Response deleteCustomer(@PathParam("id") Long cId
+    ) {
         try {
             Customer c = customerSessionBeanLocal.readCustomer(cId);
             customerSessionBeanLocal.deleteCustomer(c);
@@ -129,7 +162,8 @@ public class CustomersResource {
     @Path("/{customer_id}/orders")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addCustomerOrder(@PathParam("customer_id") Long cId, CustomerOrder o) {
+    public Response addCustomerOrder(@PathParam("customer_id") Long cId, CustomerOrder o
+    ) {
         try {
             customerOrderSessionBeanLocal.createCustomerOrder(o);
             Customer customer = customerSessionBeanLocal.readCustomer(cId);
@@ -161,7 +195,8 @@ public class CustomersResource {
     //7 update tthe cusotmer order type to : PAID
     @GET
     @Path("/{order_id}/pay")
-    public Response payOrder(@PathParam("order_id") Long oId) {
+    public Response payOrder(@PathParam("order_id") Long oId
+    ) {
         try {
             CustomerOrder o = customerOrderSessionBeanLocal.readCustomerOrder(oId);
             customerOrderSessionBeanLocal.payCustomerOrder(o);
@@ -187,10 +222,12 @@ public class CustomersResource {
         }
     }
 
+    //12
     @POST
     @Path("/login")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response login(@HeaderParam("Authorization") String authHeader) {
+    public Response login(@HeaderParam("Authorization") String authHeader
+    ) {
         if (authHeader == null || authHeader.length() == 0) { // CASE: no auth token in the header
             JsonObject exception = Json.createObjectBuilder()
                     .add("message", "authentication informaiton not found")
@@ -217,12 +254,12 @@ public class CustomersResource {
                 if (customer.getPassword().equals(password)) {
                     return Response.status(200).entity(Flattener.flatten(customer))
                             .type(MediaType.APPLICATION_JSON).build();
-                }else{
+                } else {
                     JsonObject exception = Json.createObjectBuilder()
-                        .add("message", "wrong passord")
-                        .build();
-                return Response.status(401).entity(exception)
-                        .type(MediaType.APPLICATION_JSON).build();
+                            .add("message", "wrong passord")
+                            .build();
+                    return Response.status(401).entity(exception)
+                            .type(MediaType.APPLICATION_JSON).build();
                 }
             }
         }
