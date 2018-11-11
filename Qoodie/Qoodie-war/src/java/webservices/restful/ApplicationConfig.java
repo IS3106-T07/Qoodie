@@ -36,7 +36,7 @@ public class ApplicationConfig extends Application {
         resources.add(webservices.restful.CORSFilter.class);
         resources.add(webservices.restful.CanteensResources.class);
         resources.add(webservices.restful.CustomersResource.class);
-        resources.add(webservices.restful.OrderItemResource.class);
+        resources.add(webservices.restful.OrderDishesResource.class);
         resources.add(webservices.restful.StoresResources.class);
     }
     
