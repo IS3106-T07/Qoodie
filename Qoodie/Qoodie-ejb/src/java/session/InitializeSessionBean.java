@@ -42,7 +42,6 @@ import javax.ejb.Startup;
 @Singleton
 @LocalBean
 public class InitializeSessionBean {
-   
 
     //type objects are determined by these string arrays
     private static final String[] dishTypeArr = {"HALAL", "VEGETARIAN"};
@@ -64,11 +63,11 @@ public class InitializeSessionBean {
     @EJB
     DishTypeSessionBeanLocal dishTypeSessionBeanLocal;
     @EJB
-            CustomerOrderTypeSessionBeanLocal customerOrderTypeSessionBeanLocal;
-     @EJB
-         CustomerOrderSessionBeanLocal customerOrderSessionBean;
+    CustomerOrderTypeSessionBeanLocal customerOrderTypeSessionBeanLocal;
     @EJB
-          OrderDishSessionBeanLocal orderDishSessionBean;
+    CustomerOrderSessionBeanLocal customerOrderSessionBean;
+    @EJB
+    OrderDishSessionBeanLocal orderDishSessionBean;
 
     @EJB
     CanteenSessionBeanLocal canteenSessionBeanLocal;
@@ -99,10 +98,10 @@ public class InitializeSessionBean {
 
             initializeUsers();
             initializeStores();
-            
+
             initializeOrderDish();
             initializeCustomerOrder();
-            
+
         } catch (StoreNotFoundException | DishNotFoundException | CanteenNotFoundException ex) {
 
             Logger.getLogger(InitializeSessionBean.class.getName()).log(Level.SEVERE, null, ex);
@@ -119,73 +118,71 @@ public class InitializeSessionBean {
         }
     }
 
-    public void initializeOrderDish()
-    {
-        try{
-        OrderDish o1 = new OrderDish();
-        o1.setAmount(4);
-        
-        o1.setDish(dishSessionBeanLocal.readDish(21L));
-        orderDishSessionBean.createOrderDish(o1);
-        
-        OrderDish o2 = new OrderDish();
-        o2.setAmount(5);
+    public void initializeOrderDish() {
+        try {
+            OrderDish o1 = new OrderDish();
+            o1.setAmount(4);
+
+            o1.setDish(dishSessionBeanLocal.readDish(21L));
+            orderDishSessionBean.createOrderDish(o1);
+
+            OrderDish o2 = new OrderDish();
+            o2.setAmount(5);
 // 
-        o2.setDish(dishSessionBeanLocal.readDish(20L));
-        orderDishSessionBean.createOrderDish(o2);
-        
-        OrderDish o3 = new OrderDish();
-        o3.setAmount(1);
+            o2.setDish(dishSessionBeanLocal.readDish(20L));
+            orderDishSessionBean.createOrderDish(o2);
+
+            OrderDish o3 = new OrderDish();
+            o3.setAmount(1);
 //       
-        o3.setDish(dishSessionBeanLocal.readDish(22L));
-        orderDishSessionBean.createOrderDish(o3);
-        
-        OrderDish o4 = new OrderDish();
-        o4.setAmount(6);
+            o3.setDish(dishSessionBeanLocal.readDish(22L));
+            orderDishSessionBean.createOrderDish(o3);
+
+            OrderDish o4 = new OrderDish();
+            o4.setAmount(6);
 //    
-        o4.setDish(dishSessionBeanLocal.readDish(19L));
-        orderDishSessionBean.createOrderDish(o4);
-        
-        }
-        catch(Exception e){}
-    }
-    public void initializeCustomerOrder() 
-    {
-        try{
-         CustomerOrder c = new CustomerOrder();
-        c.setCustomer(customerSessionBeanLocal.readCustomer(16L));
-        c.setCustomerOrderType(customerOrderTypeSessionBeanLocal.readCustomerOrderType(15L));
-        c.setIsAccepted(Boolean.TRUE);
-        ArrayList<OrderDish> od = new ArrayList<OrderDish>();
-        od.add(orderDishSessionBean.readOrderDish(24L));
-        od.add(orderDishSessionBean.readOrderDish(26L));
-        c.setOrderDishes(od);
-        c.setCreated(new Date());
-        c.setLastUpdate(new Date());
-        customerOrderSessionBean.createCustomerOrder(c);
-        
-        
-        c = new CustomerOrder();
-        c.setCustomer(customerSessionBeanLocal.readCustomer(17L));
-        c.setCustomerOrderType(customerOrderTypeSessionBeanLocal.readCustomerOrderType(14L));
-        c.setIsAccepted(Boolean.TRUE);
-         od = new ArrayList<OrderDish>();
-        od.add(orderDishSessionBean.readOrderDish(24L));
-        od.add(orderDishSessionBean.readOrderDish(25L));
-        c.setOrderDishes(od);
-        customerOrderSessionBean.createCustomerOrder(c);
-        
-        List<OrderDish> o1 = orderDishSessionBean.readAllOrderDish();
-        o1.get(0).setCustomerOrder(customerOrderSessionBean.readCustomerOrder(28L));
-        o1.get(1).setCustomerOrder(customerOrderSessionBean.readCustomerOrder(29L));
-        o1.get(2).setCustomerOrder(customerOrderSessionBean.readCustomerOrder(28L));
-        o1.get(3).setCustomerOrder(customerOrderSessionBean.readCustomerOrder(29L));
-        }
-        catch(Exception e){
-            System.out.println("ERROR " + e.toString());
+            o4.setDish(dishSessionBeanLocal.readDish(19L));
+            orderDishSessionBean.createOrderDish(o4);
+
+        } catch (Exception e) {
         }
     }
 
+
+    public void initializeCustomerOrder() {
+        try {
+            CustomerOrder c = new CustomerOrder();
+            c.setCustomer(customerSessionBeanLocal.readCustomer(16L));
+            c.setCustomerOrderType(customerOrderTypeSessionBeanLocal.readCustomerOrderType(15L));
+
+            ArrayList<OrderDish> od = new ArrayList<OrderDish>();
+            od.add(orderDishSessionBean.readOrderDish(24L));
+            od.add(orderDishSessionBean.readOrderDish(26L));
+            c.setOrderDishes(od);
+            c.setCreated(new Date());
+            c.setLastUpdate(new Date());
+            customerOrderSessionBean.createCustomerOrder(c);
+
+            c = new CustomerOrder();
+            c.setCustomer(customerSessionBeanLocal.readCustomer(17L));
+            c.setCustomerOrderType(customerOrderTypeSessionBeanLocal.readCustomerOrderType(14L));
+
+            od = new ArrayList<OrderDish>();
+            od.add(orderDishSessionBean.readOrderDish(24L));
+            od.add(orderDishSessionBean.readOrderDish(25L));
+            c.setOrderDishes(od);
+            customerOrderSessionBean.createCustomerOrder(c);
+
+            List<OrderDish> o1 = orderDishSessionBean.readAllOrderDish();
+            o1.get(0).setCustomerOrder(customerOrderSessionBean.readCustomerOrder(28L));
+            o1.get(1).setCustomerOrder(customerOrderSessionBean.readCustomerOrder(29L));
+            o1.get(2).setCustomerOrder(customerOrderSessionBean.readCustomerOrder(28L));
+            o1.get(3).setCustomerOrder(customerOrderSessionBean.readCustomerOrder(29L));
+        } catch (Exception e) {
+
+            System.out.println("ERROR " + e.toString());
+        }
+    }
 
     public void initializeUserType() {
         for (int i = 0; i < userTypeArr.length; i++) {
@@ -234,6 +231,29 @@ public class InitializeSessionBean {
             c.setAddress("31 Sungei Kadut Loop S 729509, Singapore");
             c.setPassword("password");
             customerSessionBeanLocal.createCustomer(c);
+        }
+    }
+
+    private void initializeCanteen() {
+        List<Canteen> canteens = new ArrayList<Canteen>();
+        
+        Canteen fineFood = new Canteen();
+        fineFood.setName("Findfood");
+        fineFood.setStores(new ArrayList<>());
+        canteens.add(fineFood);
+        Canteen foodClick = new Canteen();
+        foodClick.setName("FoodClick");
+        foodClick.setStores(new ArrayList<>());
+        canteens.add(foodClick);
+        Canteen deck = new Canteen();
+        deck.setName("Deck");
+        deck.setStores(new ArrayList<>());
+        canteens.add(deck);
+        for (Canteen c : canteens){
+            if (canteenSessionBeanLocal.readCanteenByName(c.getName()).isEmpty()){
+                canteenSessionBeanLocal.createCanteen(c);
+                System.out.printf("***** canteen (name = %s) created\n", c.getName());   
+            }
         }
     }
 
