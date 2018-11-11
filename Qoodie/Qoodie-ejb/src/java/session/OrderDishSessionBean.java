@@ -11,6 +11,7 @@ import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -27,12 +28,20 @@ public class OrderDishSessionBean implements OrderDishSessionBeanLocal {
     }
 
     @Override
+    public List<OrderDish> getStoreOrder(Long id)
+      {
+          Query q = em.createQuery("Select o From OrderDish o WHERE o.dish.store.id=:id ");
+          q.setParameter("id",id);
+          return q.getResultList();
+      }
+    @Override
     public OrderDish readOrderDish(Long cId) throws OrderDishNotFoundException {
         OrderDish c = em.find(OrderDish.class, cId);
         if ( c == null ) throw new OrderDishNotFoundException("order dish not found");
         return c;
     }
-
+    
+  
     @Override
     public void updateOrderDish(OrderDish d) throws OrderDishNotFoundException {
         OrderDish oldC = readOrderDish(d.getId());
@@ -49,6 +58,10 @@ public class OrderDishSessionBean implements OrderDishSessionBeanLocal {
     @Override
     public List<OrderDish> readAllOrderDish() {
         return (em.createQuery("SELECT f FROM OrderDish f").getResultList());
+    }
+
+    public void persist(Object object) {
+        em.persist(object);
     }
 
 }

@@ -6,6 +6,7 @@
 package session;
 
 import entity.CustomerOrder;
+import entity.OrderDish;
 import entity.CustomerOrderType;
 import entity.Dish;
 import entity.OrderDish;
@@ -23,6 +24,7 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -41,6 +43,17 @@ public class CustomerOrderSessionBean implements CustomerOrderSessionBeanLocal {
     @Override
     public void createCustomerOrder(CustomerOrder c) throws CustomerOrderTypeNotFoundException {
         c.setCreated(new Date());
+
+//        List<CustomerOrderType> types = customerOrderTypeSessionBeanLocal.readAllCustomerOrderType();
+//        for (CustomerOrderType type : types){
+//            if (type.getName().contains("IN BASKET")){
+//                c.setCustomerOrderType(type);
+//                type.getCustomerOrders().add(c);
+//                customerOrderTypeSessionBeanLocal.updateCustomerOrderType(type);
+//                break;
+//            }
+//        }
+
         Double price = 0.0;
         for (OrderDish od : c.getOrderDishes()) {
             price += od.getAmount() * od.getDish().getPrice();
