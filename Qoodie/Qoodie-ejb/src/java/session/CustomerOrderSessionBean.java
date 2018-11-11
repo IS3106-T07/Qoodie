@@ -7,6 +7,7 @@ package session;
 
 import entity.CustomerOrder;
 import entity.CustomerOrderType;
+import entity.OrderDish;
 import error.CustomerOrderAlreadyPaidException;
 import error.CustomerOrderNotFoundException;
 import error.CustomerOrderTypeNotFoundException;
@@ -31,6 +32,11 @@ public class CustomerOrderSessionBean implements CustomerOrderSessionBeanLocal {
     @Override
     public void createCustomerOrder(CustomerOrder c) throws CustomerOrderTypeNotFoundException {
         c.setCreated(new Date());
+        Double price = 0.0;
+        for (OrderDish od: c.getOrderDishes()){
+            price += od.getAmount()*od.getDish().getPrice();
+        }
+        c.setPrice(price);
         List<CustomerOrderType> types = customerOrderTypeSessionBeanLocal.readAllCustomerOrderType();
         for (CustomerOrderType type : types){
             if (type.getName().contains("IN BASKET")){
@@ -55,6 +61,7 @@ public class CustomerOrderSessionBean implements CustomerOrderSessionBeanLocal {
     public void updateCustomerOrder(CustomerOrder newC) throws CustomerOrderNotFoundException {
         CustomerOrder c = readCustomerOrder(newC.getId());
         c.setLastUpdate(new Date());
+        c.setPrice(newC.getPrice());
         c.setCustomer(newC.getCustomer());
         c.setCustomerOrderType(newC.getCustomerOrderType());
         c.setOrderDishes(newC.getOrderDishes());
