@@ -40,18 +40,18 @@ public class CustomerSessionBean implements CustomerSessionBeanLocal {
         return c;
     }
     
-    @Override
+    @Override //partial customer with null field are possible as a result of PUT
     public void updateCustoemr(Customer c) throws CustomerNotFoundException {
         Customer oldC = readCustomer(c.getId());
-        oldC.setAddress(c.getAddress());
-        oldC.setCreated(c.getCreated());
-        oldC.setCustomerOrders(c.getCustomerOrders());
-        oldC.setEmail(c.getEmail());
-        oldC.setIsActive(c.getIsActive());
-        oldC.setName(c.getName());
-        oldC.setPassword(c.getPassword());
-        oldC.setPhone(c.getPhone());
-        oldC.setUserType(c.getUserType());
+        
+        oldC.setAddress(c.getAddress()!=null?c.getAddress():oldC.getAddress());
+        oldC.setCustomerOrders(c.getCustomerOrders()!=null?c.getCustomerOrders():oldC.getCustomerOrders());
+        oldC.setEmail(c.getEmail()!=null?c.getEmail():oldC.getEmail());
+        oldC.setIsActive(c.getIsActive()!=null?c.getIsActive():oldC.getIsActive());
+        oldC.setName(c.getName()!=null?c.getName():oldC.getName());
+        oldC.setPassword(c.getPassword()!=null?c.getPassword():oldC.getPassword());
+        oldC.setPhone(c.getPhone()!=null?c.getPhone():oldC.getPhone());
+        oldC.setUserType(c.getUserType()!=null?c.getUserType():oldC.getUserType());
     }
     
     @Override
