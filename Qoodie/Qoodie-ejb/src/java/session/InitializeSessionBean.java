@@ -155,7 +155,7 @@ public class InitializeSessionBean {
          CustomerOrder c = new CustomerOrder();
         c.setCustomer(customerSessionBeanLocal.readCustomer(16L));
         c.setCustomerOrderType(customerOrderTypeSessionBeanLocal.readCustomerOrderType(15L));
-        c.setIsAccepted(Boolean.TRUE);
+        
         ArrayList<OrderDish> od = new ArrayList<OrderDish>();
         od.add(orderDishSessionBean.readOrderDish(24L));
         od.add(orderDishSessionBean.readOrderDish(26L));
@@ -168,7 +168,7 @@ public class InitializeSessionBean {
         c = new CustomerOrder();
         c.setCustomer(customerSessionBeanLocal.readCustomer(17L));
         c.setCustomerOrderType(customerOrderTypeSessionBeanLocal.readCustomerOrderType(14L));
-        c.setIsAccepted(Boolean.TRUE);
+        
          od = new ArrayList<OrderDish>();
         od.add(orderDishSessionBean.readOrderDish(24L));
         od.add(orderDishSessionBean.readOrderDish(25L));
