@@ -27,7 +27,6 @@ public class StoreSessionBean implements StoreSessionBeanLocal {
     @Override
     public void createStore(Store s) {
         em.persist(s);
-        em.flush();
     }
 
     @Override

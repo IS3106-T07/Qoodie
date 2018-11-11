@@ -97,6 +97,7 @@ public class InitializeSessionBean {
             }
 
             initializeUsers();
+            initializeCanteen();
             initializeStores();
 
             initializeOrderDish();
@@ -147,7 +148,6 @@ public class InitializeSessionBean {
         } catch (Exception e) {
         }
     }
-
 
     public void initializeCustomerOrder() {
         try {
@@ -236,9 +236,9 @@ public class InitializeSessionBean {
 
     private void initializeCanteen() {
         List<Canteen> canteens = new ArrayList<Canteen>();
-        
+
         Canteen fineFood = new Canteen();
-        fineFood.setName("Findfood");
+        fineFood.setName("FineFood");
         fineFood.setStores(new ArrayList<>());
         canteens.add(fineFood);
         Canteen foodClick = new Canteen();
@@ -249,64 +249,185 @@ public class InitializeSessionBean {
         deck.setName("Deck");
         deck.setStores(new ArrayList<>());
         canteens.add(deck);
-        for (Canteen c : canteens){
-            if (canteenSessionBeanLocal.readCanteenByName(c.getName()).isEmpty()){
+        for (Canteen c : canteens) {
+            if (canteenSessionBeanLocal.readCanteenByName(c.getName()).isEmpty()) {
                 canteenSessionBeanLocal.createCanteen(c);
-                System.out.printf("***** canteen (name = %s) created\n", c.getName());   
+                System.out.printf("***** canteen (name = %s) created\n", c.getName());
             }
         }
     }
 
     private void initializeStores() throws StoreNotFoundException, DishNotFoundException, CanteenNotFoundException {
-        List<Store> list = storeSessionBeanLocal.readAllStore();
-        List<Dish> dishes = initializeDish();
-        Canteen c1 = new Canteen();
-        if (canteenSessionBeanLocal.readCanteenByName("finefood").isEmpty()) {
-            c1.setName("finefood");
-            c1.setStores(new ArrayList<>());
-            canteenSessionBeanLocal.createCanteen(c1);
-        } else {
-            c1 = canteenSessionBeanLocal.readCanteenByName("finefood").get(0);
-        }
 
-        Store s = new Store();
-        s.setName("Yong Tou Fu");
-        s.setPassword("password");
-        s.setVendorEmail("vendor1@gmail.com");
-
-        boolean canInit = true;
-        for (Store store : storeSessionBeanLocal.readAllStore()) {
-            if (store.getVendorEmail() != null && store.getVendorEmail().equals("vendor1@gmail.com")) {
-                s = store;
-                canInit = false;
+        if (!canteenSessionBeanLocal.readCanteenByName("FineFood").isEmpty()) {
+            Canteen fineFood = canteenSessionBeanLocal.readCanteenByName("FineFood").get(0);
+            if (storeSessionBeanLocal.readStoreByEmail("vendor1@gmail.com").isEmpty()) {
+                Store s = new Store();
+                s.setName("Yong Tou Fu");
+                s.setPassword("password");
+                s.setVendorEmail("vendor1@gmail.com");
+                s.setCanteen(fineFood);
+                //create a dummy dish in the store 
+                List<Dish> dishes = new ArrayList<>();
+                Dish dish = new Dish("Bak Choy", 2 * Math.random(), "high fiber and full of vitamin");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                s.setDishes(dishes);
+                
+                storeSessionBeanLocal.createStore(s);
+                fineFood.getStores().add(s);
             }
+            if (storeSessionBeanLocal.readStoreByEmail("finefoodgc@gmail.com").isEmpty()) {
+                Store s = new Store();
+                s.setName("Gong Cha");
+                s.setPassword("password");
+                s.setVendorEmail("finefoodgc@gmail.com");
+                s.setCanteen(fineFood);
+                 //create a dummy dish in the store 
+                List<Dish> dishes = new ArrayList<>();
+                Dish dish = new Dish("Earl Grey Milk Team", 4 * Math.random(), "you can choose your own sugar level");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                s.setDishes(dishes);
+                
+                storeSessionBeanLocal.createStore(s);
+                fineFood.getStores().add(s);
+            }
+            if (storeSessionBeanLocal.readStoreByEmail("finefoodk@gmail.com").isEmpty()) {
+                Store s = new Store();
+                s.setName("Korean and Japanese");
+                s.setPassword("password");
+                s.setVendorEmail("finefoodk@gmail.com");
+                s.setCanteen(fineFood);
+                  //create a dummy dish in the store 
+                List<Dish> dishes = new ArrayList<>();
+                Dish dish = new Dish("Chicken Kimchi Soup", 7 * Math.random(), "it also has bak choya and vermecilli");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                s.setDishes(dishes);
+                storeSessionBeanLocal.createStore(s);
+                fineFood.getStores().add(s);
+            }
+            canteenSessionBeanLocal.updateCanteen(fineFood);
         }
-        c1.getStores().add(s);
-        s.setCanteen(c1);
-        canteenSessionBeanLocal.updateCanteen(c1);
+        //initialize stores for deck
+        if (!canteenSessionBeanLocal.readCanteenByName("Deck").isEmpty()) {
+            Canteen deck = canteenSessionBeanLocal.readCanteenByName("Deck").get(0);
+            if (storeSessionBeanLocal.readStoreByEmail("deckytf@gmail.com").isEmpty()) {
+                Store s = new Store();
+                s.setName("Yong Tou Fu");
+                s.setPassword("password");
+                s.setVendorEmail("deckytf@gmail.com");
+                s.setCanteen(deck);
+                  //create a dummy dish in the store 
+                List<Dish> dishes = new ArrayList<>();
+                Dish dish = new Dish("Fish Ball", 2 * Math.random(), "Made of real fish!");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                s.setDishes(dishes);
+                
+                storeSessionBeanLocal.createStore(s);
+                deck.getStores().add(s);
+            }
+            if (storeSessionBeanLocal.readStoreByEmail("deckcp@gmail.com").isEmpty()) {
+                Store s = new Store();
+                s.setName("Claypot");
+                s.setPassword("password");
+                s.setVendorEmail("deckcp@gmail.com");
+                s.setCanteen(deck); 
+                //create a dummy dish in the store 
+                List<Dish> dishes = new ArrayList<>();
+                Dish dish = new Dish("braised chicken with potato", 7 * Math.random(), "traditional chinese style");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                s.setDishes(dishes);
+                
+                deck.getStores().add(s);
+                storeSessionBeanLocal.createStore(s);
+            }
+            if (storeSessionBeanLocal.readStoreByEmail("deckcr@gmail.com").isEmpty()) {
+                Store s = new Store();
+                s.setName("Chicken Rice");
+                s.setPassword("password");
+                s.setVendorEmail("deckcr@gmail.com");
+                s.setCanteen(deck);
+                 //create a dummy dish in the store 
+                List<Dish> dishes = new ArrayList<>();
+                Dish dish = new Dish("Roasted Chicken Rice", 5 * Math.random(), "popular item");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                s.setDishes(dishes);
+                
+                deck.getStores().add(s);
+                storeSessionBeanLocal.createStore(s);
+            }
+            canteenSessionBeanLocal.updateCanteen(deck);
+        }
+        //initialise the stores for FoodClick
+        if (!canteenSessionBeanLocal.readCanteenByName("FoodClick").isEmpty()) {
+            Canteen foodClick = canteenSessionBeanLocal.readCanteenByName("FoodClick").get(0);
+            if (storeSessionBeanLocal.readStoreByEmail("foodclickbm@gmail.com").isEmpty()) {
+                Store s = new Store();
+                s.setName("Ban Mian");
+                s.setPassword("password");
+                s.setVendorEmail("foodclickbm@gmail.com");
+                s.setCanteen(foodClick);
+                 //create a dummy dish in the store 
+                List<Dish> dishes = new ArrayList<>();
+                Dish dish = new Dish("Fish and Mushroom Bam Mian", 6 * Math.random(), "you can choose in soup or dried");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                s.setDishes(dishes);
+                
+                storeSessionBeanLocal.createStore(s);
+                foodClick.getStores().add(s);
+            }
 
-        if (canInit) {
-            storeSessionBeanLocal.createStore(s);
-        }
-
-        if (s.getDishes() == null) {
-            s.setDishes(new ArrayList<>());
-        }
-        if (s.getDishes().isEmpty()) {
-            for (Dish d : dishes) {
-                s.getDishes().add(d);
-                d.setStore(s);
+            if (storeSessionBeanLocal.readStoreByEmail("foodclickfj@gmail.com").isEmpty()) {
+                Store s = new Store();
+                s.setName("Fruit and Juice");
+                s.setPassword("password");
+                s.setVendorEmail("foodclickfj@gmail.com");
+                s.setCanteen(foodClick);
+                storeSessionBeanLocal.createStore(s);
+                foodClick.getStores().add(s);
                 storeSessionBeanLocal.updateStore(s);
-                dishSessionBeanLocal.createDish(d);
             }
+
+            if (storeSessionBeanLocal.readStoreByEmail("foodclicka@gmail.com").isEmpty()) {
+                Store s = new Store();
+                s.setName("Astons");
+                s.setPassword("password");
+                s.setVendorEmail("foodclicka@gmail.com");
+                s.setCanteen(foodClick);
+                //create a dummy dish in the store 
+                List<Dish> dishes = new ArrayList<>();
+                Dish dish = new Dish("fiery chicken", 20 * Math.random(), "actually very spicy");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                s.setDishes(dishes);
+                
+                storeSessionBeanLocal.createStore(s);
+                foodClick.getStores().add(s);
+            }
+            canteenSessionBeanLocal.updateCanteen(foodClick);
         }
+
     }
 
     private List<Dish> initializeDish() {
         List<Dish> dishes = new ArrayList<>();
 
         Dish d = new Dish();
-        d.setDescription("leafy green ");
+        d.setDescription("leafy green");
         d.setIsAvailable(true);
         d.setName("Bak Choy");
         d.setPrice(.50);
