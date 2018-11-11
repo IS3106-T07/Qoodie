@@ -5,8 +5,10 @@
  */
 package session;
 
+import entity.Customer;
 import entity.Store;
 import error.StoreNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -52,6 +54,18 @@ public class StoreSessionBean implements StoreSessionBeanLocal {
     @Override
     public List<Store> readAllStore() {
         return em.createQuery("SELECT s From Store s").getResultList();
+    }
+
+    @Override
+    public List<Store> readStoreByEmail(String email) {
+         List<Store> returned =  new ArrayList<>();
+        List<Store> all = readAllStore();
+        for (Store c : all){
+            if (c.getVendorEmail().toLowerCase().equals(email.toLowerCase())){
+                returned.add(c);
+            }
+        }
+        return returned;
     }
     
 }
