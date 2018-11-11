@@ -31,6 +31,7 @@ public class CustomerOrder implements Serializable {
     private Date created;
     @Temporal(TemporalType.TIME)
     private Date lastUpdate;
+    double price;
     @ManyToOne
     private Customer customer;
     @OneToMany
@@ -44,6 +45,14 @@ public class CustomerOrder implements Serializable {
     
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public Date getLastUpdate() {

@@ -9,6 +9,8 @@ import entity.CustomerOrder;
 import error.CustomerOrderAlreadyPaidException;
 import error.CustomerOrderNotFoundException;
 import error.CustomerOrderTypeNotFoundException;
+import error.StoreNotFoundException;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -26,6 +28,7 @@ public interface CustomerOrderSessionBeanLocal {
     
     public List<CustomerOrder> readAllCustomerOrder();
     
+    public double calculateRevenue(Long storeId, Date start, Date end) throws StoreNotFoundException;
     public void payCustomerOrder(CustomerOrder c)
             throws CustomerOrderNotFoundException,
             CustomerOrderTypeNotFoundException,
