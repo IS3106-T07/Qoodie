@@ -33,4 +33,5 @@ public interface CustomerOrderSessionBeanLocal {
             throws CustomerOrderNotFoundException,
             CustomerOrderTypeNotFoundException,
             CustomerOrderAlreadyPaidException;
+    public List<CustomerOrder> getStoreCustomerOrder(Long storeId, Date start, Date end) throws StoreNotFoundException;
 }

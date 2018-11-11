@@ -151,4 +151,40 @@ public class CustomerOrderSessionBean implements CustomerOrderSessionBeanLocal {
 
         return revenue;
     }
+    
+    @Override
+    public List<CustomerOrder> getStoreCustomerOrder(Long storeId, Date start, Date end) throws StoreNotFoundException {
+        
+        Store s = storeSessionBeanLocal.readStore(storeId);
+        List<Dish> storeDishes = s.getDishes();
+        List<CustomerOrder> storeOrders = new ArrayList<>();
+        List<CustomerOrder> filteredStoreOrders = new ArrayList<>();
+        
+        if (storeDishes == null) {
+            return filteredStoreOrders;
+        }
+        //get all customer orders belonged to this store
+        for (Dish dish : storeDishes) {
+            if (dish.getOrderDishes() != null) {
+                List<OrderDish> orderdishes = dish.getOrderDishes();
+                for (OrderDish orderDish : orderdishes) {
+                    storeOrders.add(orderDish.getCustomerOrder());
+                }
+            }
+        }
+        //remove duplicates
+        Set<CustomerOrder> hs = new HashSet<>();
+        hs.addAll(storeOrders);
+        storeOrders.clear();
+        storeOrders.addAll(hs);
+        //filter for dates
+        for (CustomerOrder customerOrder : storeOrders) {
+            if (customerOrder.getCreated().after(start) || customerOrder.getCreated().equals(start)
+                    && (customerOrder.getCreated().before(end)) || customerOrder.getCreated().equals(start)) {
+                filteredStoreOrders.add(customerOrder);
+            }
+        }
+
+        return filteredStoreOrders;
+    }
 }
