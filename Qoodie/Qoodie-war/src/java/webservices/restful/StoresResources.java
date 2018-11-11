@@ -8,13 +8,10 @@ package webservices.restful;
 import entity.Customer;
 import entity.Dish;
 import entity.Store;
-import error.CustomerNotFoundException;
 import error.StoreNotFoundException;
 import java.util.Base64;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -30,6 +27,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import session.DishSessionBeanLocal;
 import session.StoreSessionBeanLocal;
+import webservices.restful.helper.Base64AuthenticationHeaderHelper;
 import webservices.restful.helper.Flattener;
 
 /**
@@ -46,7 +44,9 @@ public class StoresResources {
     DishSessionBeanLocal dishSessionBeanLocal;
 
     private static final String AUTHORIZATION_HEADER_PREFIX = "Basic ";
+
     //8  get all stores
+
     @GET
     @Produces("application/json")
     public List<Store> getAllStores() {
@@ -149,24 +149,50 @@ public class StoresResources {
             }
         }
     }
-    
+
     //15 edit a store
     @PUT
-    @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response editStore(@PathParam("id") Long sId, Store s) {
-        s.setId(sId);
-        try {
-            storeSessionBeanLocal.updateStore(s);
-            return Response.status(204).build();
-        } catch (StoreNotFoundException e) {
+    public Response editStore(@HeaderParam("Authorization") String authHeader, Store newS) {
+        String email = Base64AuthenticationHeaderHelper.getPasswordOrErrorResponseString(authHeader);
+        if (email.toLowerCase().contains("not found")) {
             JsonObject exception = Json.createObjectBuilder()
-                    .add("error", "Not found")
+                    .add("message", "authentication informaiton not found")
                     .build();
             return Response.status(404).entity(exception)
                     .type(MediaType.APPLICATION_JSON).build();
         }
+        String password = Base64AuthenticationHeaderHelper.getPasswordOrErrorResponseString(authHeader);
+        
+        List<Store> storeList = storeSessionBeanLocal.readStoreByEmail(email);
+        if (storeList.isEmpty()) //CASE: email not in database
+        {
+            JsonObject exception = Json.createObjectBuilder()
+                    .add("message", "store not found")
+                    .build();
+            return Response.status(404).entity(exception)
+                    .type(MediaType.APPLICATION_JSON).build();
+        }
+        Store oldS = storeList.get(0);
+        if (oldS.getPassword().equals(password)) { //correct credantial. can edit
+            try {
+                newS.setId(oldS.getId());
+                storeSessionBeanLocal.updateStore(newS);
+                return Response.status(204).build();
+            } catch (StoreNotFoundException e) {
+                JsonObject exception = Json.createObjectBuilder()
+                        .add("error", "Not found")
+                        .build();
+                return Response.status(404).entity(exception)
+                        .type(MediaType.APPLICATION_JSON).build();
+            }
+        } else {
+            JsonObject exception = Json.createObjectBuilder()
+                    .add("message", "wrong passord")
+                    .build();
+            return Response.status(401).entity(exception)
+                    .type(MediaType.APPLICATION_JSON).build();
+        }
     }
-    
 }
