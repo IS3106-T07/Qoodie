@@ -60,4 +60,8 @@ public class OrderDishSessionBean implements OrderDishSessionBeanLocal {
         return (em.createQuery("SELECT f FROM OrderDish f").getResultList());
     }
 
+    public void persist(Object object) {
+        em.persist(object);
+    }
+
 }

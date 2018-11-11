@@ -33,15 +33,15 @@ public class CustomerOrderSessionBean implements CustomerOrderSessionBeanLocal {
     @Override
     public void createCustomerOrder(CustomerOrder c) throws CustomerOrderTypeNotFoundException {
         c.setCreated(new Date());
-        List<CustomerOrderType> types = customerOrderTypeSessionBeanLocal.readAllCustomerOrderType();
-        for (CustomerOrderType type : types){
-            if (type.getName().contains("IN BASKET")){
-                c.setCustomerOrderType(type);
-                type.getCustomerOrders().add(c);
-                customerOrderTypeSessionBeanLocal.updateCustomerOrderType(type);
-                break;
-            }
-        }
+//        List<CustomerOrderType> types = customerOrderTypeSessionBeanLocal.readAllCustomerOrderType();
+//        for (CustomerOrderType type : types){
+//            if (type.getName().contains("IN BASKET")){
+//                c.setCustomerOrderType(type);
+//                type.getCustomerOrders().add(c);
+//                customerOrderTypeSessionBeanLocal.updateCustomerOrderType(type);
+//                break;
+//            }
+//        }
         em.persist(c);
         em.flush();
     }
