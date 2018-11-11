@@ -40,7 +40,7 @@ public class CustomerSessionBean implements CustomerSessionBeanLocal {
         return c;
     }
     
-    @Override
+    @Override //partial customer with null field are possible as a result of PUT
     public void updateCustoemr(Customer c) throws CustomerNotFoundException {
         Customer oldC = readCustomer(c.getId());
         
