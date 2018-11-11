@@ -11,81 +11,68 @@ import entity.OrderDish;
 import javax.inject.Named;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.SelectEvent;
 import session.OrderDishSessionBeanLocal;
 
 /**
  *
  * @author DEEP
  */
-@ManagedBean
-//@Named(value = "viewOrders")
-@ViewScoped
+@Named(value = "viewOrders")
+@SessionScoped
 public class viewOrders implements Serializable {
 
    private Date date;
    private boolean showIncoming;
    private boolean showCompleted;
    private long storeId;
-   private List<OrderDish> incomingOrders;
+   private List<OrderDish> incoming;
    private List<OrderDish> completed;
    @EJB
-   OrderDishSessionBeanLocal orderDishSessionLocal;
+   OrderDishSessionBeanLocal vendorsession;
    
     public viewOrders() {
-        System.out.println("HERE HERE");
-    }
-    
-    @PostConstruct
-    public void init() {
-        System.out.println("TES TEST");
-        storeId=18;
-        incomingOrders = new ArrayList<OrderDish>();
+        storeId=17;
+        incoming = new ArrayList<OrderDish>();
         completed = new ArrayList<OrderDish>();
-        seperateOrders();
+        showIncoming=false;
+        showCompleted=false;
     }
     
     public void seperateOrders()
     {
-        
-        System.out.println("TES BEAN " + orderDishSessionLocal);
-        List<OrderDish> orders = orderDishSessionLocal.getStoreOrder(getStoreId());
-        System.out.println("retrieved" + orders);
+        List<OrderDish> orders = vendorsession.getStoreOrder(getStoreId());
         for(OrderDish o :orders)
         {
-         //   System.out.println("order status - "+ o.getCustomerOrder().getCustomerOrderType().getName());
             if(o.getCustomerOrder().getCustomerOrderType().getName().toLowerCase().equals("paid"))
-            {
-                incomingOrders.add(o);
-                System.out.println("Incoming - " + incomingOrders);
-            }
-            if(o.getCustomerOrder().getCustomerOrderType().getName().toLowerCase().equals("delivered"))
-                {
-                    completed.add(o);
-                    System.out.println("Completed - " + completed);
-                }
+                incoming.add(o);
+            else
+                if(o.getCustomerOrder().getCustomerOrderType().getName().toLowerCase().equals("delivererd"))
+                completed.add(o);
         }
     }
-//  
-//    public void onDateSelect(SelectEvent event) {
-//        FacesContext facesContext = FacesContext.getCurrentInstance();
-//        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-//        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Date Selected", format.format(event.getObject())));
-//    }
-//     
-//    public void click() {
-//      RequestContext requestContext = RequestContext.getCurrentInstance();  
-//      requestContext.update("form:display");  
-//      requestContext.execute("PF('dlg').show()");  
-//    }
-// 
-//    
+  
+    public void onDateSelect(SelectEvent event) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Date Selected", format.format(event.getObject())));
+    }
+     
+    public void click() {
+      RequestContext requestContext = RequestContext.getCurrentInstance();  
+      requestContext.update("form:display");  
+      requestContext.execute("PF('dlg').show()");  
+    }
+ 
     
     /**
      * @return the storeId
@@ -95,19 +82,18 @@ public class viewOrders implements Serializable {
     }
 
     /**
-     * @return the incomingOrders
+     * @return the incoming
      */
-    public void updateOrders() {
-        System.out.println("Latest Orders Retrieved");
+    public List<OrderDish> getIncoming() {
         seperateOrders();
+        return incoming;
     }
-    
 
     /**
      * @return the completed
      */
     public List<OrderDish> getCompleted() {
-//        updateOrders();
+        seperateOrders();
         return completed;
     }
 
@@ -119,12 +105,51 @@ public class viewOrders implements Serializable {
     }
 
     /**
+     * @param incoming the incoming to set
+     */
+    public void setIncoming(List<OrderDish> incoming) {
+        this.incoming = incoming;
+    }
+
+    /**
      * @param completed the completed to set
      */
     public void setCompleted(List<OrderDish> completed) {
         this.completed = completed;
     }
 
+    /**
+     * @return the showIncoming
+     */
+    public boolean isShowIncoming() {
+        return showIncoming;
+    }
+
+ 
+    public boolean isShowCompleted() {
+        return showCompleted;
+    }
+
+    public void setShowIncoming(boolean showIncoming) {
+        this.showIncoming = showIncoming;
+    }
+
+    public void setShowCompleted(boolean showCompleted) {
+        this.showCompleted = showCompleted;
+    }
+    public String switchIncoming()
+    {
+        System.out.println("button clicked ="+showIncoming );
+        if(showIncoming==true)
+          showIncoming=false;
+        else
+            showIncoming=true;
+        return "index.xhtml";
+    }
+
+    /**
+     * @return the date
+     */
     public Date getDate() {
         return date;
     }
@@ -135,42 +160,4 @@ public class viewOrders implements Serializable {
     public void setDate(Date date) {
         this.date = date;
     }
-
-    /**
-     * @return the incomingOrders
-     */
-    public List<OrderDish> getIncomingOrders() {
-//        updateOrders();
-        return incomingOrders;
-    }
-    
-    /**
-     * @param incoming the incomingOrders to set
-     */
-    public void setIncomingOrders(List<OrderDish> incomingOrders) {
-        
-        this.incomingOrders = incomingOrders;
-    }
 }
-   /**  public String showIncoming()
-    {
-       setShowIncoming(true);
-        return "index.xhtml";
-    }
-    public String hideIncoming()
-    {
-        setShowIncoming(false);
-        return "index.xhtml";
-    }
-    public String showCompleted()
-    {
-        setShowCompleted(true);
-        return "index.xhtml";
-    }
-    public String hideCompleted()
-    {
-        setShowCompleted(false);
-        return "index.xhtml";
-    }
-    
-**/
