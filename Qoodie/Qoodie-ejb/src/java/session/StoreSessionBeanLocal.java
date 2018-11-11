@@ -23,4 +23,6 @@ public interface StoreSessionBeanLocal {
     public void deleteStore(Store s) throws StoreNotFoundException;
     
     public List<Store> readAllStore();
+
+    public List<Store> readStoreByEmail(String email);
 }

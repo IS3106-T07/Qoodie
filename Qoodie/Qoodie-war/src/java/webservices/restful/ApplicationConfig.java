@@ -14,7 +14,8 @@ import javax.ws.rs.core.Application;
  *
  * @author alex_zy
  */
-@javax.ws.rs.ApplicationPath("Resources")
+
+@javax.ws.rs.ApplicationPath("Resource")
 public class ApplicationConfig extends Application {
     
     
@@ -32,6 +33,8 @@ public class ApplicationConfig extends Application {
      * If required, comment out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
+        resources.add(webservices.restful.CORSFilter.class);
+        resources.add(webservices.restful.CanteensResources.class);
         resources.add(webservices.restful.CustomersResource.class);
         resources.add(webservices.restful.StoresResources.class);
     }

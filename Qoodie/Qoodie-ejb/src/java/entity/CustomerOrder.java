@@ -31,7 +31,7 @@ public class CustomerOrder implements Serializable {
     private Date created;
     @Temporal(TemporalType.TIME)
     private Date lastUpdate;
-    private Boolean isAccepted;
+    double price;
     @ManyToOne
     private Customer customer;
     @OneToMany
@@ -45,6 +45,14 @@ public class CustomerOrder implements Serializable {
     
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public Date getLastUpdate() {
@@ -110,14 +118,6 @@ public class CustomerOrder implements Serializable {
 
     public void setCreated(Date created) {
         this.created = created;
-    }
-
-    public Boolean getIsAccepted() {
-        return isAccepted;
-    }
-
-    public void setIsAccepted(Boolean isAccepted) {
-        this.isAccepted = isAccepted;
     }
     
 }
