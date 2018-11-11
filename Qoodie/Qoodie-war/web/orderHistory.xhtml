@@ -1,21 +1,80 @@
 <?xml version='1.0' encoding='UTF-8' ?>  
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 <html xmlns="http://www.w3.org/1999/xhtml"  
+      template="./newTemplate.xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"  
-      xmlns:p="http://primefaces.org/ui">  
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">  
     <h:head>  
-        <title>Calendar Example</title>  
+        <style type="text/css">
+            .ui-datalist {
+                width:300px;
+                margin-bottom: 20px;
+            }
+
+            .ui-datalist-item {
+                padding:3px;
+            }
+            
+            .container{
+                position: relative;
+                left: 600px;
+
+            }
+            .table{
+                position: relative;
+                left: 30px;
+
+            }
+        </style>
+
+        <title>Revenue Calculation</title>  
     </h:head>  
     <h:body>  
         <div class="container">
-           <h:form>
-               <p:calendar value="#{revenue.date}" mode="inline" showWeek="true" navigator="true">
-                   <p:ajax event="dateSelect" listener="#{revenue.handleDateSelect}"  />
-               </p:calendar>
-           </h:form>
+            <h:form>
+                <p:calendar value="#{revenue.date}" mode="inline" showWeek="true" navigator="true">
+                    <p:ajax event="dateSelect" listener="#{revenue.handleDateSelect}"  />
+                </p:calendar>
+            </h:form>
+            
+            <div class="table">
+                <br></br> 
+
+                <p:dataList value="#{viewOrders.completed}" var="item" type="ordered">
+                    <f:facet name="header">
+                        Revenue for chosen day 
+                    </f:facet>
+                    <p:column> 
+                        #{item.dish.name} &nbsp;
+                    </p:column>
+                    <p:column >
+                        #{item.amount}
+                    </p:column>
+
+                </p:dataList>
+            </div>
+            
+            
+            <div class="table">
+                <br></br> 
+
+                <p:dataList value="#{viewOrders.completed}" var="item" type="ordered">
+                    <f:facet name="header">
+                        Revenue for chosen week
+                    </f:facet>
+                    <p:column> 
+                        #{item.dish.name} &nbsp;
+                    </p:column>
+                    <p:column >
+                        #{item.amount}
+                    </p:column>
+
+                </p:dataList>
+            </div>
         </div>
-        
         
         
     </h:body>  
