@@ -53,7 +53,7 @@ public class OrderDishesResource {
     //18 a customer adds a orderDish to cart. 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createOrderDish(@HeaderParam("Authentication") String authHeader, OrderDish od) throws CustomerOrderNotFoundException, CustomerOrderTypeNotFoundException, CustomerNotFoundException {
+    public Response createOrderDish(@HeaderParam("Authorization") String authHeader, OrderDish od) throws CustomerOrderNotFoundException, CustomerOrderTypeNotFoundException, CustomerNotFoundException {
         String email = Base64AuthenticationHeaderHelper.
                 getUsernameOrErrorResponseString(authHeader);
         if (email.toLowerCase().contains("not found")) {
@@ -75,8 +75,12 @@ public class OrderDishesResource {
             Store store = od.getDish().getStore();
             if (customer.getCustomerOrders() != null) {
                 List<CustomerOrder> customerOrders = customer.getCustomerOrders();
+                System.out.printf("before adding to cart, cart size = %d", customerOrders.size());
                 for (CustomerOrder customerOrder : customerOrders) {
-                    if (customerOrder.getOrderDishes().get(0).getDish().getStore() == store) {
+                    System.out.printf("an customer order from store %s %s exist in cart\n",
+                            customerOrder.getOrderDishes().get(0).getDish().getStore().getId().toString(),
+                            customerOrder.getOrderDishes().get(0).getDish().getStore().getName()) ;
+                    if (customerOrder.getOrderDishes().get(0).getDish().getStore().getId().equals(store.getId())) {
                         customerOrder.getOrderDishes().add(od);
                         od.setCustomerOrder(customerOrder);
                         orderDishSessionBeanLocal.createOrderDish(od);
