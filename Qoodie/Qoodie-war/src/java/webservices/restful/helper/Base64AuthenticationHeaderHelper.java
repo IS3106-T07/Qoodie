@@ -22,7 +22,6 @@ public class Base64AuthenticationHeaderHelper {
     
     
     public static String getUsernameOrErrorResponseString(String authenticationHeader) {
-    
         if (authenticationHeader == null || authenticationHeader.length() == 0) { // CASE: no auth token in the header
             return "authentication informaiton not found";
         } else {
@@ -42,6 +41,7 @@ public class Base64AuthenticationHeaderHelper {
             String authToken = authenticationHeader.replaceFirst(AUTHORIZATION_HEADER_PREFIX, "");
             String decodedString = new String(Base64.getDecoder().decode(authToken));
             StringTokenizer tokenizer = new StringTokenizer(decodedString, ":");
+            tokenizer.nextToken();
             String password = tokenizer.nextToken();
             return password;
         }
