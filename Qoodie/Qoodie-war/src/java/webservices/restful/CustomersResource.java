@@ -191,6 +191,7 @@ public class CustomersResource {
         }
     }
 
+    /*
     //7 update tthe cusotmer order type to : PAID
     @GET
     @Path("/{order_id}/pay")
@@ -220,6 +221,7 @@ public class CustomersResource {
                     .type(MediaType.APPLICATION_JSON).build();
         }
     }
+    */
 
     //12
     @POST

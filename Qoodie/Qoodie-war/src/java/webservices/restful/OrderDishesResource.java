@@ -136,7 +136,7 @@ public class OrderDishesResource {
         }
     }
     
-
+    
     private Response getAuthNotFoundResponse() {
         JsonObject exception = Json.createObjectBuilder()
                 .add("message", "authentication informaiton not found")
