@@ -53,7 +53,7 @@ public class OrderDishesResource {
     //18 a customer adds a orderDish to cart. 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createOrderDish(@HeaderParam("Authorization") String authHeader, OrderDish od) throws CustomerOrderNotFoundException, CustomerOrderTypeNotFoundException, CustomerNotFoundException {
+    public Response createOrderDish(@HeaderParam("Authorization") String authHeader, OrderDish od) throws CustomerOrderNotFoundException, CustomerOrderTypeNotFoundException, CustomerNotFoundException, OrderDishNotFoundException {
         String email = Base64AuthenticationHeaderHelper.
                 getUsernameOrErrorResponseString(authHeader);
         if (email.toLowerCase().contains("not found")) {
@@ -81,7 +81,16 @@ public class OrderDishesResource {
                             customerOrder.getOrderDishes().get(0).getDish().getStore().getId().toString(),
                             customerOrder.getOrderDishes().get(0).getDish().getStore().getName()) ;
                     if (customerOrder.getOrderDishes().get(0).getDish().getStore().getId().equals(store.getId())) {
-                        customerOrder.getOrderDishes().add(od);
+                        // merge this od to an existing od if possible 
+                        List<OrderDish> odList = customerOrder.getOrderDishes();
+                        for (OrderDish existingOd : odList){
+                            if (existingOd.getDish().getId().equals(od.getDish().getId())){
+                                existingOd.setAmount(existingOd.getAmount()+od.getAmount());
+                                orderDishSessionBeanLocal.updateOrderDish(existingOd);
+                                return Response.status(204).build();
+                            }
+                        }
+                        odList.add(od);
                         od.setCustomerOrder(customerOrder);
                         orderDishSessionBeanLocal.createOrderDish(od);
                         customerOrderSessionBeanLocal.updateCustomerOrder(customerOrder);
