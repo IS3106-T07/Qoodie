@@ -7,11 +7,13 @@ package managedbean;
 
 import entity.CustomerOrder;
 import entity.OrderDish;
+import entity.Store;
 import error.StoreNotFoundException;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -19,6 +21,7 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import org.primefaces.event.SelectEvent;
 import session.CustomerOrderSessionBeanLocal;
+import session.StoreSessionBeanLocal;
 
 /**
  *
@@ -31,14 +34,22 @@ public class revenue implements Serializable {
     private Date date;
     private Date weekFirstDay;
     private Date weekLastDay;
-    private long storeId;
+    private Store store;
     Calendar cal;
      @EJB
     private CustomerOrderSessionBeanLocal customerOrderSessionBean;
-
+@EJB
+    private StoreSessionBeanLocal storeSessionBean;
+    
+    @PostConstruct
+    public void init()
+    {
+            setStore(storeSessionBean.readStoreByEmail("vendor1@gmail.com").get(0));
+    }
     public revenue() {
           this.date = new Date("11/20/2018");
-          storeId=18;
+//          System.out.println("****"+customerOrderSessionBean.readAllCustomerOrder().size());
+
           cal = Calendar.getInstance();
     }
     public void handleDateSelect(SelectEvent event) {
@@ -60,11 +71,13 @@ public class revenue implements Serializable {
 
     public List<CustomerOrder> dayOrders() throws StoreNotFoundException
     {
-        return customerOrderSessionBean.getStoreCustomerOrder(storeId, date, date);
+        System.out.println(store.getName());
+        
+        return customerOrderSessionBean.getStoreCustomerOrder(store.getId(), date, date);
     }
     public List<CustomerOrder> weekOrders() throws StoreNotFoundException
     {
-        return customerOrderSessionBean.getStoreCustomerOrder(storeId, weekFirstDay, weekLastDay);
+        return customerOrderSessionBean.getStoreCustomerOrder(store.getId(), weekFirstDay, weekLastDay);
     }
     public String dishList(List<OrderDish> list)
     {
@@ -77,11 +90,11 @@ public class revenue implements Serializable {
     }
     public double getDayRevenue() throws StoreNotFoundException
     {
-        return customerOrderSessionBean.calculateRevenue(storeId, date, date);
+        return customerOrderSessionBean.calculateRevenue(store.getId(), date, date);
     }
     public double getWeekRevenue() throws StoreNotFoundException
     {
-        return customerOrderSessionBean.calculateRevenue(storeId, weekFirstDay, weekLastDay);
+        return customerOrderSessionBean.calculateRevenue(store.getId(), weekFirstDay, weekLastDay);
     }
     /**
      * @return the date
@@ -91,11 +104,6 @@ public class revenue implements Serializable {
     }
 
     /**
-     * @return the storeId
-     */
-    public long getStoreId() {
-        return storeId;
-    }
 
     /**
      * @param date the date to set
@@ -104,12 +112,6 @@ public class revenue implements Serializable {
         this.date = date;
     }
 
-    /**
-     * @param storeId the storeId to set
-     */
-    public void setStoreId(long storeId) {
-        this.storeId = storeId;
-    }
 
     /**
      * @return the weekFirstDay
@@ -137,6 +139,20 @@ public class revenue implements Serializable {
      */
     public void setWeekLastDay(Date weekLastDay) {
         this.weekLastDay = weekLastDay;
+    }
+
+    /**
+     * @return the store
+     */
+    public Store getStore() {
+        return store;
+    }
+
+    /**
+     * @param store the store to set
+     */
+    public void setStore(Store store) {
+        this.store = store;
     }
 
     

@@ -8,6 +8,7 @@
 
 
 import entity.OrderDish;
+import entity.Store;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import session.OrderDishSessionBeanLocal;
+import session.StoreSessionBeanLocal;
 
 /**
  *
@@ -26,11 +28,13 @@ import session.OrderDishSessionBeanLocal;
 @ManagedBean
 @ViewScoped
 public class viewOrders implements Serializable {
+    @EJB
+    private StoreSessionBeanLocal storeSessionBeanLocal;
 
    private Date date;
    private boolean showIncoming;
    private boolean showCompleted;
-   private long storeId;
+   private Store store;
    private List<OrderDish> incomingOrders;
    private List<OrderDish> completed;
    @EJB
@@ -43,7 +47,7 @@ public class viewOrders implements Serializable {
     @PostConstruct
     public void init() {
         System.out.println("TES TEST");
-        storeId=18;
+        setStore(storeSessionBeanLocal.readStoreByEmail("vendor1@gmail.com").get(0));
         incomingOrders = new ArrayList<OrderDish>();
         completed = new ArrayList<OrderDish>();
         seperateOrders();
@@ -52,7 +56,7 @@ public class viewOrders implements Serializable {
     public void seperateOrders()
     {
         
-        List<OrderDish> orders = orderDishSessionLocal.getStoreOrder(getStoreId());
+        List<OrderDish> orders = orderDishSessionLocal.getStoreOrder(getStore().getId());
         System.out.println("retrieved" + orders);
         for(OrderDish o :orders)
         {
@@ -73,10 +77,7 @@ public class viewOrders implements Serializable {
     /**
      * @return the storeId
      */
-    public Long getStoreId() {
-        return storeId;
-    }
-
+    
     /**
      * @return the incoming
      */
@@ -89,10 +90,7 @@ public class viewOrders implements Serializable {
     /**
      * @param storeId the storeId to set
      */
-    public void setStoreId(Long storeId) {
-        this.storeId = storeId;
-    }
-
+    
     /**
      * @param incoming the incoming to set
      */
@@ -112,6 +110,20 @@ public class viewOrders implements Serializable {
      */
     public List<OrderDish> getCompleted() {
         return completed;
+    }
+
+    /**
+     * @return the store
+     */
+    public Store getStore() {
+        return store;
+    }
+
+    /**
+     * @param store the store to set
+     */
+    public void setStore(Store store) {
+        this.store = store;
     }
 
     /**
