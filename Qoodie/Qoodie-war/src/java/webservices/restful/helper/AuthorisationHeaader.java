@@ -30,9 +30,9 @@ public class AuthorisationHeaader {
         System.out.println("decoded customer header 1 " + new String(decodedBytes));
         
         encodedBytes = Base64.getEncoder().encode(customer2.getBytes());
-        System.out.println("encoded customer header 1 " + new String(encodedBytes));
+        System.out.println("encoded customer header 2 " + new String(encodedBytes));
         decodedBytes = Base64.getDecoder().decode(encodedBytes);
-        System.out.println("decoded customer header 1 " + new String(decodedBytes));
+        System.out.println("decoded customer header 2 " + new String(decodedBytes));
         
     }
 }
