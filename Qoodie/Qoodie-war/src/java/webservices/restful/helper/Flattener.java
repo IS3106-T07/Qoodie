@@ -28,8 +28,25 @@ public class Flattener {
         List<CustomerOrder> orders = c.getCustomerOrders();
         for (CustomerOrder co : orders) {
             co.setCustomer(null);
+            for (CustomerOrder order: orders){
+                
+                for (OrderDish od : order.getOrderDishes()){
+                    od.setCustomerOrder(null);
+                    od.getDish().setOrderDishes(null);
+                    od.getDish().setDishType(null); 
+                    od.getDish().getStore().setDishes(null);
+                    od.getDish().getStore().setCuisineType(null);
+                    od.getDish().getStore().setVendorEmail(null);
+                    od.getDish().getStore().setPassword(null);
+                    od.getDish().getStore().getCanteen().setStores(null);
+                    
+                }
+                
+            }
+            co.getCustomerOrderType().setCustomerOrders(null);
         }
-        return c;
+        c.getUserType().setCustomers(null);
+        return c; 
     }
 
     public static CustomerOrder flatten(CustomerOrder co) {

@@ -68,9 +68,10 @@ public class InitializeSessionBean {
     CustomerOrderSessionBeanLocal customerOrderSessionBean;
     @EJB
     OrderDishSessionBeanLocal orderDishSessionBean;
-
     @EJB
     CanteenSessionBeanLocal canteenSessionBeanLocal;
+    @EJB
+    CustomerOrderSessionBeanLocal customerOrderSessionBeanLocal;
 
     @PostConstruct
     public void init() {
@@ -96,10 +97,9 @@ public class InitializeSessionBean {
                 initializeCustomerOrderType();
             }
 
-            initializeUsers();
             initializeCanteen();
             initializeStores();
-
+            initializeUsers();
             initializeOrderDish();
             initializeCustomerOrder();
 
@@ -213,8 +213,8 @@ public class InitializeSessionBean {
 
     //initialise 2 users: Alice and Bob
     public void initializeUsers() {
-        List<Customer> list = customerSessionBeanLocal.readAllCustomer();
-        if (list.isEmpty()) {
+
+        if (customerSessionBeanLocal.readCustomerByEmail("alice@gmail.com").isEmpty()) {
             Customer c = new Customer();
             c.setAddress("41 Sungei Kadut Loop S 729509, Singapore");
             c.setEmail("alice@gmail.com");
@@ -223,7 +223,10 @@ public class InitializeSessionBean {
             c.setPhone("88888888");
             c.setUserType(userTypeSessionBeanLocal.readAllUserType().get(0));
             customerSessionBeanLocal.createCustomer(c);
-            c = new Customer();
+            initialiseCustomerOrderForUser(c);
+        }
+        if (customerSessionBeanLocal.readCustomerByEmail("bob@gmail.com").isEmpty()) {
+            Customer c = new Customer();
             c.setName("Bob");
             c.setEmail("bob@gmail.com");
             c.setUserType(userTypeSessionBeanLocal.readAllUserType().get(1));
@@ -231,7 +234,9 @@ public class InitializeSessionBean {
             c.setAddress("31 Sungei Kadut Loop S 729509, Singapore");
             c.setPassword("password");
             customerSessionBeanLocal.createCustomer(c);
+            initialiseCustomerOrderForUser(c);
         }
+
     }
 
     private void initializeCanteen() {
@@ -274,7 +279,7 @@ public class InitializeSessionBean {
                 dishes.add(dish);
                 dish.setStore(s);
                 s.setDishes(dishes);
-                
+
                 storeSessionBeanLocal.createStore(s);
                 fineFood.getStores().add(s);
             }
@@ -284,14 +289,14 @@ public class InitializeSessionBean {
                 s.setPassword("password");
                 s.setVendorEmail("finefoodgc@gmail.com");
                 s.setCanteen(fineFood);
-                 //create a dummy dish in the store 
+                //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
                 Dish dish = new Dish("Earl Grey Milk Team", 4 * Math.random(), "you can choose your own sugar level");
                 dishSessionBeanLocal.createDish(dish);
                 dishes.add(dish);
                 dish.setStore(s);
                 s.setDishes(dishes);
-                
+
                 storeSessionBeanLocal.createStore(s);
                 fineFood.getStores().add(s);
             }
@@ -301,7 +306,7 @@ public class InitializeSessionBean {
                 s.setPassword("password");
                 s.setVendorEmail("finefoodk@gmail.com");
                 s.setCanteen(fineFood);
-                  //create a dummy dish in the store 
+                //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
                 Dish dish = new Dish("Chicken Kimchi Soup", 7 * Math.random(), "it also has bak choya and vermecilli");
                 dishSessionBeanLocal.createDish(dish);
@@ -322,14 +327,14 @@ public class InitializeSessionBean {
                 s.setPassword("password");
                 s.setVendorEmail("deckytf@gmail.com");
                 s.setCanteen(deck);
-                  //create a dummy dish in the store 
+                //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
                 Dish dish = new Dish("Fish Ball", 2 * Math.random(), "Made of real fish!");
                 dishSessionBeanLocal.createDish(dish);
                 dishes.add(dish);
                 dish.setStore(s);
                 s.setDishes(dishes);
-                
+
                 storeSessionBeanLocal.createStore(s);
                 deck.getStores().add(s);
             }
@@ -338,7 +343,7 @@ public class InitializeSessionBean {
                 s.setName("Claypot");
                 s.setPassword("password");
                 s.setVendorEmail("deckcp@gmail.com");
-                s.setCanteen(deck); 
+                s.setCanteen(deck);
                 //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
                 Dish dish = new Dish("braised chicken with potato", 7 * Math.random(), "traditional chinese style");
@@ -346,7 +351,7 @@ public class InitializeSessionBean {
                 dishes.add(dish);
                 dish.setStore(s);
                 s.setDishes(dishes);
-                
+
                 deck.getStores().add(s);
                 storeSessionBeanLocal.createStore(s);
             }
@@ -356,14 +361,14 @@ public class InitializeSessionBean {
                 s.setPassword("password");
                 s.setVendorEmail("deckcr@gmail.com");
                 s.setCanteen(deck);
-                 //create a dummy dish in the store 
+                //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
                 Dish dish = new Dish("Roasted Chicken Rice", 5 * Math.random(), "popular item");
                 dishSessionBeanLocal.createDish(dish);
                 dishes.add(dish);
                 dish.setStore(s);
                 s.setDishes(dishes);
-                
+
                 deck.getStores().add(s);
                 storeSessionBeanLocal.createStore(s);
             }
@@ -378,14 +383,14 @@ public class InitializeSessionBean {
                 s.setPassword("password");
                 s.setVendorEmail("foodclickbm@gmail.com");
                 s.setCanteen(foodClick);
-                 //create a dummy dish in the store 
+                //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
                 Dish dish = new Dish("Fish and Mushroom Bam Mian", 6 * Math.random(), "you can choose in soup or dried");
                 dishSessionBeanLocal.createDish(dish);
                 dishes.add(dish);
                 dish.setStore(s);
                 s.setDishes(dishes);
-                
+
                 storeSessionBeanLocal.createStore(s);
                 foodClick.getStores().add(s);
             }
@@ -414,7 +419,7 @@ public class InitializeSessionBean {
                 dishes.add(dish);
                 dish.setStore(s);
                 s.setDishes(dishes);
-                
+
                 storeSessionBeanLocal.createStore(s);
                 foodClick.getStores().add(s);
             }
@@ -463,6 +468,33 @@ public class InitializeSessionBean {
         dishes.add(d5);
 
         return dishes;
+    }
+
+    //input: a user
+    //description: this method creates a customer order for input user(store -> item -> orderitem -> custoemrorder)
+    private void initialiseCustomerOrderForUser(Customer c) {
+        try {
+            Customer customer = customerSessionBeanLocal.readCustomer(c.getId());
+            List<Store> storeList = storeSessionBeanLocal.readAllStore();
+            Store store = storeList.get((int) (Math.random() * storeList.size()));
+            if (!store.getDishes().isEmpty()) {
+                OrderDish orderDish = new OrderDish();
+                orderDish.setDish(store.getDishes().get(0));
+                orderDish.setAmount((int) (Math.random() * 10));
+                orderDishSessionBean.createOrderDish(orderDish);
+                CustomerOrder customerOrder = new CustomerOrder();
+                customerOrder.setCustomer(customer);
+                List<OrderDish> odList = new ArrayList<>();
+                odList.add(orderDish);
+                customerOrder.setOrderDishes(odList);
+                customerOrderSessionBeanLocal.createCustomerOrder(customerOrder);
+                customer.getCustomerOrders().add(customerOrder);
+                customerSessionBeanLocal.updateCustoemr(c);
+            }
+        } catch (CustomerNotFoundException | CustomerOrderTypeNotFoundException ex) {
+            Logger.getLogger(InitializeSessionBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
 }
