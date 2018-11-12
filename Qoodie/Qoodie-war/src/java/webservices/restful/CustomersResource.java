@@ -7,7 +7,6 @@ package webservices.restful;
 
 import entity.Customer;
 import entity.CustomerOrder;
-import entity.OrderDish;
 import error.CustomerNotFoundException;
 import error.CustomerOrderAlreadyPaidException;
 import error.CustomerOrderNotFoundException;
@@ -26,13 +25,13 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PUT;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import session.CustomerOrderSessionBeanLocal;
 import session.CustomerSessionBeanLocal;
 import webservices.restful.helper.Base64AuthenticationHeaderHelper;
 import webservices.restful.helper.Flattener;
+import webservices.restful.helper.PATCH;
 
 /**
  * REST Web Service
@@ -89,8 +88,8 @@ public class CustomersResource {
         }
     }
 
-    //4 edit a customer . 
-    @PUT
+    //4 edit a customer. 
+    @PATCH
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response editCustomer(@HeaderParam("Authorization") String authHeader, Customer newC) {

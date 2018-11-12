@@ -31,6 +31,7 @@ import session.CustomerOrderTypeSessionBeanLocal;
 import session.CustomerSessionBeanLocal;
 import session.OrderDishSessionBeanLocal;
 import webservices.restful.helper.Base64AuthenticationHeaderHelper;
+import webservices.restful.helper.PATCH;
 
 /**
  * REST Web Service
@@ -108,7 +109,7 @@ public class OrderDishesResource {
     }
     
     //19 a customer edits a orderDish in cart
-    @PUT
+    @PATCH
     @Consumes(MediaType.APPLICATION_JSON)
     public Response editOrderDish(@HeaderParam("Authentication") String authHeader, OrderDish od) throws OrderDishNotFoundException {
         String email = Base64AuthenticationHeaderHelper.
