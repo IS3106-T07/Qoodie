@@ -4,11 +4,10 @@
  * and open the template in the editor.
  */
 
- package managedbean;
+  package managedbean;
 
 
 import entity.OrderDish;
-import javax.inject.Named;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ import session.OrderDishSessionBeanLocal;
  * @author DEEP
  */
 @ManagedBean
-//@Named(value = "viewOrders")
 @ViewScoped
 public class viewOrders implements Serializable {
 
@@ -54,11 +52,11 @@ public class viewOrders implements Serializable {
     public void seperateOrders()
     {
         
-        System.out.println("TES BEAN " + orderDishSessionLocal);
         List<OrderDish> orders = orderDishSessionLocal.getStoreOrder(getStoreId());
         System.out.println("retrieved" + orders);
         for(OrderDish o :orders)
         {
+            System.out.println("hello we are now separating orders");
          //   System.out.println("order status - "+ o.getCustomerOrder().getCustomerOrderType().getName());
             if(o.getCustomerOrder().getCustomerOrderType().getName().toLowerCase().equals("paid"))
             {
@@ -72,21 +70,6 @@ public class viewOrders implements Serializable {
                 }
         }
     }
-//  
-//    public void onDateSelect(SelectEvent event) {
-//        FacesContext facesContext = FacesContext.getCurrentInstance();
-//        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-//        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Date Selected", format.format(event.getObject())));
-//    }
-//     
-//    public void click() {
-//      RequestContext requestContext = RequestContext.getCurrentInstance();  
-//      requestContext.update("form:display");  
-//      requestContext.execute("PF('dlg').show()");  
-//    }
-// 
-//    
-    
     /**
      * @return the storeId
      */
@@ -95,21 +78,13 @@ public class viewOrders implements Serializable {
     }
 
     /**
-     * @return the incomingOrders
+     * @return the incoming
      */
-    public void updateOrders() {
-        System.out.println("Latest Orders Retrieved");
-        seperateOrders();
+    public List<OrderDish> getIncoming() {
+         seperateOrders();
+        return incomingOrders;
     }
-    
 
-    /**
-     * @return the completed
-     */
-    public List<OrderDish> getCompleted() {
-//        updateOrders();
-        return completed;
-    }
 
     /**
      * @param storeId the storeId to set
@@ -119,58 +94,31 @@ public class viewOrders implements Serializable {
     }
 
     /**
+     * @param incoming the incoming to set
+     */
+    public void setIncoming(List<OrderDish> incoming) {
+        this.incomingOrders = incoming;
+    }
+
+    /**
      * @param completed the completed to set
      */
     public void setCompleted(List<OrderDish> completed) {
         this.completed = completed;
     }
 
-    public Date getDate() {
-        return date;
+    /**
+     * @return the completed
+     */
+    public List<OrderDish> getCompleted() {
+        return completed;
     }
 
     /**
-     * @param date the date to set
+     * @return the showIncoming
      */
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
+  
     /**
-     * @return the incomingOrders
+     * @return the date
      */
-    public List<OrderDish> getIncomingOrders() {
-//        updateOrders();
-        return incomingOrders;
-    }
-    
-    /**
-     * @param incoming the incomingOrders to set
-     */
-    public void setIncomingOrders(List<OrderDish> incomingOrders) {
-        
-        this.incomingOrders = incomingOrders;
-    }
 }
-   /**  public String showIncoming()
-    {
-       setShowIncoming(true);
-        return "index.xhtml";
-    }
-    public String hideIncoming()
-    {
-        setShowIncoming(false);
-        return "index.xhtml";
-    }
-    public String showCompleted()
-    {
-        setShowCompleted(true);
-        return "index.xhtml";
-    }
-    public String hideCompleted()
-    {
-        setShowCompleted(false);
-        return "index.xhtml";
-    }
-    
-**/

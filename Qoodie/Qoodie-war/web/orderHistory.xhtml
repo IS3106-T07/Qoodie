@@ -43,15 +43,16 @@
             <div class="table">
                 <br></br> 
 
-                <p:dataList value="#{viewOrders.completed}" var="item" type="ordered">
+                <p:dataList value="#{revenue.dayOrders()}" var="item" type="ordered">
                     <f:facet name="header">
-                        Revenue for chosen day 
+                        Revenue for chosen day <br/>
+                         #{revenue.dayRevenue}
                     </f:facet>
                     <p:column> 
-                        #{item.dish.name} &nbsp;
+                        #{revenue.dishList(item.orderDishes)} &nbsp;
                     </p:column>
                     <p:column >
-                        #{item.amount}
+                        #{item.price}
                     </p:column>
 
                 </p:dataList>
@@ -61,16 +62,11 @@
             <div class="table">
                 <br></br> 
 
-                <p:dataList value="#{viewOrders.completed}" var="item" type="ordered">
+                <p:dataList value="#{revenue.weekOrders()}" var="item" type="ordered">
                     <f:facet name="header">
-                        Revenue for chosen week
+                        Revenue for corresponding Week <br/>
+                         #{revenue.weekRevenue}
                     </f:facet>
-                    <p:column> 
-                        #{item.dish.name} &nbsp;
-                    </p:column>
-                    <p:column >
-                        #{item.amount}
-                    </p:column>
 
                 </p:dataList>
             </div>
