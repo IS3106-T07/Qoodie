@@ -480,7 +480,7 @@ public class InitializeSessionBean {
             if (!store.getDishes().isEmpty()) {
                 OrderDish orderDish = new OrderDish();
                 orderDish.setDish(store.getDishes().get(0));
-                orderDish.setAmount((int) (Math.random() * 10));
+                orderDish.setAmount(1+(int) (Math.random() * 10));
                 orderDishSessionBean.createOrderDish(orderDish);
                 CustomerOrder customerOrder = new CustomerOrder();
                 customerOrder.setCustomer(customer);
