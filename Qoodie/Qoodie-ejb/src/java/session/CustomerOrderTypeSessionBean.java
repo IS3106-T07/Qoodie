@@ -52,6 +52,6 @@ public class CustomerOrderTypeSessionBean implements CustomerOrderTypeSessionBea
 
     @Override
     public List<CustomerOrderType> readCustomerOrderTypeByName(String name) {
-        return em.createQuery("SELECT c From CustomerOrderType c WHERE LOWER(c.name) = "+name.toLowerCase()).getResultList();
+        return em.createQuery("SELECT c From CustomerOrderType c WHERE LOWER(c.name) = \""+name.toLowerCase()+"\"").getResultList();
     }
 }
