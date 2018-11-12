@@ -29,6 +29,7 @@ import session.DishSessionBeanLocal;
 import session.StoreSessionBeanLocal;
 import webservices.restful.helper.Base64AuthenticationHeaderHelper;
 import webservices.restful.helper.Flattener;
+import webservices.restful.helper.PATCH;
 
 /**
  * REST Web Service
@@ -151,7 +152,7 @@ public class StoresResources {
     }
 
     //15 edit a store
-    @PUT
+    @PATCH
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response editStore(@HeaderParam("Authorization") String authHeader, Store newS) {

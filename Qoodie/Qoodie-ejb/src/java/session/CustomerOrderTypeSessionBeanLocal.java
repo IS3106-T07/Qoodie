@@ -22,4 +22,5 @@ public interface CustomerOrderTypeSessionBeanLocal {
     public void deleteCustomerOrderType(CustomerOrderType c) throws CustomerOrderTypeNotFoundException;
     
     public List<CustomerOrderType> readAllCustomerOrderType(); //for init bean 
+    public List<CustomerOrderType> readCustomerOrderTypeByName(String name);
 }

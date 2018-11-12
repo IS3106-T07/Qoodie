@@ -43,39 +43,20 @@ public class CustomerOrderSessionBean implements CustomerOrderSessionBeanLocal {
     @Override
     public void createCustomerOrder(CustomerOrder c) throws CustomerOrderTypeNotFoundException {
         c.setCreated(new Date());
+        CustomerOrderType InBasketType = customerOrderTypeSessionBeanLocal.readCustomerOrderTypeByName("IN BASKET").get(0);
+        c.setCustomerOrderType(InBasketType);
+        InBasketType.getCustomerOrders().add(c);
+        customerOrderTypeSessionBeanLocal.updateCustomerOrderType(InBasketType);
 
-//        List<CustomerOrderType> types = customerOrderTypeSessionBeanLocal.readAllCustomerOrderType();
-//        for (CustomerOrderType type : types){
-//            if (type.getName().contains("IN BASKET")){
-//                c.setCustomerOrderType(type);
-//                type.getCustomerOrders().add(c);
-//                customerOrderTypeSessionBeanLocal.updateCustomerOrderType(type);
-//                break;
-//            }
-//        }
-
-        Double price = 0.0;
-        for (OrderDish od : c.getOrderDishes()) {
-            price += od.getAmount() * od.getDish().getPrice();
-        }
-        c.setPrice(price);
-        List<CustomerOrderType> types = customerOrderTypeSessionBeanLocal.readAllCustomerOrderType();
-        for (CustomerOrderType type : types) {
-            if (type.getName().contains("IN BASKET")) {
-                c.setCustomerOrderType(type);
-                type.getCustomerOrders().add(c);
-                customerOrderTypeSessionBeanLocal.updateCustomerOrderType(type);
-                break;
-            }
-        }
         em.persist(c);
-        em.flush();
     }
 
     @Override
-    public CustomerOrder readCustomerOrder(Long cId) throws CustomerOrderNotFoundException {
+    public CustomerOrder
+            readCustomerOrder(Long cId) throws CustomerOrderNotFoundException {
         CustomerOrder c = em.find(CustomerOrder.class, cId);
-        if (c == null) {
+        if (c
+                == null) {
             throw new CustomerOrderNotFoundException("customer order not found");
         }
         return c;
@@ -85,10 +66,41 @@ public class CustomerOrderSessionBean implements CustomerOrderSessionBeanLocal {
     public void updateCustomerOrder(CustomerOrder newC) throws CustomerOrderNotFoundException {
         CustomerOrder c = readCustomerOrder(newC.getId());
         c.setLastUpdate(new Date());
-        c.setPrice(newC.getPrice());
         c.setCustomer(newC.getCustomer());
-        c.setCustomerOrderType(newC.getCustomerOrderType());
         c.setOrderDishes(newC.getOrderDishes());
+        if (c.getPrice() > 0) { //no need to reset price if is temporary
+            c.setPrice(newC.getPrice());
+        }
+        //if the type changes from IN BASKET to PAID, need to set positive price 
+        if (c.getCustomerOrderType().getName().contains("IN BASKET")
+                && newC.getCustomerOrderType().getName().contains("PAID")) {
+            c.setPrice(newC.getPrice());
+        }
+        c.setCustomerOrderType(newC.getCustomerOrderType());
+        
+    }
+
+    @Override
+    public void updateCustomerOrderNonNullFields(CustomerOrder newC) throws CustomerOrderNotFoundException {
+        CustomerOrder c = readCustomerOrder(newC.getId());
+        c.setLastUpdate(new Date());
+        if (newC.getPrice() != null && c.getPrice() > 0) { //no need to reset price if is temporary
+            c.setPrice(newC.getPrice());
+        }
+        if (newC.getCustomer() != null) {
+            c.setCustomer(newC.getCustomer());
+        }
+        if (newC.getCustomerOrderType() != null) {
+            c.setCustomerOrderType(newC.getCustomerOrderType());
+            //if the type changes from IN BASKET to PAID, need to set positive price 
+            if (c.getCustomerOrderType().getName().contains("IN BASKET")
+                    && newC.getCustomerOrderType().getName().contains("PAID")) {
+                c.setPrice(newC.getPrice());
+            }
+        }
+        if (newC.getOrderDishes() != null) {
+            c.setOrderDishes(newC.getOrderDishes());
+        }
     }
 
     @Override
@@ -164,15 +176,15 @@ public class CustomerOrderSessionBean implements CustomerOrderSessionBeanLocal {
 
         return revenue;
     }
-    
+
     @Override
     public List<CustomerOrder> getStoreCustomerOrder(Long storeId, Date start, Date end) throws StoreNotFoundException {
-        
+
         Store s = storeSessionBeanLocal.readStore(storeId);
         List<Dish> storeDishes = s.getDishes();
         List<CustomerOrder> storeOrders = new ArrayList<>();
         List<CustomerOrder> filteredStoreOrders = new ArrayList<>();
-        
+
         if (storeDishes == null) {
             return filteredStoreOrders;
         }

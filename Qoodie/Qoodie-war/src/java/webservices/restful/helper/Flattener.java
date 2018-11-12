@@ -28,7 +28,24 @@ public class Flattener {
         List<CustomerOrder> orders = c.getCustomerOrders();
         for (CustomerOrder co : orders) {
             co.setCustomer(null);
+            for (CustomerOrder order : orders) {
+
+                for (OrderDish od : order.getOrderDishes()) {
+                    od.setCustomerOrder(null);
+                    od.getDish().setOrderDishes(null);
+                    od.getDish().setDishType(null);
+                    od.getDish().getStore().setDishes(null);
+                    od.getDish().getStore().setCuisineType(null);
+                    od.getDish().getStore().setVendorEmail(null);
+                    od.getDish().getStore().setPassword(null);
+                    od.getDish().getStore().getCanteen().setStores(null);
+
+                }
+
+            }
+            co.getCustomerOrderType().setCustomerOrders(null);
         }
+        c.getUserType().setCustomers(null);
         return c;
     }
 
@@ -38,23 +55,31 @@ public class Flattener {
         List<OrderDish> orderDishes = co.getOrderDishes();
         for (OrderDish od : orderDishes) {
             od.setCustomerOrder(null);
+            od.getDish().setOrderDishes(null);
+            od.getDish().setDishType(null);
+            od.getDish().getStore().setDishes(null);
+            od.getDish().getStore().setCuisineType(null);
+            od.getDish().getStore().setVendorEmail(null);
+            od.getDish().getStore().setPassword(null);
+            od.getDish().getStore().getCanteen().setStores(null);
         }
         return co;
     }
 
     public static Store flatten(Store s) {
-        if (s.getCanteen() != null)
+        if (s.getCanteen() != null) {
             s.getCanteen().setStores(null);
+        }
         if (s.getCuisineType() != null) {
             s.getCuisineType().setStores(null);
         }
         for (Dish d : s.getDishes()) {
-            if(d.getDishType() != null)
+            if (d.getDishType() != null) {
                 d.getDishType().setDishes(null);
+            }
             d.setStore(null);
             d.setOrderDishes(null);
         }
-        
 
         return s;
     }
@@ -84,8 +109,9 @@ public class Flattener {
     }
 
     public static Dish flatten(Dish d) {
-        if(d.getDishType() != null)
+        if (d.getDishType() != null) {
             d.getDishType().setDishes(null);
+        }
         for (OrderDish od : d.getOrderDishes()) {
             od.setDish(null);
         }

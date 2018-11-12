@@ -1,8 +1,8 @@
 /*
-* To change this license header, choose License Headers in Project Properties.
-* To change this template file, choose Tools | Templates
-* and open the template in the editor.
-*/
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package entity;
 
 import java.io.Serializable;
@@ -23,6 +23,7 @@ import javax.persistence.TemporalType;
  */
 @Entity
 public class CustomerOrder implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -31,24 +32,32 @@ public class CustomerOrder implements Serializable {
     private Date created;
     @Temporal(TemporalType.TIME)
     private Date lastUpdate;
-    double price;
+    Double price = -1.0;
     @ManyToOne
     private Customer customer;
     @OneToMany
     private List<OrderDish> orderDishes;
     @ManyToOne
     private CustomerOrderType customerOrderType;
-    
+
     public Long getId() {
         return id;
     }
-    
+
     public void setId(Long id) {
         this.id = id;
     }
 
-    public double getPrice() {
-        return price;
+    public Double getPrice() {
+        if (price > 0) {
+            return price;
+        } else {
+            double tempPrice = 0.0; //temporary price is calculated from order dishes in this
+            for(OrderDish od : this.getOrderDishes()){
+                tempPrice += od.getAmount() * od.getDish().getPrice();
+            }
+            return tempPrice;
+        }
     }
 
     public void setPrice(double price) {
@@ -86,14 +95,14 @@ public class CustomerOrder implements Serializable {
     public void setCustomerOrderType(CustomerOrderType customerOrderType) {
         this.customerOrderType = customerOrderType;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
-    
+
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
@@ -106,7 +115,7 @@ public class CustomerOrder implements Serializable {
         }
         return true;
     }
-    
+
     @Override
     public String toString() {
         return "entity.CustomerOrder[ id=" + id + " ]";
@@ -119,5 +128,5 @@ public class CustomerOrder implements Serializable {
     public void setCreated(Date created) {
         this.created = created;
     }
-    
+
 }

@@ -49,4 +49,9 @@ public class CustomerOrderTypeSessionBean implements CustomerOrderTypeSessionBea
     public List<CustomerOrderType> readAllCustomerOrderType() {
         return em.createQuery("SELECT c From CustomerOrderType c").getResultList();
     }
+
+    @Override
+    public List<CustomerOrderType> readCustomerOrderTypeByName(String name) {
+        return em.createQuery("SELECT c From CustomerOrderType c WHERE LOWER(c.name) = \""+name.toLowerCase()+"\"").getResultList();
+    }
 }
