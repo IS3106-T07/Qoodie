@@ -25,6 +25,7 @@ public interface CustomerOrderSessionBeanLocal {
     public void createCustomerOrder(CustomerOrder c) throws CustomerOrderTypeNotFoundException;
     public CustomerOrder readCustomerOrder(Long cId) throws CustomerOrderNotFoundException;
     public void updateCustomerOrder(CustomerOrder newC) throws CustomerOrderNotFoundException;
+    public void updateCustomerOrderNonNullFields(CustomerOrder newC) throws CustomerOrderNotFoundException;
     public void deleteCustomerOrder(CustomerOrder c) throws CustomerOrderNotFoundException, CustomerOrderTypeNotFoundException;
 
     public List<CustomerOrder> readAllCustomerOrder();
