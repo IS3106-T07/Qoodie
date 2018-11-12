@@ -69,14 +69,15 @@ public class CustomerOrderResource {
             List<CustomerOrder> resultCustomerOrders = new ArrayList<>();
             for (CustomerOrder co : customerOrders) {
                 if (co.getCustomerOrderType().getName().contains("IN BASKET")) {
-                    resultCustomerOrders.add(Flattener.flatten(co));
+                    co = Flattener.flatten(co);
+                    co.setCustomer(null);
+                    resultCustomerOrders.add(co);
                 }
             }
             System.out.println("*** cart size = " + resultCustomerOrders.size());
 
-            GenericEntity<List<CustomerOrder>> resultCustomerOrdersGeneric 
-                    = new GenericEntity<List<CustomerOrder>>(resultCustomerOrders) {
-            };
+            GenericEntity<List<CustomerOrder>> resultCustomerOrdersGeneric
+                    = new GenericEntity<List<CustomerOrder>>(resultCustomerOrders) {};
 
             return Response.status(200).entity(resultCustomerOrdersGeneric)
                     .type(MediaType.APPLICATION_JSON).build();
