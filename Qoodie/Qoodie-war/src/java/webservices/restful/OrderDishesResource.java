@@ -13,6 +13,7 @@ import entity.Store;
 import error.CustomerNotFoundException;
 import error.CustomerOrderNotFoundException;
 import error.CustomerOrderTypeNotFoundException;
+import error.OrderDishNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
@@ -21,6 +22,7 @@ import javax.json.JsonObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -104,6 +106,35 @@ public class OrderDishesResource {
         }
         //TODO: test this method
     }
+    
+    //19 a customer edits a orderDish in cart
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response editOrderDish(@HeaderParam("Authentication") String authHeader, OrderDish od) throws OrderDishNotFoundException {
+        String email = Base64AuthenticationHeaderHelper.
+                getUsernameOrErrorResponseString(authHeader);
+        if (email.toLowerCase().contains("not found")) {
+            return getAuthNotFoundResponse();
+        }
+        String password = Base64AuthenticationHeaderHelper.
+                getPasswordOrErrorResponseString(authHeader);
+
+        List<Customer> customerList = customerSessionBeanLocal.readCustomerByEmail(email);
+        if (customerList.isEmpty()) //CASE: email not in database
+        {
+            return getUserNotFoundResponse();
+        }
+
+        Customer customer = customerList.get(0);
+
+        if (customer.getPassword().equals(password)) { //correct credantial. perform logic
+           orderDishSessionBeanLocal.updateOrderDish(od);
+           return Response.status(204).build();
+        } else {
+            return getWrongPasswordResponse();
+        }
+    }
+    
 
     private Response getAuthNotFoundResponse() {
         JsonObject exception = Json.createObjectBuilder()
