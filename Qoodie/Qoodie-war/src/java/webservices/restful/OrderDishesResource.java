@@ -127,10 +127,11 @@ public class OrderDishesResource {
             List<OrderDish> orderDishes = new ArrayList<>();
             orderDishes.add(od);
             customerOrder.setOrderDishes(orderDishes);
+            customerOrderSessionBeanLocal.createCustomerOrder(customerOrder);
             od.setCustomerOrder(customerOrder);
+            orderDishSessionBeanLocal.updateOrderDish(od);
             CustomerOrderType inBasketType = customerOrderTypeSessionBeanLocal.readCustomerOrderTypeByName("in basket").get(0);
             customerOrder.setCustomerOrderType(inBasketType);
-            customerOrderSessionBeanLocal.createCustomerOrder(customerOrder);
             inBasketType.getCustomerOrders().add(customerOrder);
             customerOrderTypeSessionBeanLocal.updateCustomerOrderType(inBasketType);
             customer.getCustomerOrders().add(customerOrder);
