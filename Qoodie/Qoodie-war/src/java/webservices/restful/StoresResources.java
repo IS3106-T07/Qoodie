@@ -6,10 +6,15 @@
 package webservices.restful;
 
 import entity.Customer;
+import entity.CustomerOrder;
 import entity.Dish;
+import entity.OrderDish;
 import entity.Store;
+import error.CustomerOrderNotFoundException;
 import error.StoreNotFoundException;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.List;
 import java.util.StringTokenizer;
 import javax.ejb.EJB;
@@ -23,6 +28,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import session.DishSessionBeanLocal;
@@ -47,7 +53,6 @@ public class StoresResources {
     private static final String AUTHORIZATION_HEADER_PREFIX = "Basic ";
 
     //8  get all stores
-
     @GET
     @Produces("application/json")
     public List<Store> getAllStores() {
@@ -165,7 +170,7 @@ public class StoresResources {
                     .type(MediaType.APPLICATION_JSON).build();
         }
         String password = Base64AuthenticationHeaderHelper.getPasswordOrErrorResponseString(authHeader);
-        
+
         List<Store> storeList = storeSessionBeanLocal.readStoreByEmail(email);
         if (storeList.isEmpty()) //CASE: email not in database
         {
@@ -195,5 +200,100 @@ public class StoresResources {
             return Response.status(401).entity(exception)
                     .type(MediaType.APPLICATION_JSON).build();
         }
+    }
+
+    //23 a store gets all its orders (in bask, delivered and undelivered)
+    @GET
+    @Path("/orders")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getAllOrders(@HeaderParam("Authorization") String authHeader) {
+        String email = Base64AuthenticationHeaderHelper.
+                getUsernameOrErrorResponseString(authHeader);
+        if (email.toLowerCase().contains("not found")) {
+            return getAuthNotFoundResponse();
+        }
+        String password = Base64AuthenticationHeaderHelper.
+                getPasswordOrErrorResponseString(authHeader);
+
+        List<Store> storeList = storeSessionBeanLocal.readStoreByEmail(email);
+        if (storeList.isEmpty()) //CASE: email not in database
+        {
+            return getStoreNotFoundResponse();
+        }
+
+        Store store = storeList.get(0);
+
+        if (store.getPassword().equals(password)) { //correct credential, perform logic
+            List<CustomerOrder> allCustomerOrders = new ArrayList<>();
+
+            for (Dish d : store.getDishes()) {
+                System.out.println(d.toString());
+                System.out.printf("this dish has %d ordered dish\n", d.getOrderDishes().size());
+                for (OrderDish od : d.getOrderDishes()) {
+                    System.out.println(od.toString());
+                    allCustomerOrders.add(od.getCustomerOrder());
+                }
+            }
+            //remove the repeated customer orders with hashset
+            HashSet<CustomerOrder> hs = new HashSet<>();
+            hs.addAll(allCustomerOrders);
+            allCustomerOrders.clear();
+            allCustomerOrders.addAll(hs);
+
+            for (CustomerOrder co : allCustomerOrders) {
+                co = Flattener.flatten(co);
+                co.getCustomer().setPassword(null);
+            }
+            GenericEntity<List<CustomerOrder>> allCustomerOrdersGeneric
+                    = new GenericEntity<List<CustomerOrder>>(allCustomerOrders) {
+                    };
+
+//            return Response.ok(new GenericEntity<List<CustomerOrder>>(allCustomerOrders){}).build();
+            return Response.status(200).entity(allCustomerOrdersGeneric)
+                    .type(MediaType.APPLICATION_JSON).build();
+        } else {
+            return getWrongPasswordResponse();//TODO: test this endpoint
+        }
+
+    }
+
+    private Response getAuthNotFoundResponse() {
+        JsonObject exception = Json.createObjectBuilder()
+                .add("message", "authentication informaiton not found")
+                .build();
+        return Response.status(404).entity(exception)
+                .type(MediaType.APPLICATION_JSON).build();
+    }
+
+    private Response getStoreNotFoundResponse() {
+        JsonObject exception = Json.createObjectBuilder()
+                .add("message", "store not found")
+                .build();
+        return Response.status(404).entity(exception)
+                .type(MediaType.APPLICATION_JSON).build();
+    }
+
+    private Response getNotFoundResponse() {
+        JsonObject exception = Json.createObjectBuilder()
+                .add("message", "not found")
+                .build();
+        return Response.status(404).entity(exception)
+                .type(MediaType.APPLICATION_JSON).build();
+    }
+
+    private Response getWrongPasswordResponse() {
+        JsonObject exception = Json.createObjectBuilder()
+                .add("message", "wrong passord")
+                .build();
+        return Response.status(401).entity(exception)
+                .type(MediaType.APPLICATION_JSON).build();
+    }
+
+    private Response getNoPermissionResponse() {
+        JsonObject exception = Json.createObjectBuilder()
+                .add("message", "no permission")
+                .build();
+        return Response.status(403).entity(exception)
+                .type(MediaType.APPLICATION_JSON).build();
     }
 }
