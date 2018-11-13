@@ -11,9 +11,12 @@ import error.CustomerNotFoundException;
 import error.CustomerOrderAlreadyPaidException;
 import error.CustomerOrderNotFoundException;
 import error.CustomerOrderTypeNotFoundException;
+import error.OrderDishNotFoundException;
 import java.util.Base64;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -186,6 +189,11 @@ public class CustomersResource {
         } catch (CustomerOrderNotFoundException ex) {
             JsonObject exception = Json.createObjectBuilder()
                     .add("error", "Customer order not found")
+                    .build();
+            return Response.status(404).entity(exception).build();
+        } catch (OrderDishNotFoundException ex) {
+            JsonObject exception = Json.createObjectBuilder()
+                    .add("error", "Order Dish not found")
                     .build();
             return Response.status(404).entity(exception).build();
         }

@@ -77,7 +77,8 @@ public class CustomerOrderResource {
             System.out.println("*** cart size = " + resultCustomerOrders.size());
 
             GenericEntity<List<CustomerOrder>> resultCustomerOrdersGeneric
-                    = new GenericEntity<List<CustomerOrder>>(resultCustomerOrders) {};
+                    = new GenericEntity<List<CustomerOrder>>(resultCustomerOrders) {
+                    };
 
             return Response.status(200).entity(resultCustomerOrdersGeneric)
                     .type(MediaType.APPLICATION_JSON).build();
@@ -111,17 +112,23 @@ public class CustomerOrderResource {
         Customer customer = customerList.get(0);
 
         if (customer.getPassword().equals(password)) {
-            CustomerOrder co = customerOrderSessionBeanLocal.readCustomerOrder(Long.valueOf(coId));
-            if (co.getCustomer() != customer) { // check if this order belongs to the auth customer
-                return getNoPermissionResponse();
+            try {
+                CustomerOrder co = customerOrderSessionBeanLocal.readCustomerOrder(Long.valueOf(coId));
+
+                if (!co.getCustomer().getId().equals(customer.getId())) { // check if this order belongs to the auth customer
+                    return getNoPermissionResponse();
+                }
+                //correct credantial. perform logic
+                customerOrder.setId(Long.valueOf(coId));
+                customerOrderSessionBeanLocal.updateCustomerOrderNonNullFields(customerOrder);
+                return Response.status(204).build();
+
+            } catch (CustomerOrderNotFoundException e) {
+                return getNotFoundResponse();
             }
-            //correct credantial. perform logic
-            customerOrder.setId(Long.valueOf(coId));
-            customerOrderSessionBeanLocal.updateCustomerOrderNonNullFields(customerOrder);
-            return Response.status(204).build();
         } else {
-            return getWrongPasswordResponse();
-        } //TODO: test this endpoint
+            return getWrongPasswordResponse();//TODO: test this endpoint
+        }
     }
 
     private Response getAuthNotFoundResponse() {
@@ -135,6 +142,14 @@ public class CustomerOrderResource {
     private Response getUserNotFoundResponse() {
         JsonObject exception = Json.createObjectBuilder()
                 .add("message", "user not found")
+                .build();
+        return Response.status(404).entity(exception)
+                .type(MediaType.APPLICATION_JSON).build();
+    }
+
+    private Response getNotFoundResponse() {
+        JsonObject exception = Json.createObjectBuilder()
+                .add("message", "not found")
                 .build();
         return Response.status(404).entity(exception)
                 .type(MediaType.APPLICATION_JSON).build();

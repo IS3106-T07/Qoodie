@@ -8,11 +8,13 @@ package webservices.restful;
 import entity.Customer;
 import entity.CustomerOrder;
 import entity.CustomerOrderType;
+import entity.Dish;
 import entity.OrderDish;
 import entity.Store;
 import error.CustomerNotFoundException;
 import error.CustomerOrderNotFoundException;
 import error.CustomerOrderTypeNotFoundException;
+import error.DishNotFoundException;
 import error.OrderDishNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,7 @@ import javax.ws.rs.core.Response;
 import session.CustomerOrderSessionBeanLocal;
 import session.CustomerOrderTypeSessionBeanLocal;
 import session.CustomerSessionBeanLocal;
+import session.DishSessionBeanLocal;
 import session.OrderDishSessionBeanLocal;
 import webservices.restful.helper.Base64AuthenticationHeaderHelper;
 import webservices.restful.helper.PATCH;
@@ -49,11 +52,13 @@ public class OrderDishesResource {
     OrderDishSessionBeanLocal orderDishSessionBeanLocal;
     @EJB
     CustomerOrderTypeSessionBeanLocal customerOrderTypeSessionBeanLocal;
+    @EJB
+    DishSessionBeanLocal dishSessionBeanLocal;
 
     //18 a customer adds a orderDish to cart. 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createOrderDish(@HeaderParam("Authorization") String authHeader, OrderDish od) throws CustomerOrderNotFoundException, CustomerOrderTypeNotFoundException, CustomerNotFoundException, OrderDishNotFoundException {
+    public Response createOrderDish(@HeaderParam("Authorization") String authHeader, OrderDish od) throws CustomerOrderNotFoundException, CustomerOrderTypeNotFoundException, CustomerNotFoundException, OrderDishNotFoundException, DishNotFoundException {
         String email = Base64AuthenticationHeaderHelper.
                 getUsernameOrErrorResponseString(authHeader);
         if (email.toLowerCase().contains("not found")) {
@@ -71,6 +76,7 @@ public class OrderDishesResource {
         Customer customer = customerList.get(0);
 
         if (customer.getPassword().equals(password)) { //correct credantial. can add orderdish to himself
+
             //add the orderDish to a custoemrOrder if possible
             Store store = od.getDish().getStore();
             if (customer.getCustomerOrders() != null) {
@@ -79,18 +85,28 @@ public class OrderDishesResource {
                 for (CustomerOrder customerOrder : customerOrders) {
                     System.out.printf("an customer order from store %s %s exist in cart\n",
                             customerOrder.getOrderDishes().get(0).getDish().getStore().getId().toString(),
-                            customerOrder.getOrderDishes().get(0).getDish().getStore().getName()) ;
-                    if (customerOrder.getOrderDishes().get(0).getDish().getStore().getId().equals(store.getId())) {
-                        // merge this od to an existing od if possible 
+                            customerOrder.getOrderDishes().get(0).getDish().getStore().getName());
+                    if (customerOrder.getCustomerOrderType().getName().contains("IN BASKET")
+                            && customerOrder.getOrderDishes().get(0).getDish().getStore().getId().equals(store.getId())) {
                         List<OrderDish> odList = customerOrder.getOrderDishes();
-                        for (OrderDish existingOd : odList){
-                            if (existingOd.getDish().getId().equals(od.getDish().getId())){
-                                existingOd.setAmount(existingOd.getAmount()+od.getAmount());
+                        // merge this od to an existing od if possible 
+                        for (OrderDish existingOd : odList) {
+                            if (existingOd.getDish().getId().equals(od.getDish().getId())) {
+                                existingOd.setAmount(existingOd.getAmount() + od.getAmount());
                                 orderDishSessionBeanLocal.updateOrderDish(existingOd);
                                 return Response.status(204).build();
                             }
                         }
                         odList.add(od);
+                        Dish dish = od.getDish();
+
+                        if (dish.getOrderDishes() == null) {
+                            dish.setOrderDishes(new ArrayList<>());
+                        }
+                        dish.getOrderDishes().add(od);
+                        dishSessionBeanLocal.updateDish(dish);
+                        System.out.printf("after adding to cart,"
+                                + " the dish (id = %d, name = %s) now have %d order dishes\n", dish.getId(), dish.getName());
                         od.setCustomerOrder(customerOrder);
                         orderDishSessionBeanLocal.createOrderDish(od);
                         customerOrderSessionBeanLocal.updateCustomerOrder(customerOrder);
@@ -99,28 +115,35 @@ public class OrderDishesResource {
                 }
             }
             //add the orderDIsh to a new customer order
+            Dish dish = od.getDish();
+            if (dish.getOrderDishes() == null) {
+                dish.setOrderDishes(new ArrayList<>());
+            }
+            dish.getOrderDishes().add(od);
             orderDishSessionBeanLocal.createOrderDish(od);
+            dishSessionBeanLocal.updateDish(dish);
             CustomerOrder customerOrder = new CustomerOrder();
             customerOrder.setCustomer(customer);
             List<OrderDish> orderDishes = new ArrayList<>();
             orderDishes.add(od);
             customerOrder.setOrderDishes(orderDishes);
+            customerOrderSessionBeanLocal.createCustomerOrder(customerOrder);
             od.setCustomerOrder(customerOrder);
+            orderDishSessionBeanLocal.updateOrderDish(od);
             CustomerOrderType inBasketType = customerOrderTypeSessionBeanLocal.readCustomerOrderTypeByName("in basket").get(0);
             customerOrder.setCustomerOrderType(inBasketType);
-            customerOrderSessionBeanLocal.createCustomerOrder(customerOrder);
             inBasketType.getCustomerOrders().add(customerOrder);
             customerOrderTypeSessionBeanLocal.updateCustomerOrderType(inBasketType);
             customer.getCustomerOrders().add(customerOrder);
             customerSessionBeanLocal.updateCustoemr(customer);
-            
+
             return Response.status(204).build();
         } else {
             return getWrongPasswordResponse();
         }
         //TODO: test this method
     }
-    
+
     //19 a customer edits a orderDish in cart
     @PATCH
     @Consumes(MediaType.APPLICATION_JSON)
@@ -142,14 +165,13 @@ public class OrderDishesResource {
         Customer customer = customerList.get(0);
 
         if (customer.getPassword().equals(password)) { //correct credantial. perform logic
-           orderDishSessionBeanLocal.updateOrderDish(od);
-           return Response.status(204).build();
+            orderDishSessionBeanLocal.updateOrderDish(od);
+            return Response.status(204).build();
         } else {
             return getWrongPasswordResponse();
         }
     }
-    
-    
+
     private Response getAuthNotFoundResponse() {
         JsonObject exception = Json.createObjectBuilder()
                 .add("message", "authentication informaiton not found")

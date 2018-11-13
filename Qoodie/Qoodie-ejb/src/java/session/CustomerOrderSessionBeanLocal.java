@@ -10,6 +10,7 @@ import entity.OrderDish;
 import error.CustomerOrderAlreadyPaidException;
 import error.CustomerOrderNotFoundException;
 import error.CustomerOrderTypeNotFoundException;
+import error.OrderDishNotFoundException;
 import error.StoreNotFoundException;
 import java.util.Date;
 import java.util.List;
@@ -22,7 +23,7 @@ import javax.ejb.Local;
 @Local
 public interface CustomerOrderSessionBeanLocal {
     
-    public void createCustomerOrder(CustomerOrder c) throws CustomerOrderTypeNotFoundException;
+    public void createCustomerOrder(CustomerOrder c) throws CustomerOrderTypeNotFoundException, OrderDishNotFoundException;
     public CustomerOrder readCustomerOrder(Long cId) throws CustomerOrderNotFoundException;
     public void updateCustomerOrder(CustomerOrder newC) throws CustomerOrderNotFoundException;
     public void updateCustomerOrderNonNullFields(CustomerOrder newC) throws CustomerOrderNotFoundException;

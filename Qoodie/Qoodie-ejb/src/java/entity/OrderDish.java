@@ -58,7 +58,7 @@ public class OrderDish implements Serializable {
     
     @Override
     public String toString() {
-        return "entity.OrderDish[ id=" + id + " ]";
+        return "entity.OrderDish[ dish name = " + this.dish.getName() + " amount = "+ this.getAmount()+" ]";
     }
 
     public Dish getDish() {

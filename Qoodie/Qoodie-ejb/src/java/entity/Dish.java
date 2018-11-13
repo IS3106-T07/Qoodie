@@ -78,7 +78,7 @@ public class Dish implements Serializable {
     
     @Override
     public String toString() {
-        return "entity.Dish[ id=" + id + " ]";
+        return "entity.Dish[ id=" + id + " name = "+this.name + " ]";
     }
 
     public String getName() {

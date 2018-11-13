@@ -49,15 +49,7 @@ public class CustomerOrder implements Serializable {
     }
 
     public Double getPrice() {
-        if (price > 0) {
-            return price;
-        } else {
-            double tempPrice = 0.0; //temporary price is calculated from order dishes in this
-            for(OrderDish od : this.getOrderDishes()){
-                tempPrice += od.getAmount() * od.getDish().getPrice();
-            }
-            return tempPrice;
-        }
+        return this.price;
     }
 
     public void setPrice(double price) {

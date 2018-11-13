@@ -14,6 +14,7 @@ import entity.Store;
 import error.CustomerOrderAlreadyPaidException;
 import error.CustomerOrderNotFoundException;
 import error.CustomerOrderTypeNotFoundException;
+import error.OrderDishNotFoundException;
 import error.StoreNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,13 +40,20 @@ public class CustomerOrderSessionBean implements CustomerOrderSessionBeanLocal {
     private CustomerOrderTypeSessionBeanLocal customerOrderTypeSessionBeanLocal;
     @EJB
     private StoreSessionBeanLocal storeSessionBeanLocal;
+    @EJB
+    private OrderDishSessionBeanLocal orderDishSessionBeanLocal;
 
     @Override
-    public void createCustomerOrder(CustomerOrder c) throws CustomerOrderTypeNotFoundException {
+    public void createCustomerOrder(CustomerOrder c) throws CustomerOrderTypeNotFoundException, OrderDishNotFoundException {
         c.setCreated(new Date());
+        c.setLastUpdate(new Date());
         CustomerOrderType InBasketType = customerOrderTypeSessionBeanLocal.readCustomerOrderTypeByName("IN BASKET").get(0);
         c.setCustomerOrderType(InBasketType);
         InBasketType.getCustomerOrders().add(c);
+        for (OrderDish od : c.getOrderDishes()) {
+            od.setCustomerOrder(c);
+            orderDishSessionBeanLocal.updateOrderDish(od);
+        }
         customerOrderTypeSessionBeanLocal.updateCustomerOrderType(InBasketType);
 
         em.persist(c);
@@ -55,8 +63,7 @@ public class CustomerOrderSessionBean implements CustomerOrderSessionBeanLocal {
     public CustomerOrder
             readCustomerOrder(Long cId) throws CustomerOrderNotFoundException {
         CustomerOrder c = em.find(CustomerOrder.class, cId);
-        if (c
-                == null) {
+        if (c == null) {
             throw new CustomerOrderNotFoundException("customer order not found");
         }
         return c;
@@ -77,26 +84,41 @@ public class CustomerOrderSessionBean implements CustomerOrderSessionBeanLocal {
             c.setPrice(newC.getPrice());
         }
         c.setCustomerOrderType(newC.getCustomerOrderType());
-        
+
     }
 
     @Override
     public void updateCustomerOrderNonNullFields(CustomerOrder newC) throws CustomerOrderNotFoundException {
         CustomerOrder c = readCustomerOrder(newC.getId());
         c.setLastUpdate(new Date());
-        if (newC.getPrice() != null && c.getPrice() > 0) { //no need to reset price if is temporary
+        if (newC.getPrice() != null && c.getPrice() < 0) { //no need to reset price if is temporary
             c.setPrice(newC.getPrice());
         }
         if (newC.getCustomer() != null) {
             c.setCustomer(newC.getCustomer());
         }
         if (newC.getCustomerOrderType() != null) {
-            c.setCustomerOrderType(newC.getCustomerOrderType());
             //if the type changes from IN BASKET to PAID, need to set positive price 
+            System.out.printf("order type was %s, is %s \n",
+                    c.getCustomerOrderType().getName(),
+                    newC.getCustomerOrderType().getName());
             if (c.getCustomerOrderType().getName().contains("IN BASKET")
                     && newC.getCustomerOrderType().getName().contains("PAID")) {
-                c.setPrice(newC.getPrice());
+                double realPrice = 0.0;
+                if (newC.getOrderDishes() != null) {
+                    for (OrderDish od : newC.getOrderDishes()) {
+                        realPrice += od.getAmount() * od.getDish().getPrice();
+                        System.out.println("**** updating the price : " + realPrice);
+                    }
+                } else {
+                    for (OrderDish od : c.getOrderDishes()) {
+                        realPrice += od.getAmount() * od.getDish().getPrice();
+                        System.out.println("**** updating the price : " + realPrice);
+                    }
+                }
+                c.setPrice(realPrice);
             }
+            c.setCustomerOrderType(newC.getCustomerOrderType());
         }
         if (newC.getOrderDishes() != null) {
             c.setOrderDishes(newC.getOrderDishes());
