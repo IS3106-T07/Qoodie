@@ -48,7 +48,6 @@ public class InitializeSessionBean {
     private static final String[] userTypeArr = {"ADMIN", "USER"};
     private static final String[] cuisineTypesArr = {"KOREAN", "JAPANESE", "CHINESE", "WESTERN", "DRINK", "FRUIT", "INDIAN", "MALAY"};
     private static final String[] customerOrderTypesArr = {"IN BASKET", "PAID", "DELIVERED"};
-    private static final String[] orderDish = {"IN BASKET", "PAID"};
 
     @EJB
     CuisineTypeSessionBeanLocal cuisineTypeSessionBeanLocal;
@@ -480,6 +479,10 @@ public class InitializeSessionBean {
             if (!store.getDishes().isEmpty()) {
                 OrderDish orderDish = new OrderDish();
                 orderDish.setDish(store.getDishes().get(0));
+                Dish dish = orderDish.getDish();
+                dish.setOrderDishes(new ArrayList<>());
+                dish.getOrderDishes().add(orderDish);
+                dishSessionBeanLocal.updateDish(dish);
                 orderDish.setAmount(1+(int) (Math.random() * 10));
                 orderDishSessionBean.createOrderDish(orderDish);
                 CustomerOrder customerOrder = new CustomerOrder();
@@ -491,7 +494,7 @@ public class InitializeSessionBean {
                 customer.getCustomerOrders().add(customerOrder);
                 customerSessionBeanLocal.updateCustoemr(c);
             }
-        } catch (CustomerNotFoundException | CustomerOrderTypeNotFoundException | OrderDishNotFoundException ex) {
+        } catch (CustomerNotFoundException | CustomerOrderTypeNotFoundException | OrderDishNotFoundException | DishNotFoundException ex) {
             Logger.getLogger(InitializeSessionBean.class.getName()).log(Level.SEVERE, null, ex);
         }
 
