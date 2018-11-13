@@ -80,7 +80,7 @@ public class OrderDishesResource {
                     System.out.printf("an customer order from store %s %s exist in cart\n",
                             customerOrder.getOrderDishes().get(0).getDish().getStore().getId().toString(),
                             customerOrder.getOrderDishes().get(0).getDish().getStore().getName()) ;
-                    if (customerOrder.getOrderDishes().get(0).getDish().getStore().getId().equals(store.getId())) {
+                    if (customerOrder.getCustomerOrderType().getName().contains("IN BASKET") && customerOrder.getOrderDishes().get(0).getDish().getStore().getId().equals(store.getId())) {
                         // merge this od to an existing od if possible 
                         List<OrderDish> odList = customerOrder.getOrderDishes();
                         for (OrderDish existingOd : odList){

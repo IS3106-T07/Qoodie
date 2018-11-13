@@ -491,7 +491,7 @@ public class InitializeSessionBean {
                 customer.getCustomerOrders().add(customerOrder);
                 customerSessionBeanLocal.updateCustoemr(c);
             }
-        } catch (CustomerNotFoundException | CustomerOrderTypeNotFoundException ex) {
+        } catch (CustomerNotFoundException | CustomerOrderTypeNotFoundException | OrderDishNotFoundException ex) {
             Logger.getLogger(InitializeSessionBean.class.getName()).log(Level.SEVERE, null, ex);
         }
 
