@@ -7,16 +7,14 @@ package webservices.restful;
 
 import entity.Customer;
 import entity.CustomerOrder;
+import entity.Store;
 import error.CustomerNotFoundException;
-import error.CustomerOrderAlreadyPaidException;
 import error.CustomerOrderNotFoundException;
 import error.CustomerOrderTypeNotFoundException;
 import error.OrderDishNotFoundException;
 import java.util.Base64;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -28,6 +26,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import session.CustomerOrderSessionBeanLocal;
@@ -55,7 +54,6 @@ public class CustomersResource {
     @GET
     @Produces("application/json")
     public List<Customer> getAllCustomers() {
-        System.out.println("***************reading all customers************");
         List<Customer> customers = customerSessionBeanLocal.readAllCustomer();
         for (Customer c : customers) {
             c = Flattener.flatten(c);
@@ -108,7 +106,7 @@ public class CustomersResource {
         }
         String password = Base64AuthenticationHeaderHelper.
                 getPasswordOrErrorResponseString(authHeader);
-        
+
         List<Customer> customerList = customerSessionBeanLocal.readCustomerByEmail(email);
         if (customerList.isEmpty()) //CASE: email not in database
         {
@@ -118,7 +116,7 @@ public class CustomersResource {
             return Response.status(404).entity(exception)
                     .type(MediaType.APPLICATION_JSON).build();
         }
-        
+
         Customer c = customerList.get(0);
         newC.setId(c.getId());
         if (c.getPassword().equals(password)) { //correct credantial. can edit
@@ -200,37 +198,36 @@ public class CustomersResource {
     }
 
     /*
-    //7 update tthe cusotmer order type to : PAID
-    @GET
-    @Path("/{order_id}/pay")
-    public Response payOrder(@PathParam("order_id") Long oId
-    ) {
-        try {
-            CustomerOrder o = customerOrderSessionBeanLocal.readCustomerOrder(oId);
-            customerOrderSessionBeanLocal.payCustomerOrder(o);
-            return Response.status(200).entity(Flattener.flatten(o)).build();
-        } catch (CustomerOrderNotFoundException ex) {
-            JsonObject exception = Json.createObjectBuilder()
-                    .add("message", "order not found")
-                    .build();
-            return Response.status(404).entity(exception)
-                    .type(MediaType.APPLICATION_JSON).build();
-        } catch (CustomerOrderTypeNotFoundException ex) {
-            JsonObject exception = Json.createObjectBuilder()
-                    .add("message", "order type not found")
-                    .build();
-            return Response.status(404).entity(exception)
-                    .type(MediaType.APPLICATION_JSON).build();
-        } catch (CustomerOrderAlreadyPaidException ex) {
-            JsonObject exception = Json.createObjectBuilder()
-                    .add("message", "order already paid")
-                    .build();
-            return Response.status(404).entity(exception)
-                    .type(MediaType.APPLICATION_JSON).build();
-        }
-    }
-    */
-
+     //7 update tthe cusotmer order type to : PAID
+     @GET
+     @Path("/{order_id}/pay")
+     public Response payOrder(@PathParam("order_id") Long oId
+     ) {
+     try {
+     CustomerOrder o = customerOrderSessionBeanLocal.readCustomerOrder(oId);
+     customerOrderSessionBeanLocal.payCustomerOrder(o);
+     return Response.status(200).entity(Flattener.flatten(o)).build();
+     } catch (CustomerOrderNotFoundException ex) {
+     JsonObject exception = Json.createObjectBuilder()
+     .add("message", "order not found")
+     .build();
+     return Response.status(404).entity(exception)
+     .type(MediaType.APPLICATION_JSON).build();
+     } catch (CustomerOrderTypeNotFoundException ex) {
+     JsonObject exception = Json.createObjectBuilder()
+     .add("message", "order type not found")
+     .build();
+     return Response.status(404).entity(exception)
+     .type(MediaType.APPLICATION_JSON).build();
+     } catch (CustomerOrderAlreadyPaidException ex) {
+     JsonObject exception = Json.createObjectBuilder()
+     .add("message", "order already paid")
+     .build();
+     return Response.status(404).entity(exception)
+     .type(MediaType.APPLICATION_JSON).build();
+     }
+     }
+     */
     //12
     @POST
     @Path("/login")
@@ -273,4 +270,77 @@ public class CustomersResource {
             }
         }
     }
+
+    //22 a customer gets his/her customer order with the all types: DELIVERED, IN BASKET and PAID
+    @GET
+    @Path("orders")
+    public Response getAllCustomerOrders(@HeaderParam("Authorization") String authHeader) {
+        String email = Base64AuthenticationHeaderHelper.
+                getUsernameOrErrorResponseString(authHeader);
+        if (email.toLowerCase().contains("not found")) {
+            return getAuthNotFoundResponse();
+        }
+        String password = Base64AuthenticationHeaderHelper.
+                getPasswordOrErrorResponseString(authHeader);
+
+        List<Customer> customerList = customerSessionBeanLocal.readCustomerByEmail(email);
+        if (customerList.isEmpty()) //CASE: email not in database
+        {
+            return getUserNotFoundResponse();
+        }
+
+        Customer customer = customerList.get(0);
+
+        if (customer.getPassword().equals(password)) {//correct credential. perform logic
+            List<CustomerOrder> customerOrders = customer.getCustomerOrders();
+            for (CustomerOrder customerOrder: customerOrders){
+                customerOrder = Flattener.flatten(customerOrder);
+            }
+            return Response.ok(new GenericEntity<List<CustomerOrder>>(customerOrders){}).build();
+           
+        } else {
+            return getWrongPasswordResponse();//TODO: test this endpoint
+        }
+    }
+
+    private Response getAuthNotFoundResponse() {
+        JsonObject exception = Json.createObjectBuilder()
+                .add("message", "authentication informaiton not found")
+                .build();
+        return Response.status(404).entity(exception)
+                .type(MediaType.APPLICATION_JSON).build();
+    }
+
+    private Response getUserNotFoundResponse() {
+        JsonObject exception = Json.createObjectBuilder()
+                .add("message", "user not found")
+                .build();
+        return Response.status(404).entity(exception)
+                .type(MediaType.APPLICATION_JSON).build();
+    }
+
+    private Response getNotFoundResponse() {
+        JsonObject exception = Json.createObjectBuilder()
+                .add("message", "not found")
+                .build();
+        return Response.status(404).entity(exception)
+                .type(MediaType.APPLICATION_JSON).build();
+    }
+
+    private Response getWrongPasswordResponse() {
+        JsonObject exception = Json.createObjectBuilder()
+                .add("message", "wrong passord")
+                .build();
+        return Response.status(401).entity(exception)
+                .type(MediaType.APPLICATION_JSON).build();
+    }
+
+    private Response getNoPermissionResponse() {
+        JsonObject exception = Json.createObjectBuilder()
+                .add("message", "no permission")
+                .build();
+        return Response.status(403).entity(exception)
+                .type(MediaType.APPLICATION_JSON).build();
+    }
+
 }
