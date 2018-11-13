@@ -8,6 +8,7 @@ package webservices.restful;
 import entity.Customer;
 import entity.CustomerOrder;
 import entity.OrderDish;
+import entity.Store;
 import error.CustomerOrderNotFoundException;
 import error.OrderDishNotFoundException;
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import session.CustomerOrderSessionBeanLocal;
 import session.CustomerSessionBeanLocal;
+import session.StoreSessionBean;
+import session.StoreSessionBeanLocal;
 import webservices.restful.helper.Base64AuthenticationHeaderHelper;
 import webservices.restful.helper.Flattener;
 import webservices.restful.helper.PATCH;
@@ -42,6 +45,8 @@ public class CustomerOrderResource {
     CustomerSessionBeanLocal customerSessionBeanLocal;
     @EJB
     CustomerOrderSessionBeanLocal customerOrderSessionBeanLocal;
+    @EJB
+    StoreSessionBeanLocal storeSessionBeanLocal;
 
     //20 a customer gets his/her customer order with the type "IN BASKET" 
     @GET
@@ -87,7 +92,7 @@ public class CustomerOrderResource {
         } //TODO: test this endpoint
     }
 
-    // 21 a customer edits his/her customer order(this replaces endpoint 7)
+    // 21 a customer OR A VENDOR edits his/her customer order(this replaces endpoint 7)
     @PATCH
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("{order_id}")
@@ -103,31 +108,58 @@ public class CustomerOrderResource {
         String password = Base64AuthenticationHeaderHelper.
                 getPasswordOrErrorResponseString(authHeader);
 
+        boolean isCustomer = false;
+        boolean isStore = false;
         List<Customer> customerList = customerSessionBeanLocal.readCustomerByEmail(email);
-        if (customerList.isEmpty()) //CASE: email not in database
-        {
+        List<Store> storeList = storeSessionBeanLocal.readStoreByEmail(email);
+        if (!customerList.isEmpty()) { //CASE: email not in database
+            isCustomer = true;
+        } else if (!storeList.isEmpty()) {
+            isStore = true;
+        }
+        if (!isCustomer && !isStore) {
             return getUserNotFoundResponse();
         }
+        if (isCustomer) {
+            Customer customer = customerList.get(0);
 
-        Customer customer = customerList.get(0);
+            if (customer.getPassword().equals(password)) {
+                try {
+                    CustomerOrder co = customerOrderSessionBeanLocal.readCustomerOrder(Long.valueOf(coId));
 
-        if (customer.getPassword().equals(password)) {
-            try {
-                CustomerOrder co = customerOrderSessionBeanLocal.readCustomerOrder(Long.valueOf(coId));
+                    if (!co.getCustomer().getId().equals(customer.getId())) { // check if this order belongs to the auth customer
+                        return getNoPermissionResponse();
+                    }
+                    //correct credantial. perform logic
+                    customerOrder.setId(Long.valueOf(coId));
+                    customerOrderSessionBeanLocal.updateCustomerOrderNonNullFields(customerOrder);
+                    return Response.status(204).build();
 
-                if (!co.getCustomer().getId().equals(customer.getId())) { // check if this order belongs to the auth customer
-                    return getNoPermissionResponse();
+                } catch (CustomerOrderNotFoundException e) {
+                    return getNotFoundResponse();
                 }
-                //correct credantial. perform logic
-                customerOrder.setId(Long.valueOf(coId));
-                customerOrderSessionBeanLocal.updateCustomerOrderNonNullFields(customerOrder);
-                return Response.status(204).build();
-
-            } catch (CustomerOrderNotFoundException e) {
-                return getNotFoundResponse();
+            } else {
+                return getWrongPasswordResponse();//TODO: test this endpoint
             }
-        } else {
-            return getWrongPasswordResponse();//TODO: test this endpoint
+        } else { //isStore == true
+            Store store = storeList.get(0);
+            if (store.getPassword().equals(password)) {
+                try {
+                    CustomerOrder co = customerOrderSessionBeanLocal.readCustomerOrder(Long.valueOf(coId));
+
+                    if (!co.getOrderDishes().get(0).getDish().getStore().getId().equals(store.getId())) { // check if this order belongs to the sotore
+                        return getNoPermissionResponse();
+                    }
+                    //correct credantial. perform logic
+                    customerOrder.setId(Long.valueOf(coId));
+                    customerOrderSessionBeanLocal.updateCustomerOrderNonNullFields(customerOrder);
+                    return Response.status(204).build();
+                } catch (CustomerOrderNotFoundException e) {
+                    return getNotFoundResponse();
+                }
+            } else {
+                return getWrongPasswordResponse();//TODO: test this endpoint
+            }
         }
     }
 
