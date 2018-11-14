@@ -239,7 +239,7 @@ public class InitializeSessionBean {
     }
 
     private void initializeCanteen() {
-        List<Canteen> canteens = new ArrayList<Canteen>();
+        List<Canteen> canteens = new ArrayList<>();
 
         Canteen fineFood = new Canteen();
         fineFood.setName("FineFood");
@@ -271,12 +271,121 @@ public class InitializeSessionBean {
                 s.setPassword("password");
                 s.setVendorEmail("vendor1@gmail.com");
                 s.setCanteen(fineFood);
-                //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
+                //create a dummy dish in the store 
                 Dish dish = new Dish("Bak Choy", 2 * Math.random(), "high fiber and full of vitamin");
                 dishSessionBeanLocal.createDish(dish);
                 dishes.add(dish);
                 dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Sliced Ham", 3 * Math.random(), "canned. size: half of a circle");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Cheese tofu", 3 * Math.random(), "Must try");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("fish ball", 3 * Math.random(), "made with real fish");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("crab  stick", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Tau pok", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Beancurd Sheet", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Tau Pok with Fish Paste", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Green Chilli with Fish Paste", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Ladies Finger with Fish Paste", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Brinjal with Fish Paste", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Bittergourd with Fish Paste", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Red Chilli with Fish Paste ", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Egg Tofu", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("kway teow", 1.0, "noodles");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("yello noodles", 1.0, "noodles");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("been hoon", 1.0, "noodles");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("vermicilli", 1.0, "noodles");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("hor fun", 1.0, "noodles");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
                 s.setDishes(dishes);
 
                 storeSessionBeanLocal.createStore(s);
@@ -288,12 +397,92 @@ public class InitializeSessionBean {
                 s.setPassword("password");
                 s.setVendorEmail("finefoodgc@gmail.com");
                 s.setCanteen(fineFood);
-                //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
-                Dish dish = new Dish("Earl Grey Milk Team", 4 * Math.random(), "you can choose your own sugar level");
+
+                //create a dummy dish in the store 
+                Dish dish = new Dish("Earl Grey Milk Tea", 4 * Math.random(), "default: 50% sugar, regular ice");
                 dishSessionBeanLocal.createDish(dish);
                 dishes.add(dish);
                 dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Earl Grey Milk Tea", 4 * Math.random(), "default: 50% sugar, regular ice");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Black Milk Tea", 4 * Math.random(), "default: 50% sugar, regular ice");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Taro  Milk Tea", 4 * Math.random(), "default: 50% sugar, regular ice");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Milk foam green Tea", 4 * Math.random(), "default: 50% sugar, regular ice");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Milk Foam winter melon", 4 * Math.random(), "default: 50% sugar, regular ice");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("0% sugar", 0.0, "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                //create a dummy dish in the store 
+                dish = new Dish("20% sugar", 0.0, "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                //create a dummy dish in the store 
+                dish = new Dish("50% sugar", 0.0, "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                //create a dummy dish in the store 
+                dish = new Dish("75% sugar", 0.0, "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("0% ice", 0.0, "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                //create a dummy dish in the store 
+                dish = new Dish("20% ice", 0.0, "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                //create a dummy dish in the store 
+                dish = new Dish("50% ice", 0.0, "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                //create a dummy dish in the store 
+                dish = new Dish("75% ice", 0.0, "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("warm drink", 0.0, "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
                 s.setDishes(dishes);
 
                 storeSessionBeanLocal.createStore(s);
@@ -305,12 +494,33 @@ public class InitializeSessionBean {
                 s.setPassword("password");
                 s.setVendorEmail("finefoodk@gmail.com");
                 s.setCanteen(fineFood);
-                //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
-                Dish dish = new Dish("Chicken Kimchi Soup", 7 * Math.random(), "it also has bak choya and vermecilli");
+                //create a dummy dish in the store                
+                Dish dish = new Dish("Chicken Kimchi Soup", 7 * Math.random(), "it also has bak choy and vermecilli");
                 dishSessionBeanLocal.createDish(dish);
                 dishes.add(dish);
                 dish.setStore(s);
+                //create a dummy dish in the store                
+                dish = new Dish("spicy marinated chicken", 7 * Math.random(), "with rice and miso soup");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                //create a dummy dish in the store                
+                dish = new Dish("spicy marinated beef", 7 * Math.random(), "with rice and miso soup");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                //create a dummy dish in the store                
+                dish = new Dish("spicy marinated pork", 7 * Math.random(), "with rice and miso soup");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                //create a dummy dish in the store                
+                dish = new Dish("Saba fish", 7 * Math.random(), "with rice and miso soup");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
                 s.setDishes(dishes);
                 storeSessionBeanLocal.createStore(s);
                 fineFood.getStores().add(s);
@@ -326,9 +536,110 @@ public class InitializeSessionBean {
                 s.setPassword("password");
                 s.setVendorEmail("deckytf@gmail.com");
                 s.setCanteen(deck);
-                //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
+                //create a dummy dish in the store 
                 Dish dish = new Dish("Fish Ball", 2 * Math.random(), "Made of real fish!");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                //create a dummy dish in the store 
+                dish = new Dish("Sliced Ham", 3 * Math.random(), "canned. size: half of a circle");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Cheese tofu", 3 * Math.random(), "Must try");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("crab  stick", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Tau pok", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Beancurd Sheet", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Tau Pok with Fish Paste", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Green Chilli with Fish Paste", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Ladies Finger with Fish Paste", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Brinjal with Fish Paste", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Bittergourd with Fish Paste", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Red Chilli with Fish Paste ", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Egg Tofu", 3 * Math.random(), "made with real crab");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("kway teow", 1.0, "noodles");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("yello noodles", 1.0, "noodles");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("been hoon", 1.0, "noodles");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("vermicilli", 1.0, "noodles");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("hor fun", 1.0, "noodles");
                 dishSessionBeanLocal.createDish(dish);
                 dishes.add(dish);
                 dish.setStore(s);
@@ -349,6 +660,31 @@ public class InitializeSessionBean {
                 dishSessionBeanLocal.createDish(dish);
                 dishes.add(dish);
                 dish.setStore(s);
+                //create a dummy dish in the store 
+                dish = new Dish("clay pot sepcial", 7 * Math.random(), "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Claypot chicken rice with mushroom",  7 * Math.random(), "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Claypot chicken rice with egg",  7 * Math.random(), "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Claypot Yee Mee Soup with egg",  7 * Math.random(), "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                
                 s.setDishes(dishes);
 
                 deck.getStores().add(s);
@@ -366,6 +702,32 @@ public class InitializeSessionBean {
                 dishSessionBeanLocal.createDish(dish);
                 dishes.add(dish);
                 dish.setStore(s);
+                
+                 //create a dummy dish in the store 
+                dish = new Dish("Chicken rice with veg", 7 * Math.random(), "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Chicken rice set",  7 * Math.random(), "with half an egg and soup");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Roasted Chicken rice set",  7 * Math.random(), "with half an egg and soup");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("Chicken Noodles",  6 * Math.random(), "dry noodles with soup");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                
                 s.setDishes(dishes);
 
                 deck.getStores().add(s);
@@ -384,10 +746,35 @@ public class InitializeSessionBean {
                 s.setCanteen(foodClick);
                 //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
-                Dish dish = new Dish("Fish and Mushroom Bam Mian", 6 * Math.random(), "you can choose in soup or dried");
+                Dish dish = new Dish("Fish and Mushroom ban mian", 6 * Math.random(), "you can choose in soup or dried");
                 dishSessionBeanLocal.createDish(dish);
                 dishes.add(dish);
                 dish.setStore(s);
+                
+                 //create a dummy dish in the store 
+                dish = new Dish("singature dry chilli ban mian", 7 * Math.random(), "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("clam pan ban mian",  7 * Math.random(), "with half an egg and soup");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("homemade fishball soup",  7 * Math.random(), "with half an egg and soup");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("meatball soup",  6 * Math.random(), "dry noodles with soup");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
                 s.setDishes(dishes);
 
                 storeSessionBeanLocal.createStore(s);
@@ -400,6 +787,38 @@ public class InitializeSessionBean {
                 s.setPassword("password");
                 s.setVendorEmail("foodclickfj@gmail.com");
                 s.setCanteen(foodClick);
+                //create a dummy dish in the store 
+                List<Dish> dishes = new ArrayList<>();
+                Dish dish = new Dish("apple juice", 1 * Math.random(), "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                
+                 //create a dummy dish in the store 
+                dish = new Dish("pear juice", 1 * Math.random(), "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("carrot juice",  1 * Math.random(), "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("cucumber juice",  1 * Math.random(), "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("banana milk shake",  1 * Math.random(), "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                
+                s.setDishes(dishes);
                 storeSessionBeanLocal.createStore(s);
                 foodClick.getStores().add(s);
                 storeSessionBeanLocal.updateStore(s);
@@ -417,6 +836,32 @@ public class InitializeSessionBean {
                 dishSessionBeanLocal.createDish(dish);
                 dishes.add(dish);
                 dish.setStore(s);
+                
+                 //create a dummy dish in the store 
+                dish = new Dish("chargrill chicken", 20 * Math.random(), "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("black pepper chicken",  20 * Math.random(), "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("teriyaki chicken",  20 * Math.random(), "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+
+                //create a dummy dish in the store 
+                dish = new Dish("new york strip",  20 * Math.random(), "");
+                dishSessionBeanLocal.createDish(dish);
+                dishes.add(dish);
+                dish.setStore(s);
+                
+                
                 s.setDishes(dishes);
 
                 storeSessionBeanLocal.createStore(s);
@@ -483,7 +928,7 @@ public class InitializeSessionBean {
                 dish.setOrderDishes(new ArrayList<>());
                 dish.getOrderDishes().add(orderDish);
                 dishSessionBeanLocal.updateDish(dish);
-                orderDish.setAmount(1+(int) (Math.random() * 10));
+                orderDish.setAmount(1 + (int) (Math.random() * 10));
                 orderDishSessionBean.createOrderDish(orderDish);
                 CustomerOrder customerOrder = new CustomerOrder();
                 customerOrder.setCustomer(customer);
