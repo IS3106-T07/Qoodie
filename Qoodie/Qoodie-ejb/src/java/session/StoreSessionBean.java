@@ -7,10 +7,12 @@ package session;
 
 import entity.Store;
 import error.StoreNotFoundException;
-import java.util.List;
+
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import java.util.List;
 
 /**
  *
@@ -47,6 +49,18 @@ public class StoreSessionBean implements StoreSessionBeanLocal {
     public void deleteStore(Store s) throws StoreNotFoundException {
         Store oldS = readStore(s.getId());
         em.remove(oldS);
+    }
+
+    @Override
+    public void updateVendor(Store s) throws StoreNotFoundException {
+        em.merge(s);
+    }
+
+    @Override
+    public Boolean checkVendorUserName(String username) {
+        Query query = em.createQuery("SELECT s FROM Store s WHERE s.vendorUsername = :username");
+        query.setParameter("username", username);
+        return query.getResultList().size() == 0;
     }
 
     @Override

@@ -7,8 +7,9 @@ package session;
 
 import entity.Store;
 import error.StoreNotFoundException;
-import java.util.List;
+
 import javax.ejb.Local;
+import java.util.List;
 
 /**
  *
@@ -21,6 +22,7 @@ public interface StoreSessionBeanLocal {
     public Store readStore(Long sId) throws StoreNotFoundException;
     public void updateStore(Store s) throws StoreNotFoundException;
     public void deleteStore(Store s) throws StoreNotFoundException;
-    
+    public void updateVendor(Store s) throws StoreNotFoundException;
+    public Boolean checkVendorUserName(String username);
     public List<Store> readAllStore();
 }

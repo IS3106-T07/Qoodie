@@ -5,14 +5,9 @@
 */
 package entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 
 /**
  *
@@ -25,10 +20,13 @@ public class Store implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
+    //username is case insensitive and doesn't contain spaces
+    private String vendorUsername;
     private String vendorEmail;
     private String password;
     @OneToMany
     private List<Dish> dishes;
+    @ManyToOne
     private CuisineType cuisineType;
     public Long getId() {
         return id;
@@ -102,5 +100,12 @@ public class Store implements Serializable {
     public void setCuisineType(CuisineType cuisineType) {
         this.cuisineType = cuisineType;
     }
-    
+
+    public String getVendorUsername() {
+        return vendorUsername;
+    }
+
+    public void setVendorUsername(String vendorUsername) {
+        this.vendorUsername = vendorUsername;
+    }
 }

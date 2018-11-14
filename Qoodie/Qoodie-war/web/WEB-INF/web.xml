@@ -19,4 +19,16 @@
         <local>session.CustomerSessionBeanLocal</local>
         <ejb-link>Qoodie-ejb.jar#CustomerSessionBean</ejb-link>
     </ejb-local-ref>
+    <ejb-local-ref>
+        <ejb-ref-name>DishSessionBean</ejb-ref-name>
+        <ejb-ref-type>Session</ejb-ref-type>
+        <local>session.DishSessionBeanLocal</local>
+        <ejb-link>Qoodie-ejb.jar#DishSessionBean</ejb-link>
+    </ejb-local-ref>
+    <ejb-local-ref>
+        <ejb-ref-name>StoreSessionBeanLocal</ejb-ref-name>
+        <ejb-ref-type>Session</ejb-ref-type>
+        <local>session.StoreSessionBeanLocal</local>
+        <ejb-link>Qoodie-ejb.jar#StoreSessionBean</ejb-link>
+    </ejb-local-ref>
 </web-app>
