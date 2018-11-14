@@ -8,81 +8,79 @@
 //import entity.CustomerOrder;
 //import entity.OrderDish;
 //import error.StoreNotFoundException;
-//import java.io.Serializable;
 //import java.util.Calendar;
 //import java.util.Date;
 //import java.util.List;
 //import javax.ejb.EJB;
 //import javax.faces.application.FacesMessage;
+//import javax.inject.Named;
 //import javax.faces.bean.ManagedBean;
-//import javax.faces.bean.SessionScoped;
+//import javax.faces.bean.RequestScoped;
 //import javax.faces.context.FacesContext;
 //import org.primefaces.event.SelectEvent;
 //import session.CustomerOrderSessionBeanLocal;
 //
 ///**
 // *
-// * @author DEEP
+// * @author alex_zy
 // */
 //@ManagedBean
-//@SessionScoped
-//public class revenue implements Serializable {
+//@RequestScoped
+//public class revenueManagedBean {
 //
 //    private Date date;
 //    private Date weekFirstDay;
 //    private Date weekLastDay;
 //    private long storeId;
 //    Calendar cal;
-//     @EJB
+//
+//    @EJB
 //    private CustomerOrderSessionBeanLocal customerOrderSessionBean;
 //
-//    public revenue() {
-//          this.date = new Date("11/20/2018");
-//          storeId=18;
-//          cal = Calendar.getInstance();
+//    public revenueManagedBean() {
 //    }
+//
 //    public void handleDateSelect(SelectEvent event) {
 //        setDate((Date) event.getObject());
-//        
+//
 //        cal.setTime(getDate());
 //        cal.set(Calendar.DAY_OF_WEEK, 1);
-//        weekFirstDay = cal.getTime(); 
+//        weekFirstDay = cal.getTime();
 //        cal.set(Calendar.DAY_OF_WEEK, 7);
 //        weekLastDay = cal.getTime();
-//        
-//        System.out.println("date chosen = "+ getDate());
-//        System.out.println("first Day of Week = "+ getWeekFirstDay());
-//        System.out.println("Last Day of Week = "+ getWeekLastDay());
-//        
+//
+//        System.out.println("date chosen = " + getDate());
+//        System.out.println("first Day of Week = " + getWeekFirstDay());
+//        System.out.println("Last Day of Week = " + getWeekLastDay());
+//
 //        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", "Date is" + getDate().toString());
 //        FacesContext.getCurrentInstance().addMessage(null, message);
 //    }
 //
-//    public List<CustomerOrder> dayOrders() throws StoreNotFoundException
-//    {
+//    public List<CustomerOrder> dayOrders() throws StoreNotFoundException {
 //        return customerOrderSessionBean.getStoreCustomerOrder(storeId, date, date);
 //    }
-//    public List<CustomerOrder> weekOrders() throws StoreNotFoundException
-//    {
+//
+//    public List<CustomerOrder> weekOrders() throws StoreNotFoundException {
 //        return customerOrderSessionBean.getStoreCustomerOrder(storeId, weekFirstDay, weekLastDay);
 //    }
-//    public String dishList(List<OrderDish> list)
-//    {
-//        String str="";
-//        for(OrderDish i : list)
-//        {
-//            str=str+ i.getDish().getName()+","; 
+//
+//    public String dishList(List<OrderDish> list) {
+//        String str = "";
+//        for (OrderDish i : list) {
+//            str = str + i.getDish().getName() + ",";
 //        }
-//        return str.substring(0, str.length()-1);
+//        return str.substring(0, str.length() - 1);
 //    }
-//    public double getDayRevenue() throws StoreNotFoundException
-//    {
+//
+//    public double getDayRevenue() throws StoreNotFoundException {
 //        return customerOrderSessionBean.calculateRevenue(storeId, date, date);
 //    }
-//    public double getWeekRevenue() throws StoreNotFoundException
-//    {
+//
+//    public double getWeekRevenue() throws StoreNotFoundException {
 //        return customerOrderSessionBean.calculateRevenue(storeId, weekFirstDay, weekLastDay);
 //    }
+//
 //    /**
 //     * @return the date
 //     */
@@ -138,6 +136,4 @@
 //    public void setWeekLastDay(Date weekLastDay) {
 //        this.weekLastDay = weekLastDay;
 //    }
-//
-//    
 //}

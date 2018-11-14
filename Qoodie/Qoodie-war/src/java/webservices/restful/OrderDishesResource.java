@@ -129,6 +129,7 @@ public class OrderDishesResource {
             customerOrder.setOrderDishes(orderDishes);
             customerOrderSessionBeanLocal.createCustomerOrder(customerOrder);
             od.setCustomerOrder(customerOrder);
+            System.out.println("*** next: orderDishSessionBeanLocal.updateOrderDish(od);");
             orderDishSessionBeanLocal.updateOrderDish(od);
             CustomerOrderType inBasketType = customerOrderTypeSessionBeanLocal.readCustomerOrderTypeByName("in basket").get(0);
             customerOrder.setCustomerOrderType(inBasketType);

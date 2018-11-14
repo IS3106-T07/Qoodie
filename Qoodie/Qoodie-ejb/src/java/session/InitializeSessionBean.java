@@ -99,7 +99,7 @@ public class InitializeSessionBean {
             initializeCanteen();
             initializeStores();
             initializeUsers();
-            initializeOrderDish();
+            //initializeOrderDish();
             initializeCustomerOrder();
 
         } catch (StoreNotFoundException | DishNotFoundException | CanteenNotFoundException ex) {
@@ -117,7 +117,7 @@ public class InitializeSessionBean {
             cuisineTypeSessionBeanLocal.createCuisineType(c);
         }
     }
-
+/*
     public void initializeOrderDish() {
         try {
             OrderDish o1 = new OrderDish();
@@ -147,6 +147,7 @@ public class InitializeSessionBean {
         } catch (Exception e) {
         }
     }
+    */
 
     public void initializeCustomerOrder() {
         try {
