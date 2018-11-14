@@ -88,6 +88,13 @@ public class Flattener {
             s.setCanteen(null);
             for (Dish d : s.getDishes()) {
                 d.setStore(null);
+                d.setOrderDishes(null);
+                if (d.getDishType() != null) {
+                    d.getDishType().setDishes(null);
+                }
+            }
+            if (s.getCuisineType() != null) {
+                s.getCuisineType().setStores(null);
             }
         }
         return c;
