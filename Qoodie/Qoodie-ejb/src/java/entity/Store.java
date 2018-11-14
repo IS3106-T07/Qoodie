@@ -5,6 +5,7 @@
 */
 package entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Entity;
@@ -26,6 +27,8 @@ public class Store implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
+    //username is case insensitive and doesn't contain spaces
+    private String vendorUsername;
     private String vendorEmail;
     private String password;
     @OneToMany
@@ -114,5 +117,12 @@ public class Store implements Serializable {
     public void setCuisineType(CuisineType cuisineType) {
         this.cuisineType = cuisineType;
     }
-    
+
+    public String getVendorUsername() {
+        return vendorUsername;
+    }
+
+    public void setVendorUsername(String vendorUsername) {
+        this.vendorUsername = vendorUsername;
+    }
 }
