@@ -25,6 +25,7 @@ public interface StoreSessionBeanLocal {
     public void updateVendor(Store s) throws StoreNotFoundException;
     public Boolean checkVendorUserName(String username);
     public List<Store> readAllStore();
+    Store retrieveStoreById(Long id);
 
     public List<Store> readStoreByEmail(String email);
 }

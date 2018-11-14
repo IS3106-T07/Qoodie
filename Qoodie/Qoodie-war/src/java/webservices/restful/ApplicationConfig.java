@@ -45,7 +45,8 @@ public class ApplicationConfig extends Application {
         resources.add(webservices.restful.CanteensResources.class);
         resources.add(webservices.restful.CustomerOrderResource.class);
         resources.add(webservices.restful.CustomerOrderTypesResource.class);
-        resources.add(webservices.restful.CustomersResource.class)resources.add(webservices.restful.OrderDishesResource.class);
+        resources.add(webservices.restful.CustomersResource.class);
+        resources.add(webservices.restful.OrderDishesResource.class);
         resources.add(webservices.restful.StoresResources.class);
         resources.add(webservices.restful.VendorResource.class);
     }

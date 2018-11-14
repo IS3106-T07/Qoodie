@@ -5,15 +5,14 @@
  */
 package session;
 
-import entity.Customer;
 import entity.Store;
 import error.StoreNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
+
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -82,6 +81,11 @@ public class StoreSessionBean implements StoreSessionBeanLocal {
     @Override
     public List<Store> readAllStore() {
         return em.createQuery("SELECT s From Store s").getResultList();
+    }
+
+    @Override
+    public Store retrieveStoreById(Long id) {
+        return em.find(Store.class, id);
     }
 
     @Override

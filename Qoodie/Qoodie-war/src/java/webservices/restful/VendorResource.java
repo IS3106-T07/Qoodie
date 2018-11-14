@@ -5,12 +5,18 @@
  */
 package webservices.restful;
 
+import entity.Dish;
+import entity.OrderDish;
 import entity.Store;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import session.CustomerOrderSessionBeanLocal;
+import session.DishSessionBeanLocal;
+import session.OrderDishSessionBeanLocal;
 import session.StoreSessionBeanLocal;
 import webservices.restful.datamodels.CreateItemReq;
 import webservices.restful.datamodels.CreateVendorReq;
+import webservices.restful.datamodels.OrderRsp;
 import webservices.restful.datamodels.StoreRsp;
 import webservices.restful.util.StorageDir;
 
@@ -27,8 +33,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,6 +48,9 @@ import static webservices.restful.util.ResponseHelper.getExceptionDump;
  */
 @Path("vendors")
 public class VendorResource {
+    DishSessionBeanLocal dishSessionBeanLocal = lookupDishSessionBeanLocal();
+    CustomerOrderSessionBeanLocal customerOrderSessionBean = lookupCustomerOrderSessionBeanLocal();
+    OrderDishSessionBeanLocal orderDishSessionBean = lookupOrderDishSessionBeanLocal();
     StoreSessionBeanLocal storeSessionBeanLocal = lookupStoreSessionBeanLocal();
     private LinkedHashMap<Object, Object> error = new LinkedHashMap<>();
     private String storageDir = StorageDir.dir;
@@ -134,8 +145,16 @@ public class VendorResource {
     public Response getOrdersByVendorId(@QueryParam("vendorId") Long vendorId) {
         try {
             userTransaction.begin();
+            Store store = storeSessionBeanLocal.retrieveStoreById(vendorId);
+            List<OrderRsp> response = new ArrayList<>();
+            List<Dish> dishes = store.getDishes();
+            for (Dish dish : dishes) {
+                for (OrderDish orderDish : dish.getOrderDishes()) {
+                    response.add(new OrderRsp(orderDish));
+                }
+            }
             userTransaction.commit();
-            return  Response.status(Response.Status.OK).entity(null).build();
+            return  Response.status(Response.Status.OK).entity(response).build();
         } catch (Exception ex) {
             try {
                 userTransaction.setRollbackOnly();
@@ -271,6 +290,36 @@ public class VendorResource {
         try {
             Context c = new InitialContext();
             return (StoreSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/StoreSessionBean!session.StoreSessionBeanLocal");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
+    }
+
+    private OrderDishSessionBeanLocal lookupOrderDishSessionBeanLocal() {
+        try {
+            Context c = new InitialContext();
+            return (OrderDishSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/OrderDishSessionBean!session.OrderDishSessionBeanLocal");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
+    }
+
+    private CustomerOrderSessionBeanLocal lookupCustomerOrderSessionBeanLocal() {
+        try {
+            Context c = new InitialContext();
+            return (CustomerOrderSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/CustomerOrderSessionBean!session.CustomerOrderSessionBeanLocal");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
+    }
+
+    private DishSessionBeanLocal lookupDishSessionBeanLocal() {
+        try {
+            Context c = new InitialContext();
+            return (DishSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/DishSessionBean!session.DishSessionBeanLocal");
         } catch (NamingException ne) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
             throw new RuntimeException(ne);
