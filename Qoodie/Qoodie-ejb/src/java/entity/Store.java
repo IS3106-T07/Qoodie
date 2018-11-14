@@ -8,6 +8,13 @@ package entity;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -28,8 +35,18 @@ public class Store implements Serializable {
     private List<Dish> dishes;
     @ManyToOne
     private CuisineType cuisineType;
+    @ManyToOne
+    private Canteen canteen;
     public Long getId() {
         return id;
+    }
+
+    public Canteen getCanteen() {
+        return canteen;
+    }
+
+    public void setCanteen(Canteen canteen) {
+        this.canteen = canteen;
     }
     
     public void setId(Long id) {

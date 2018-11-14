@@ -16,7 +16,6 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
-import javax.ejb.EJB;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.naming.Context;
@@ -37,12 +36,11 @@ import session.CustomerSessionBeanLocal;
  * @author alex_zy
  */
 public class AdminFilter implements Filter {
-//    CustomerSessionBeanLocal customerSessionBeanLocal = lookupCustomerSessionBeanLocal();
+    CustomerSessionBeanLocal customerSessionBeanLocal = lookupCustomerSessionBeanLocal();
     private static final String AUTHORIZATION_HEADER = "Authorization"; //the key we will be looking for in the header
     private static final String AUTHORIZATION_HEADER_PREFIX = "Basic ";
     private static final String SECURED_URL_PREFIX = "customers";
-    @EJB
-    private CustomerSessionBeanLocal customerSessionBeanLocal;
+    
     
     
     public AdminFilter() {
@@ -132,13 +130,13 @@ public class AdminFilter implements Filter {
         
     }
 
-//    private CustomerSessionBeanLocal lookupCustomerSessionBeanLocal() {
-//        try {
-//            Context c = new InitialContext();
-//            return (CustomerSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/CustomerSessionBean!session.CustomerSessionBeanLocal");
-//        } catch (NamingException ne) {
-//            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
-//            throw new RuntimeException(ne);
-//        }
-//    }
+    private CustomerSessionBeanLocal lookupCustomerSessionBeanLocal() {
+        try {
+            Context c = new InitialContext();
+            return (CustomerSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/CustomerSessionBean!session.CustomerSessionBeanLocal");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
+    }
 }

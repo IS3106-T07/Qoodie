@@ -127,6 +127,27 @@ public class VendorResource {
         }
     }
 
+    @GET
+    @Path("getOrdersByVendorId")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getOrdersByVendorId(@QueryParam("vendorId") Long vendorId) {
+        try {
+            userTransaction.begin();
+            userTransaction.commit();
+            return  Response.status(Response.Status.OK).entity(null).build();
+        } catch (Exception ex) {
+            try {
+                userTransaction.setRollbackOnly();
+                System.out.println("ROLLED BACK");
+            } catch (SystemException e) {
+                System.out.println("ROLLBACK FAILED");
+            }
+            error.put("message", getExceptionDump(ex));
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
+        }
+    }
+
     @POST
     @Path("createVendor")
     @Produces(MediaType.APPLICATION_JSON)

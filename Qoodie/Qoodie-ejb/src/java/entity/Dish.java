@@ -25,7 +25,7 @@ public class Dish implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
-    private Boolean isAvailable;
+    private Boolean isAvailable = true;
     private Double price;
     private String description;
     @ManyToOne
@@ -34,7 +34,20 @@ public class Dish implements Serializable {
     private DishType dishType;
     @OneToMany
     private List<OrderDish> orderDishes;
+
+    public Dish(String name, Double price, String description) {
+        this.name = name;
+        this.price = price;
+        this.description = description;
+    }
     
+     public Dish(String name, Double price) {
+        this.name = name;
+        this.price = price;
+        this.description = "";
+    }
+    
+    public Dish(){}
     public Long getId() {
         return id;
     }
@@ -65,7 +78,7 @@ public class Dish implements Serializable {
     
     @Override
     public String toString() {
-        return "entity.Dish[ id=" + id + " ]";
+        return "entity.Dish[ id=" + id + " name = "+this.name + " ]";
     }
 
     public String getName() {

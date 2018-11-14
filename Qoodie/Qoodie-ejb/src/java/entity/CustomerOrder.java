@@ -1,8 +1,8 @@
 /*
-* To change this license header, choose License Headers in Project Properties.
-* To change this template file, choose Tools | Templates
-* and open the template in the editor.
-*/
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package entity;
 
 import java.io.Serializable;
@@ -23,6 +23,7 @@ import javax.persistence.TemporalType;
  */
 @Entity
 public class CustomerOrder implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -31,20 +32,28 @@ public class CustomerOrder implements Serializable {
     private Date created;
     @Temporal(TemporalType.TIME)
     private Date lastUpdate;
-    private Boolean isAccepted;
+    Double price = -1.0;
     @ManyToOne
     private Customer customer;
     @OneToMany
     private List<OrderDish> orderDishes;
     @ManyToOne
     private CustomerOrderType customerOrderType;
-    
+
     public Long getId() {
         return id;
     }
-    
+
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Double getPrice() {
+        return this.price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public Date getLastUpdate() {
@@ -78,14 +87,14 @@ public class CustomerOrder implements Serializable {
     public void setCustomerOrderType(CustomerOrderType customerOrderType) {
         this.customerOrderType = customerOrderType;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
-    
+
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
@@ -98,7 +107,7 @@ public class CustomerOrder implements Serializable {
         }
         return true;
     }
-    
+
     @Override
     public String toString() {
         return "entity.CustomerOrder[ id=" + id + " ]";
@@ -112,12 +121,4 @@ public class CustomerOrder implements Serializable {
         this.created = created;
     }
 
-    public Boolean getIsAccepted() {
-        return isAccepted;
-    }
-
-    public void setIsAccepted(Boolean isAccepted) {
-        this.isAccepted = isAccepted;
-    }
-    
 }
