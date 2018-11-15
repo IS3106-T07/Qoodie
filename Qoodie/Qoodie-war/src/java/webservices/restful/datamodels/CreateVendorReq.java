@@ -3,26 +3,16 @@ package webservices.restful.datamodels;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType(name = "createVendorReq", propOrder = {
-        "username",
         "emailAddress",
         "password",
         "storeName",
         "canteen",
 })
 public class CreateVendorReq {
-    private String username;
     private String emailAddress;
     private String password;
     private String storeName;
-    private String canteen;
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    private Long canteen;
 
     public String getEmailAddress() {
         return emailAddress;
@@ -48,11 +38,11 @@ public class CreateVendorReq {
         this.storeName = storeName;
     }
 
-    public String getCanteen() {
+    public Long getCanteen() {
         return canteen;
     }
 
-    public void setCanteen(String canteen) {
+    public void setCanteen(Long canteen) {
         this.canteen = canteen;
     }
 }

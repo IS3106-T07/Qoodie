@@ -10,7 +10,7 @@ import java.util.List;
 public class StoreRsp {
     private Long id;
     private String name;
-    private String vendorUsername;
+    private Long vendorId;
     private String vendorEmail;
     private List<DishRsp> dishes;
     private String cuisineType;
@@ -21,8 +21,6 @@ public class StoreRsp {
     public StoreRsp(Store store) {
         setId(store.getId());
         setName(store.getName());
-        setVendorUsername(store.getVendorUsername());
-        setVendorEmail(store.getVendorEmail());
         List<Dish> dishes = store.getDishes();
         List<DishRsp> dishRsps = new ArrayList<>();
         for (Dish dish : dishes) {
@@ -48,14 +46,6 @@ public class StoreRsp {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getVendorUsername() {
-        return vendorUsername;
-    }
-
-    public void setVendorUsername(String vendorUsername) {
-        this.vendorUsername = vendorUsername;
     }
 
     public String getVendorEmail() {
@@ -88,5 +78,13 @@ public class StoreRsp {
 
     public void setCuisineTypeId(Long cuisineTypeId) {
         this.cuisineTypeId = cuisineTypeId;
+    }
+
+    public Long getVendorId() {
+        return vendorId;
+    }
+
+    public void setVendorId(Long vendorId) {
+        this.vendorId = vendorId;
     }
 }

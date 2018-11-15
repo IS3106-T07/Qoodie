@@ -23,7 +23,7 @@ public interface StoreSessionBeanLocal {
     public void updateStore(Store s) throws StoreNotFoundException;
     public void deleteStore(Store s) throws StoreNotFoundException;
     public void updateVendor(Store s) throws StoreNotFoundException;
-    public Boolean checkVendorUserName(String username);
+    public Boolean checkVendorEmail(String username);
     public List<Store> readAllStore();
     Store retrieveStoreById(Long id);
 

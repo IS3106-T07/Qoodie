@@ -6,30 +6,23 @@
 package filter;
 
 import entity.Customer;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Base64;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.Resource;
+import enums.UserType;
+import session.CustomerSessionBeanLocal;
+
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import session.CustomerSessionBeanLocal;
+import java.io.IOException;
+import java.util.Base64;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -80,7 +73,7 @@ public class AdminFilter implements Filter {
             else
             {
                 Customer customer = customerList.get(0);
-                if (!customer.getUserType().getName().toLowerCase().equals("admin")) //CASE: not admin user
+                if (customer.getUserType() != UserType.ADMIN) //CASE: not admin user
                 {
                     throwForbidden(response);
                 }

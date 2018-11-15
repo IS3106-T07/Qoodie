@@ -5,16 +5,8 @@
  */
 package webservices.restful.helper;
 
-import entity.Canteen;
-import entity.CuisineType;
-import entity.Customer;
-import entity.CustomerOrder;
-import entity.CustomerOrderType;
-import entity.Dish;
-import entity.DishType;
-import entity.OrderDish;
-import entity.Store;
-import entity.UserType;
+import entity.*;
+
 import java.util.List;
 
 /**
@@ -24,29 +16,30 @@ import java.util.List;
 public class Flattener {
 
     public static Customer flatten(Customer c) {
-        c.getUserType().setCustomers(null);
         List<CustomerOrder> orders = c.getCustomerOrders();
         for (CustomerOrder co : orders) {
             co.setCustomer(null);
             for (CustomerOrder order : orders) {
 
                 for (OrderDish od : order.getOrderDishes()) {
-                    od.setCustomerOrder(null);
-                    od.getDish().setOrderDishes(null);
-                    od.getDish().setDishType(null);
-                    od.getDish().getStore().setDishes(null);
-                    od.getDish().getStore().setCuisineType(null);
-                    od.getDish().getStore().setVendorEmail(null);
-                    od.getDish().getStore().setPassword(null);
-                    od.getDish().getStore().getCanteen().setStores(null);
+                    cleanupOrderDish(od);
 
                 }
 
             }
             co.getCustomerOrderType().setCustomerOrders(null);
         }
-        c.getUserType().setCustomers(null);
         return c;
+    }
+
+    private static void cleanupOrderDish(OrderDish od) {
+        od.setCustomerOrder(null);
+        od.getDish().setOrderDishes(null);
+        od.getDish().setDishType(null);
+        od.getDish().getStore().setDishes(null);
+        od.getDish().getStore().setCuisineType(null);
+        od.getDish().getStore().setVendor(null);
+        od.getDish().getStore().getCanteen().setStores(null);
     }
 
     public static CustomerOrder flatten(CustomerOrder co) {
@@ -54,14 +47,7 @@ public class Flattener {
         co.getCustomerOrderType().setCustomerOrders(null);
         List<OrderDish> orderDishes = co.getOrderDishes();
         for (OrderDish od : orderDishes) {
-            od.setCustomerOrder(null);
-            od.getDish().setOrderDishes(null);
-            od.getDish().setDishType(null);
-            od.getDish().getStore().setDishes(null);
-            od.getDish().getStore().setCuisineType(null);
-            od.getDish().getStore().setVendorEmail(null);
-            od.getDish().getStore().setPassword(null);
-            od.getDish().getStore().getCanteen().setStores(null);
+            cleanupOrderDish(od);
         }
         return co;
     }
@@ -138,15 +124,4 @@ public class Flattener {
         od.setDish(flatten(od.getDish()));
         return od;
     }
-
-    public static UserType flatten(UserType ut) {
-        for (Customer c : ut.getCustomers()) {
-            c.setUserType(null);
-            for (CustomerOrder co : c.getCustomerOrders()) {
-                co.setOrderDishes(null);
-            }
-        }
-        return ut;
-    }
-
 }

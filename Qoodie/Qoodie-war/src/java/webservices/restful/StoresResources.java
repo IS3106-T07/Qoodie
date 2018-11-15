@@ -5,37 +5,25 @@
  */
 package webservices.restful;
 
-import entity.Customer;
 import entity.CustomerOrder;
 import entity.Dish;
 import entity.OrderDish;
 import entity.Store;
-import error.CustomerOrderNotFoundException;
 import error.StoreNotFoundException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashSet;
-import java.util.List;
-import java.util.StringTokenizer;
-import javax.ejb.EJB;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import session.DishSessionBeanLocal;
 import session.StoreSessionBeanLocal;
 import webservices.restful.helper.Base64AuthenticationHeaderHelper;
 import webservices.restful.helper.Flattener;
 import webservices.restful.helper.PATCH;
+
+import javax.ejb.EJB;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.ws.rs.*;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.*;
 
 /**
  * REST Web Service
@@ -142,7 +130,7 @@ public class StoresResources {
                         .type(MediaType.APPLICATION_JSON).build();
             } else {
                 Store store = storeList.get(0);
-                if (store.getPassword().equals(password)) {
+                if (store.getVendor().getPassword().equals(password)) {
                     return Response.status(200).entity(Flattener.flatten(store))
                             .type(MediaType.APPLICATION_JSON).build();
                 } else {
@@ -181,7 +169,7 @@ public class StoresResources {
                     .type(MediaType.APPLICATION_JSON).build();
         }
         Store oldS = storeList.get(0);
-        if (oldS.getPassword().equals(password)) { //correct credantial. can edit
+        if (oldS.getVendor().getPassword().equals(password)) { //correct credantial. can edit
             try {
                 newS.setId(oldS.getId());
                 storeSessionBeanLocal.updateStore(newS);
@@ -223,7 +211,7 @@ public class StoresResources {
 
         Store store = storeList.get(0);
 
-        if (store.getPassword().equals(password)) { //correct credential, perform logic
+        if (store.getVendor().getPassword().equals(password)) { //correct credential, perform logic
             List<CustomerOrder> allCustomerOrders = new ArrayList<>();
 
             for (Dish d : store.getDishes()) {

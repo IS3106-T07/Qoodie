@@ -5,34 +5,20 @@
  */
 package session;
 
-import entity.Canteen;
-import entity.CuisineType;
-import entity.Customer;
-import entity.CustomerOrder;
-import entity.CustomerOrderType;
-import entity.Dish;
-import entity.DishType;
-import entity.OrderDish;
-import entity.Store;
-import entity.UserType;
-import error.CustomerNotFoundException;
-import error.CustomerOrderNotFoundException;
-import error.CanteenNotFoundException;
-import error.CuisineTypeNotFoundException;
-import error.CustomerOrderTypeNotFoundException;
-import error.DishNotFoundException;
-import error.OrderDishNotFoundException;
-import error.StoreNotFoundException;
+import entity.*;
+import enums.UserType;
+import error.*;
+
+import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
+import javax.ejb.LocalBean;
+import javax.ejb.Singleton;
+import javax.ejb.Startup;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.ejb.EJB;
-import javax.ejb.Singleton;
-import javax.ejb.LocalBean;
-import javax.ejb.Startup;
 
 /**
  *
@@ -51,8 +37,6 @@ public class InitializeSessionBean {
 
     @EJB
     CuisineTypeSessionBeanLocal cuisineTypeSessionBeanLocal;
-    @EJB
-    UserTypeSessionBeanLocal userTypeSessionBeanLocal;
     @EJB
     CustomerSessionBeanLocal customerSessionBeanLocal;
     @EJB
@@ -79,11 +63,6 @@ public class InitializeSessionBean {
             List<CuisineType> cuisineTypes = cuisineTypeSessionBeanLocal.readAllCuisineType();
             if (cuisineTypes.size() != cuisineTypesArr.length) {
                 initializeCuisineType();
-            }
-
-            List<UserType> userTypes = userTypeSessionBeanLocal.readAllUserType();
-            if (userTypes.size() != userTypeArr.length) {
-                initializeUserType();
             }
 
             List<DishType> dishTypes = dishTypeSessionBeanLocal.readAllDishType();
@@ -184,15 +163,6 @@ public class InitializeSessionBean {
         }
     }
 
-    public void initializeUserType() {
-        for (int i = 0; i < userTypeArr.length; i++) {
-            UserType u = new UserType();
-            u.setName(userTypeArr[i]);
-            u.setCustomers(new ArrayList<>());
-            userTypeSessionBeanLocal.createUserType(u);
-        }
-    }
-
     private void initializeDishType() {
         for (int i = 0; i < dishTypeArr.length; i++) {
             DishType d = new DishType();
@@ -221,7 +191,7 @@ public class InitializeSessionBean {
             c.setName("Alice");
             c.setPassword("password");
             c.setPhone("88888888");
-            c.setUserType(userTypeSessionBeanLocal.readAllUserType().get(0));
+            c.setUserType(UserType.STUDENT);
             customerSessionBeanLocal.createCustomer(c);
             initialiseCustomerOrderForUser(c);
         }
@@ -229,10 +199,10 @@ public class InitializeSessionBean {
             Customer c = new Customer();
             c.setName("Bob");
             c.setEmail("bob@gmail.com");
-            c.setUserType(userTypeSessionBeanLocal.readAllUserType().get(1));
             c.setPhone("66666666");
             c.setAddress("31 Sungei Kadut Loop S 729509, Singapore");
             c.setPassword("password");
+            c.setUserType(UserType.ADMIN);
             customerSessionBeanLocal.createCustomer(c);
             initialiseCustomerOrderForUser(c);
         }
@@ -269,8 +239,17 @@ public class InitializeSessionBean {
             if (storeSessionBeanLocal.readStoreByEmail("vendor1@gmail.com").isEmpty()) {
                 Store s = new Store();
                 s.setName("Yong Tou Fu");
-                s.setPassword("password");
-                s.setVendorEmail("vendor1@gmail.com");
+
+                Customer c = new Customer();
+                c.setName("Christine");
+                c.setEmail("christine@gmail.com");
+                c.setPhone("66666666");
+                c.setAddress("31 Jalan Besah Road 985678, Singapore");
+                c.setPassword("password");
+                c.setUserType(UserType.VENDOR);
+                customerSessionBeanLocal.createCustomer(c);
+                s.setVendor(c);
+
                 s.setCanteen(fineFood);
                 List<Dish> dishes = new ArrayList<>();
                 //create a dummy dish in the store 
@@ -395,8 +374,13 @@ public class InitializeSessionBean {
             if (storeSessionBeanLocal.readStoreByEmail("finefoodgc@gmail.com").isEmpty()) {
                 Store s = new Store();
                 s.setName("Gong Cha");
-                s.setPassword("password");
-                s.setVendorEmail("finefoodgc@gmail.com");
+                Customer c = new Customer();
+                c.setEmail("finefoodgc@gmail.com");
+                c.setPassword("password");
+                customerSessionBeanLocal.createCustomer(c);
+                c.setUserType(UserType.VENDOR);
+                s.setVendor(c);
+
                 s.setCanteen(fineFood);
                 List<Dish> dishes = new ArrayList<>();
 
@@ -492,8 +476,12 @@ public class InitializeSessionBean {
             if (storeSessionBeanLocal.readStoreByEmail("finefoodk@gmail.com").isEmpty()) {
                 Store s = new Store();
                 s.setName("Korean and Japanese");
-                s.setPassword("password");
-                s.setVendorEmail("finefoodk@gmail.com");
+                Customer c = new Customer();
+                c.setEmail("finefoodk@gmail.com");
+                c.setPassword("password");
+                c.setUserType(UserType.VENDOR);
+                customerSessionBeanLocal.createCustomer(c);
+                s.setVendor(c);
                 s.setCanteen(fineFood);
                 List<Dish> dishes = new ArrayList<>();
                 //create a dummy dish in the store                
@@ -534,8 +522,12 @@ public class InitializeSessionBean {
             if (storeSessionBeanLocal.readStoreByEmail("deckytf@gmail.com").isEmpty()) {
                 Store s = new Store();
                 s.setName("Yong Tou Fu");
-                s.setPassword("password");
-                s.setVendorEmail("deckytf@gmail.com");
+                Customer c = new Customer();
+                c.setEmail("deckytf@gmail.com");
+                c.setPassword("password");
+                c.setUserType(UserType.VENDOR);
+                customerSessionBeanLocal.createCustomer(c);
+                s.setVendor(c);
                 s.setCanteen(deck);
                 List<Dish> dishes = new ArrayList<>();
                 //create a dummy dish in the store 
@@ -652,8 +644,12 @@ public class InitializeSessionBean {
             if (storeSessionBeanLocal.readStoreByEmail("deckcp@gmail.com").isEmpty()) {
                 Store s = new Store();
                 s.setName("Claypot");
-                s.setPassword("password");
-                s.setVendorEmail("deckcp@gmail.com");
+                Customer c = new Customer();
+                c.setEmail("deckcp@gmail.com");
+                c.setPassword("password");
+                c.setUserType(UserType.VENDOR);
+                customerSessionBeanLocal.createCustomer(c);
+                s.setVendor(c);
                 s.setCanteen(deck);
                 //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
@@ -694,8 +690,12 @@ public class InitializeSessionBean {
             if (storeSessionBeanLocal.readStoreByEmail("deckcr@gmail.com").isEmpty()) {
                 Store s = new Store();
                 s.setName("Chicken Rice");
-                s.setPassword("password");
-                s.setVendorEmail("deckcr@gmail.com");
+                Customer c = new Customer();
+                c.setEmail("deckcr@gmail.com");
+                c.setPassword("password");
+                c.setUserType(UserType.VENDOR);
+                customerSessionBeanLocal.createCustomer(c);
+                s.setVendor(c);
                 s.setCanteen(deck);
                 //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
@@ -742,8 +742,12 @@ public class InitializeSessionBean {
             if (storeSessionBeanLocal.readStoreByEmail("foodclickbm@gmail.com").isEmpty()) {
                 Store s = new Store();
                 s.setName("Ban Mian");
-                s.setPassword("password");
-                s.setVendorEmail("foodclickbm@gmail.com");
+                Customer c = new Customer();
+                c.setEmail("foodclickbm@gmail.com");
+                c.setPassword("password");
+                c.setUserType(UserType.VENDOR);
+                customerSessionBeanLocal.createCustomer(c);
+                s.setVendor(c);
                 s.setCanteen(foodClick);
                 //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
@@ -785,8 +789,12 @@ public class InitializeSessionBean {
             if (storeSessionBeanLocal.readStoreByEmail("foodclickfj@gmail.com").isEmpty()) {
                 Store s = new Store();
                 s.setName("Fruit and Juice");
-                s.setPassword("password");
-                s.setVendorEmail("foodclickfj@gmail.com");
+                Customer c = new Customer();
+                c.setEmail("foodclickfj@gmail.com");
+                c.setPassword("password");
+                c.setUserType(UserType.VENDOR);
+                customerSessionBeanLocal.createCustomer(c);
+                s.setVendor(c);
                 s.setCanteen(foodClick);
                 //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
@@ -828,8 +836,13 @@ public class InitializeSessionBean {
             if (storeSessionBeanLocal.readStoreByEmail("foodclicka@gmail.com").isEmpty()) {
                 Store s = new Store();
                 s.setName("Astons");
-                s.setPassword("password");
-                s.setVendorEmail("foodclicka@gmail.com");
+                Customer c = new Customer();
+                c.setEmail("foodclicka@gmail.com");
+                c.setPassword("password");
+                c.setUserType(UserType.VENDOR);
+                customerSessionBeanLocal.createCustomer(c);
+                customerSessionBeanLocal.createCustomer(c);
+                s.setVendor(c);
                 s.setCanteen(foodClick);
                 //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
