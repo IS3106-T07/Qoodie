@@ -11,26 +11,22 @@ import entity.OrderDish;
 import entity.Store;
 import error.CustomerOrderNotFoundException;
 import error.OrderDishNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import javax.ejb.EJB;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import session.CustomerOrderSessionBeanLocal;
 import session.CustomerSessionBeanLocal;
-import session.StoreSessionBean;
 import session.StoreSessionBeanLocal;
 import webservices.restful.helper.Base64AuthenticationHeaderHelper;
 import webservices.restful.helper.Flattener;
 import webservices.restful.helper.PATCH;
+
+import javax.ejb.EJB;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.ws.rs.*;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * REST Web Service
@@ -143,7 +139,7 @@ public class CustomerOrderResource {
             }
         } else { //isStore == true
             Store store = storeList.get(0);
-            if (store.getPassword().equals(password)) {
+            if (store.getVendor().getPassword().equals(password)) {
                 try {
                     CustomerOrder co = customerOrderSessionBeanLocal.readCustomerOrder(Long.valueOf(coId));
 

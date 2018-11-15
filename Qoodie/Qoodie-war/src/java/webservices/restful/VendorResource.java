@@ -5,19 +5,15 @@
  */
 package webservices.restful;
 
-import entity.Dish;
-import entity.OrderDish;
-import entity.Store;
+import entity.*;
+import enums.UserType;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
-import session.CustomerOrderSessionBeanLocal;
-import session.DishSessionBeanLocal;
-import session.OrderDishSessionBeanLocal;
-import session.StoreSessionBeanLocal;
+import session.*;
 import webservices.restful.datamodels.CreateItemReq;
 import webservices.restful.datamodels.CreateVendorReq;
 import webservices.restful.datamodels.OrderRsp;
-import webservices.restful.datamodels.StoreRsp;
+import webservices.restful.helper.Flattener;
 import webservices.restful.util.StorageDir;
 
 import javax.imageio.ImageIO;
@@ -48,8 +44,10 @@ import static webservices.restful.util.ResponseHelper.getExceptionDump;
  */
 @Path("vendors")
 public class VendorResource {
+    CustomerSessionBeanLocal customerSessionBeanLocal = lookupCustomerSessionBeanLocal();
+    CanteenSessionBeanLocal canteenSessionBeanLocal = lookupCanteenSessionBeanLocal();
     DishSessionBeanLocal dishSessionBeanLocal = lookupDishSessionBeanLocal();
-    CustomerOrderSessionBeanLocal customerOrderSessionBean = lookupCustomerOrderSessionBeanLocal();
+    CustomerOrderSessionBeanLocal customerOrderSessionBeanLocal = lookupCustomerOrderSessionBeanLocal();
     OrderDishSessionBeanLocal orderDishSessionBean = lookupOrderDishSessionBeanLocal();
     StoreSessionBeanLocal storeSessionBeanLocal = lookupStoreSessionBeanLocal();
     private LinkedHashMap<Object, Object> error = new LinkedHashMap<>();
@@ -167,6 +165,27 @@ public class VendorResource {
         }
     }
 
+    @GET
+    @Path("getAllCanteens")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getAllCanteens() {
+        try {
+            List<Canteen> canteens = canteenSessionBeanLocal.readAllCanteen();
+            List<LinkedHashMap<Object, Object>> results = new ArrayList<>();
+            for (Canteen canteen : canteens) {
+                LinkedHashMap<Object, Object> pair = new LinkedHashMap<>();
+                pair.put("id", canteen.getId());
+                pair.put("name", canteen.getName());
+                results.add(pair);
+            }
+            return  Response.status(Response.Status.OK).entity(results).build();
+        } catch (Exception ex) {
+            error.put("message", getExceptionDump(ex));
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
+        }
+    }
+
     @POST
     @Path("createVendor")
     @Produces(MediaType.APPLICATION_JSON)
@@ -174,26 +193,40 @@ public class VendorResource {
     public Response createVendor(CreateVendorReq createVendorReq) {
         try {
             userTransaction.begin();
-            String username = createVendorReq.getUsername().toLowerCase();
-            if (username.contains(" ")) {
+            String emailAddress = createVendorReq.getEmailAddress().toLowerCase();
+            if (emailAddress.contains(" ")) {
                 userTransaction.setRollbackOnly();
-                error.put("message", "Username contains spaces");
+                error.put("message", "Email contains spaces");
                 return  Response.status(Response.Status.NOT_ACCEPTABLE).entity(error).build();
             }
-            if (!storeSessionBeanLocal.checkVendorUserName(username)) {
+            if (!storeSessionBeanLocal.checkVendorEmail(emailAddress)) {
                 userTransaction.setRollbackOnly();
                 error.put("message", "User Exists");
                 return  Response.status(Response.Status.NOT_ACCEPTABLE).entity(error).build();
             }
             Store store = new Store();
-            store.setVendorUsername(username);
-            store.setVendorEmail(createVendorReq.getEmailAddress());
-            store.setPassword(createVendorReq.getPassword());
+            String password = createVendorReq.getPassword();
             store.setName(createVendorReq.getStoreName());
+            Canteen canteen = canteenSessionBeanLocal.readCanteen(createVendorReq.getCanteen());
+            List<Store> stores = canteen.getStores();
+            stores = stores == null ? new ArrayList<>() : stores;
+            stores.add(store);
+            canteen.setStores(stores);
             storeSessionBeanLocal.createStore(store);
+            canteenSessionBeanLocal.updateCanteen(canteen);
+
+            Customer vendor = new Customer();
+            vendor.setEmail(emailAddress);
+            vendor.setPassword(password);
+            vendor.setCreated(new Date());
+            vendor.setIsActive(true);
+            vendor.setUserType(UserType.VENDOR);
+            customerSessionBeanLocal.createCustomer(vendor);
+            store.setVendor(vendor);
+            storeSessionBeanLocal.updateStore(store);
+
             userTransaction.commit();
-            StoreRsp response = new StoreRsp(store);
-            return  Response.status(Response.Status.OK).entity(response).build();
+            return  Response.status(Response.Status.OK).entity(Flattener.flatten(vendor)).build();
         } catch (Exception ex) {
             try {
                 userTransaction.setRollbackOnly();
@@ -320,6 +353,26 @@ public class VendorResource {
         try {
             Context c = new InitialContext();
             return (DishSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/DishSessionBean!session.DishSessionBeanLocal");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
+    }
+
+    private CanteenSessionBeanLocal lookupCanteenSessionBeanLocal() {
+        try {
+            Context c = new InitialContext();
+            return (CanteenSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/CanteenSessionBean!session.CanteenSessionBeanLocal");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
+    }
+
+    private CustomerSessionBeanLocal lookupCustomerSessionBeanLocal() {
+        try {
+            Context c = new InitialContext();
+            return (CustomerSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/CustomerSessionBean!session.CustomerSessionBeanLocal");
         } catch (NamingException ne) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
             throw new RuntimeException(ne);

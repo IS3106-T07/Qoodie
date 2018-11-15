@@ -49,11 +49,11 @@ public class StoreSessionBean implements StoreSessionBeanLocal {
         if (newS.getName() != null) {
             oldS.setName(newS.getName());
         }
-        if (newS.getPassword() != null) {
-             oldS.setPassword(newS.getPassword());
+        if (newS.getVendor().getPassword() != null) {
+             oldS.getVendor().setPassword(newS.getVendor().getPassword());
         }
-        if (newS.getVendorEmail() != null) {
-            oldS.setVendorEmail(newS.getVendorEmail());
+        if (newS.getVendor().getEmail() != null) {
+            oldS.getVendor().setEmail(newS.getVendor().getEmail());
         }
         if (newS.getCuisineType()!=null){
             oldS.setCuisineType(newS.getCuisineType());
@@ -72,9 +72,9 @@ public class StoreSessionBean implements StoreSessionBeanLocal {
     }
 
     @Override
-    public Boolean checkVendorUserName(String username) {
-        Query query = em.createQuery("SELECT s FROM Store s WHERE s.vendorUsername = :username");
-        query.setParameter("username", username);
+    public Boolean checkVendorEmail(String email) {
+        Query query = em.createQuery("SELECT s FROM Store s WHERE s.vendor.email = :email");
+        query.setParameter("email", email);
         return query.getResultList().size() == 0;
     }
 
@@ -93,7 +93,7 @@ public class StoreSessionBean implements StoreSessionBeanLocal {
         List<Store> returned = new ArrayList<>();
         List<Store> all = readAllStore();
         for (Store c : all) {
-            if (c.getVendorEmail().toLowerCase().equals(email.toLowerCase())) {
+            if (c.getVendor().getEmail().toLowerCase().equals(email.toLowerCase())) {
                 returned.add(c);
             }
         }

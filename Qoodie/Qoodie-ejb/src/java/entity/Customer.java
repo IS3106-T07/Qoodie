@@ -5,19 +5,12 @@
 */
 package entity;
 
+import enums.UserType;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
 
 /**
  *
@@ -38,10 +31,10 @@ public class Customer implements Serializable {
     private Boolean isActive = true; //admin can activate or deactivate the customer
     @Temporal(TemporalType.DATE)
     private Date created;
-    @ManyToOne
-    private UserType userType;
     @OneToMany()
     private List<CustomerOrder> customerOrders;
+    @Enumerated(EnumType.STRING)
+    private UserType userType;
 
     public Long getId() {
         return id;
@@ -106,14 +99,6 @@ public class Customer implements Serializable {
     public void setCreated(Date created) {
         this.created = created;
     }
-    
-    public UserType getUserType() {
-        return userType;
-    }
-
-    public void setUserType(UserType userType) {
-        this.userType = userType;
-    }
 
     public List<CustomerOrder> getCustomerOrders() {
         return customerOrders;
@@ -146,5 +131,13 @@ public class Customer implements Serializable {
     @Override
     public String toString() {
         return "entity.Customer[ id=" + id + " ]";
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
     }
 }
