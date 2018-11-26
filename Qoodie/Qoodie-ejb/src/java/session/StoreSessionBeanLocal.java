@@ -26,6 +26,6 @@ public interface StoreSessionBeanLocal {
     public Boolean checkVendorEmail(String username);
     public List<Store> readAllStore();
     Store retrieveStoreById(Long id);
-
+    Store retrieveStoreByVendorId(Long id);
     public List<Store> readStoreByEmail(String email);
 }

@@ -10,9 +10,7 @@ import enums.UserType;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import session.*;
-import webservices.restful.datamodels.CreateItemReq;
-import webservices.restful.datamodels.CreateVendorReq;
-import webservices.restful.datamodels.OrderRsp;
+import webservices.restful.datamodels.*;
 import webservices.restful.helper.Flattener;
 import webservices.restful.util.StorageDir;
 
@@ -29,12 +27,18 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static webservices.restful.util.ResponseHelper.getExceptionDump;
 
@@ -44,6 +48,9 @@ import static webservices.restful.util.ResponseHelper.getExceptionDump;
  */
 @Path("vendors")
 public class VendorResource {
+    CustomerOrderTypeSessionBeanLocal customerOrderTypeSessionLocal = lookupCustomerOrderTypeSessionBeanLocal();
+    DishTypeSessionBeanLocal dishTypeSessionBean = lookupDishTypeSessionBeanLocal();
+    FileDirectorySessionLocal fileDirectorySessionLocal = lookupFileDirectorySessionLocal();
     CustomerSessionBeanLocal customerSessionBeanLocal = lookupCustomerSessionBeanLocal();
     CanteenSessionBeanLocal canteenSessionBeanLocal = lookupCanteenSessionBeanLocal();
     DishSessionBeanLocal dishSessionBeanLocal = lookupDishSessionBeanLocal();
@@ -66,18 +73,136 @@ public class VendorResource {
     @Path("uploadImage")
     @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response uploadImage(@FormDataParam("filepond") InputStream is,
-                                @FormDataParam("filepond")FormDataContentDisposition fileDetails) {
+    public Response uploadFile(@FormDataParam("filepond") InputStream is,
+                               @FormDataParam("filepond") FormDataContentDisposition fileDetails) {
         try {
             String fileName = fileDetails.getFileName();
-            System.out.println("Uploading File " + fileName + " To Temp");
-            long tmpId = new Date().getTime();
-            String path = tempDir + tmpId;
-            System.out.println(path);
-            File file = new File(path);
-            if (!file.mkdir()) return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            boolean mkdirSuccess = true;
+            String path;
+            int i = 0;
+            long tmpId = 0L;
+            do {
+                if (!mkdirSuccess) {
+                    Thread.sleep(1000);
+                }
+                tmpId = new Date().getTime();
+                path = tempDir + tmpId;
+
+                File file = new File(path);
+                mkdirSuccess = file.mkdirs();
+                i++;
+            } while (!mkdirSuccess && i < 10);
+            if (!mkdirSuccess) {
+                return Response.status(Response.Status.CONFLICT).build();
+            }
             writeToFile(is, path + "/" + fileName);
-            return  Response.status(Response.Status.OK).entity(tmpId).build();
+            return Response.status(Response.Status.OK).entity(tmpId).build();
+        } catch (Exception ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(getExceptionDump(ex)).build();
+        }
+    }
+
+    @GET
+    @Path("getAllDishTypes")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getAllDishTypes() {
+        try {
+            List<DishType> dishTypes = dishTypeSessionBean.readAllDishType();
+            return  Response.status(Response.Status.OK).entity(dishTypes.stream().map(DishTypeRsp::new)
+                    .collect(Collectors.toList())).build();
+        } catch (Exception ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(getExceptionDump(ex)).build();
+        }
+    }
+
+    @GET
+    @Path("getVendorDetails")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getVendorDetails(@QueryParam("vendorId") Long id) {
+        try {
+            Store store = storeSessionBeanLocal.retrieveStoreByVendorId(id);
+            return  Response.status(Response.Status.OK).entity(new StoreRsp(store)).build();
+        } catch (Exception ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(getExceptionDump(ex)).build();
+        }
+    }
+
+    @GET
+    @Path("setOrderToReady")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response setOrderToReady(@QueryParam("storeId") Long storeId,
+                                    @QueryParam("orderId") Long orderId) {
+        try {
+            Store store = storeSessionBeanLocal.retrieveStoreByVendorId(storeId);
+            OrderDish orderDish = orderDishSessionBean.readOrderDish(orderId);
+            Dish dish = orderDish.getDish();
+            Long sId = dish.getStore().getId();
+            if (!sId.equals(storeId)) {
+                error.put("message", "Unauthorised vendor");
+                return Response.status(Response.Status.NOT_ACCEPTABLE).entity(error).build();
+            }
+            List<CustomerOrderType> ready = customerOrderTypeSessionLocal.readCustomerOrderTypeByName("READY");
+            CustomerOrder customerOrder = orderDish.getCustomerOrder();
+            customerOrder.setCustomerOrderType(ready.get(0));
+            customerOrderSessionBeanLocal.updateCustomerOrder(customerOrder);
+            return  Response.status(Response.Status.NO_CONTENT).build();
+        } catch (Exception ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(getExceptionDump(ex)).build();
+        }
+    }
+
+    @GET
+    @Path("setOrderToDelivered")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response setOrderToDelivered(@QueryParam("storeId") Long storeId,
+                                    @QueryParam("orderId") Long orderId) {
+        try {
+            Store store = storeSessionBeanLocal.retrieveStoreByVendorId(storeId);
+            OrderDish orderDish = orderDishSessionBean.readOrderDish(orderId);
+            Dish dish = orderDish.getDish();
+            Long sId = dish.getStore().getId();
+            if (!sId.equals(storeId)) {
+                error.put("message", "Unauthorised vendor");
+                return Response.status(Response.Status.NOT_ACCEPTABLE).entity(error).build();
+            }
+            List<CustomerOrderType> ready = customerOrderTypeSessionLocal.readCustomerOrderTypeByName("DELIVERED");
+            CustomerOrder customerOrder = orderDish.getCustomerOrder();
+            customerOrder.setCustomerOrderType(ready.get(0));
+            customerOrderSessionBeanLocal.updateCustomerOrder(customerOrder);
+            return  Response.status(Response.Status.NO_CONTENT).build();
+        } catch (Exception ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(getExceptionDump(ex)).build();
+        }
+    }
+
+    @GET
+    @Path("getVendorOrders")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getVendorOrders(@QueryParam("vendorId") Long id,
+                                    @QueryParam("startDate") Long startDate,
+                                    @QueryParam("endDate") Long endDate) {
+        try {
+            Store store = storeSessionBeanLocal.retrieveStoreByVendorId(id);
+            List<OrderRsp> orderRsps = new ArrayList<>();
+            for (Dish dish : store.getDishes()) {
+                for (OrderDish orderDish : dish.getOrderDishes()) {
+                    CustomerOrder customerOrder = orderDish.getCustomerOrder();
+                    CustomerOrderType orderStatus = customerOrder.getCustomerOrderType();
+                    boolean checkDelivered = orderStatus.getName().toLowerCase().contains("delivered");
+                    long time = customerOrder.getCreated().getTime();
+                    boolean checkTime = time > startDate && time <= endDate;
+                    if (checkDelivered && checkTime) orderRsps.add(new OrderRsp(orderDish));
+                    else {
+                        System.out.println(orderDish);
+                    }
+                }
+            }
+            return  Response.status(Response.Status.OK).entity(orderRsps).build();
         } catch (Exception ex) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(getExceptionDump(ex)).build();
         }
@@ -89,24 +214,41 @@ public class VendorResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createNewItem(CreateItemReq createItemReq) {
         try {
-            userTransaction.begin();
-            String _dir = persistDir + "dishes/";
-            new File(_dir).mkdirs();
-            String _tempDir = tempDir + createItemReq.getFile();
-            File oldDir = new File(_tempDir);
-            System.out.println("Old Dir " + _tempDir);
-            File file = oldDir.listFiles()[0];
-            String newDir = _dir + createItemReq.getFile() + "_" + file.getName();
-            System.out.println("New Dir " + newDir);
-            boolean moved = file.renameTo(new File(newDir));
-            if (moved) {
-                System.out.println("Delete File " + _tempDir + " in Temp");
-                deleteFolder(oldDir);
-                userTransaction.commit();
-                return Response.status(Response.Status.NO_CONTENT).build();
+            Long fileId = createItemReq.getFileId();
+            if (createItemReq.getFile() == null || fileId == null) {
+                error.put("message", "No Image Provided");
+                return Response.status(Response.Status.NOT_ACCEPTABLE).entity(error).build();
             }
-            userTransaction.setRollbackOnly();
-            return  Response.status(Response.Status.NOT_ACCEPTABLE).entity("CANNOT MOVE FILE").build();
+            userTransaction.begin();
+            Long vendorId = createItemReq.getVendorId();
+            Customer customer = customerOrderSessionBeanLocal.getCustomerById(vendorId);
+            if (customer == null) {
+                error.put("message", "Vendor doesn't exist");
+                return Response.status(Response.Status.NOT_ACCEPTABLE).entity(error).build();
+            }
+            Store store = storeSessionBeanLocal.retrieveStoreByVendorId(vendorId);
+            Long dishTypeId = createItemReq.getDishTypeId();
+            DishType dishType = dishTypeSessionBean.readDishType(dishTypeId);
+            if (dishType == null) {
+                error.put("message", "Vendor doesn't exist");
+                return Response.status(Response.Status.NOT_ACCEPTABLE).entity(error).build();
+            }
+            FileDirectoryEntity file = persistFile(createItemReq.getFile(), fileId, "/" + store.getName());
+            Dish newItem = new Dish();
+            newItem.setName(createItemReq.getName());
+            newItem.setDescription(createItemReq.getDescription());
+            newItem.setIsAvailable(true);
+            newItem.setPrice(createItemReq.getPrice());
+            newItem.setStore(store);
+            newItem.setFileDirectoryEntity(file);
+            newItem.setDishType(dishType);
+            dishSessionBeanLocal.createDish(newItem);
+            List<Dish> dishes = store.getDishes();
+            dishes = dishes == null ? new ArrayList<>() : dishes;
+            dishes.add(newItem);
+            storeSessionBeanLocal.updateStore(store);
+            userTransaction.commit();
+            return  Response.status(Response.Status.NO_CONTENT).build();
         } catch (Exception ex) {
             try {
                 userTransaction.setRollbackOnly();
@@ -119,18 +261,104 @@ public class VendorResource {
     }
 
     @POST
+    @Path("updateItem")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateItem(CreateItemReq createItemReq) {
+        try {
+            userTransaction.begin();
+            Long vendorId = createItemReq.getVendorId();
+            Customer customer = customerOrderSessionBeanLocal.getCustomerById(vendorId);
+            if (customer == null) {
+                error.put("message", "Vendor doesn't exist");
+                return Response.status(Response.Status.NOT_ACCEPTABLE).entity(error).build();
+            }
+            Store store = storeSessionBeanLocal.retrieveStoreByVendorId(vendorId);
+
+            Dish dish = dishSessionBeanLocal.readDish(createItemReq.getId());
+            Customer vendor = dish.getStore().getVendor();
+            if (!vendor.getId().equals(vendorId)) {
+                error.put("message", "Unauthorised Vendor");
+                return Response.status(Response.Status.NOT_ACCEPTABLE).entity(error).build();
+            }
+            dish.setName(createItemReq.getName());
+            dish.setDescription(createItemReq.getDescription());
+            dish.setIsAvailable(true);
+            dish.setPrice(createItemReq.getPrice());
+
+            Long fileId = createItemReq.getFileId();
+            if (fileId != null) {
+                FileDirectoryEntity file = persistFile(createItemReq.getFile(), fileId, "/" + store.getName());
+                dish.setFileDirectoryEntity(file);
+            }
+            Long dishTypeId = createItemReq.getDishTypeId();
+            if (dishTypeId != -1) {
+                DishType dishType = dishTypeSessionBean.readDishType(dishTypeId);
+                dish.setDishType(dishType);
+            }
+            dishSessionBeanLocal.updateDish(dish);
+            userTransaction.commit();
+            return  Response.status(Response.Status.NO_CONTENT).build();
+        } catch (Exception ex) {
+            try {
+                userTransaction.setRollbackOnly();
+                System.out.println("ROLLED BACK");
+            } catch (SystemException e) {
+                System.out.println("ROLLBACK FAILED");
+            }
+            error.put("message", getExceptionDump(ex));
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
+        }
+    }
+
+    @POST
+    @Path("deleteItem")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteItem(CreateItemReq createItemReq) {
+        try {
+            userTransaction.begin();
+            Long vendorId = createItemReq.getVendorId();
+            Customer customer = customerOrderSessionBeanLocal.getCustomerById(vendorId);
+            if (customer == null) {
+                error.put("message", "Vendor doesn't exist");
+                return Response.status(Response.Status.NOT_ACCEPTABLE).entity(error).build();
+            }
+
+            Dish dish = dishSessionBeanLocal.readDish(createItemReq.getId());
+            Customer vendor = dish.getStore().getVendor();
+            if (!vendor.getId().equals(vendorId)) {
+                error.put("message", "Unauthorised Vendor");
+                return Response.status(Response.Status.NOT_ACCEPTABLE).entity(error).build();
+            }
+            dish.setIsAvailable(false);
+            dishSessionBeanLocal.updateDish(dish);
+            userTransaction.commit();
+            return  Response.status(Response.Status.NO_CONTENT).build();
+        } catch (Exception ex) {
+            try {
+                userTransaction.setRollbackOnly();
+                System.out.println("ROLLED BACK");
+            } catch (SystemException e) {
+                System.out.println("ROLLBACK FAILED");
+            }
+            error.put("message", getExceptionDump(ex));
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
+        }
+    }
+
+    @POST
     @Path("revertImage")
     @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.TEXT_PLAIN)
-    public Response revertImage(String tmpId) {
+    public Response revertFile(String tmpId) {
         try {
-            System.out.println("Delete File " + tmpId + " in Temp");
             String path = tempDir + tmpId;
-            System.out.println(path);
+
             File file = new File(path);
             boolean deleteResult = deleteFolder(file);
             if (!deleteResult) return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("File Doesn't Exist").build();
-            return  Response.status(Response.Status.NO_CONTENT).build();
+            return  Response.status(Response.Status.OK).entity(tmpId).build();
         } catch (Exception ex) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(getExceptionDump(ex)).build();
         }
@@ -143,7 +371,12 @@ public class VendorResource {
     public Response getOrdersByVendorId(@QueryParam("vendorId") Long vendorId) {
         try {
             userTransaction.begin();
-            Store store = storeSessionBeanLocal.retrieveStoreById(vendorId);
+            Store store = storeSessionBeanLocal.retrieveStoreByVendorId(vendorId);
+            if (store == null) {
+                userTransaction.setRollbackOnly();
+                error.put("message", "Unauthorise vendor");
+                return  Response.status(Response.Status.NOT_ACCEPTABLE).entity(error).build();
+            }
             List<OrderRsp> response = new ArrayList<>();
             List<Dish> dishes = store.getDishes();
             for (Dish dish : dishes) {
@@ -292,6 +525,63 @@ public class VendorResource {
         return folder.delete();
     }
 
+    public FileDirectoryEntity persistFile(FileReq fileReq, Long id, String subFolder) throws NoSuchAlgorithmException {
+        boolean isImage = fileReq.getType().contains("image/");
+        String originalName = fileReq.getName();
+        String pathname = tempDir + id + "/" + originalName;
+        File file = new File(pathname);
+
+        FileDirectoryEntity newFile = new FileDirectoryEntity();
+        newFile.setCreatedAt(new Timestamp(new Date().getTime()));
+        newFile.setFileName(originalName);
+        newFile.setImage(isImage);
+        newFile.setFileSize(fileReq.getSize());
+        String salt = getShaHash("" + ThreadLocalRandom.current().nextLong());
+        newFile.setSalt(salt);
+        newFile.setOriginalName(originalName);
+        String fileName = salt + originalName;
+        String hashedFilename = getShaHash(fileName);
+        newFile.setFileName(hashedFilename);
+
+        if (isImage) {
+            String imageDir = "../docroot" + subFolder;
+            boolean mkdirs = new File(imageDir).mkdirs();
+            System.out.println("MAKE DIR " + mkdirs);
+            String imagePath = imageDir + "/" + hashedFilename;
+            file.renameTo(new File(imagePath));
+            deleteFolder(new File(tempDir + id));
+            newFile.setDirectory(subFolder + "/" + hashedFilename);
+        } else {
+            String fileDir = storageDir + subFolder;
+            new File(fileDir).mkdirs();
+            String filePath = fileDir + "/" + hashedFilename;
+            file.renameTo(new File(filePath));
+            deleteFolder(new File(tempDir + id));
+            newFile.setDirectory(subFolder + "/" + originalName);
+        }
+
+        fileDirectorySessionLocal.createFile(newFile);
+        return newFile;
+    }
+
+    private String getShaHash(String string) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] encodedHash = digest.digest(string.getBytes(StandardCharsets.UTF_8));
+        return bytesToHex(encodedHash);
+    }
+
+    private String bytesToHex(byte[] hash) {
+        StringBuffer hexString = new StringBuffer();
+        for (int i = 0; i < hash.length; i++) {
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+
     private void writeToFile(InputStream uploadedInputStream, String uploadedFileLocation) {
         try {
             int read = 0;
@@ -308,6 +598,7 @@ public class VendorResource {
         }
 
     }
+
 
     private UserTransaction lookupUserTransaction() {
         try {
@@ -373,6 +664,36 @@ public class VendorResource {
         try {
             Context c = new InitialContext();
             return (CustomerSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/CustomerSessionBean!session.CustomerSessionBeanLocal");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
+    }
+
+    private FileDirectorySessionLocal lookupFileDirectorySessionLocal() {
+        try {
+            Context c = new InitialContext();
+            return (FileDirectorySessionLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/FileDirectorySession!session.FileDirectorySessionLocal");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
+    }
+
+    private DishTypeSessionBeanLocal lookupDishTypeSessionBeanLocal() {
+        try {
+            Context c = new InitialContext();
+            return (DishTypeSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/DishTypeSessionBean!session.DishTypeSessionBeanLocal");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
+    }
+
+    private CustomerOrderTypeSessionBeanLocal lookupCustomerOrderTypeSessionBeanLocal() {
+        try {
+            Context c = new InitialContext();
+            return (CustomerOrderTypeSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/CustomerOrderTypeSessionBean!session.CustomerOrderTypeSessionBeanLocal");
         } catch (NamingException ne) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
             throw new RuntimeException(ne);

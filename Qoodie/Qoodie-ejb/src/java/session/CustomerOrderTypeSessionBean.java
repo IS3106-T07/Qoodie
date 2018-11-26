@@ -7,10 +7,12 @@ package session;
 
 import entity.CustomerOrderType;
 import error.CustomerOrderTypeNotFoundException;
-import java.util.List;
+
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import java.util.List;
 
 /**
  *
@@ -24,6 +26,7 @@ public class CustomerOrderTypeSessionBean implements CustomerOrderTypeSessionBea
     @Override
     public void createCustomerOrderType(CustomerOrderType c) {
         em.persist(c);
+        System.out.println("CREATED CUSTOMER TYPE " + c.getName());
     }
 
     @Override
@@ -35,9 +38,10 @@ public class CustomerOrderTypeSessionBean implements CustomerOrderTypeSessionBea
 
     @Override
     public void updateCustomerOrderType(CustomerOrderType c) throws CustomerOrderTypeNotFoundException {
-        CustomerOrderType OldC = readCustomerOrderType(c.getId());
-        OldC.setCustomerOrders(c.getCustomerOrders());
-        OldC.setName(c.getName());
+//        CustomerOrderType OldC = readCustomerOrderType(c.getId());
+//        OldC.setCustomerOrders(c.getCustomerOrders());
+//        OldC.setName(c.getName());
+        em.merge(c);
     }
 
     @Override
@@ -52,6 +56,8 @@ public class CustomerOrderTypeSessionBean implements CustomerOrderTypeSessionBea
 
     @Override
     public List<CustomerOrderType> readCustomerOrderTypeByName(String name) {
-        return em.createQuery("SELECT c From CustomerOrderType c WHERE LOWER(c.name) = \""+name.toLowerCase()+"\"").getResultList();
+        Query query = em.createQuery("SELECT c From CustomerOrderType c WHERE LOWER(c.name) = :name");
+        query.setParameter("name", name.toLowerCase());
+        return query.getResultList();
     }
 }

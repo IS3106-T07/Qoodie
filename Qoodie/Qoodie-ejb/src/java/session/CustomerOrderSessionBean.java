@@ -5,27 +5,14 @@
  */
 package session;
 
-import entity.CustomerOrder;
-import entity.OrderDish;
-import entity.CustomerOrderType;
-import entity.Dish;
-import entity.OrderDish;
-import entity.Store;
-import error.CustomerOrderAlreadyPaidException;
-import error.CustomerOrderNotFoundException;
-import error.CustomerOrderTypeNotFoundException;
-import error.OrderDishNotFoundException;
-import error.StoreNotFoundException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import entity.*;
+import error.*;
+
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import java.util.*;
 
 /**
  *
@@ -44,19 +31,11 @@ public class CustomerOrderSessionBean implements CustomerOrderSessionBeanLocal {
     private OrderDishSessionBeanLocal orderDishSessionBeanLocal;
 
     @Override
-    public void createCustomerOrder(CustomerOrder c) throws CustomerOrderTypeNotFoundException, OrderDishNotFoundException {
+    public void createCustomerOrder(CustomerOrder c) {
         c.setCreated(new Date());
         c.setLastUpdate(new Date());
-        CustomerOrderType InBasketType = customerOrderTypeSessionBeanLocal.readCustomerOrderTypeByName("IN BASKET").get(0);
-        c.setCustomerOrderType(InBasketType);
-        InBasketType.getCustomerOrders().add(c);
-        for (OrderDish od : c.getOrderDishes()) {
-            od.setCustomerOrder(c);
-            orderDishSessionBeanLocal.updateOrderDish(od);
-        }
-        customerOrderTypeSessionBeanLocal.updateCustomerOrderType(InBasketType);
-
         em.persist(c);
+        System.out.println("CREATED CUSTOMER ORDER " + c.getId());
     }
 
     @Override
@@ -71,20 +50,20 @@ public class CustomerOrderSessionBean implements CustomerOrderSessionBeanLocal {
 
     @Override
     public void updateCustomerOrder(CustomerOrder newC) throws CustomerOrderNotFoundException {
-        CustomerOrder c = readCustomerOrder(newC.getId());
-        c.setLastUpdate(new Date());
-        c.setCustomer(newC.getCustomer());
-        c.setOrderDishes(newC.getOrderDishes());
-        if (c.getPrice() > 0) { //no need to reset price if is temporary
-            c.setPrice(newC.getPrice());
-        }
-        //if the type changes from IN BASKET to PAID, need to set positive price 
-        if (c.getCustomerOrderType().getName().contains("IN BASKET")
-                && newC.getCustomerOrderType().getName().contains("PAID")) {
-            c.setPrice(newC.getPrice());
-        }
-        c.setCustomerOrderType(newC.getCustomerOrderType());
-
+//        CustomerOrder c = readCustomerOrder(newC.getId());
+//        c.setLastUpdate(new Date());
+//        c.setCustomer(newC.getCustomer());
+//        c.setOrderDishes(newC.getOrderDishes());
+//        if (c.getPrice() > 0) { //no need to reset price if is temporary
+//            c.setPrice(newC.getPrice());
+//        }
+//        //if the type changes from IN BASKET to PAID, need to set positive price
+//        if (c.getCustomerOrderType().getName().contains("IN BASKET")
+//                && newC.getCustomerOrderType().getName().contains("PAID")) {
+//            c.setPrice(newC.getPrice());
+//        }
+//        c.setCustomerOrderType(newC.getCustomerOrderType());
+        em.merge(newC);
     }
 
     @Override
@@ -139,6 +118,11 @@ public class CustomerOrderSessionBean implements CustomerOrderSessionBeanLocal {
     @Override
     public List<CustomerOrder> readAllCustomerOrder() {
         return em.createQuery("Select c From CustomerOrder c").getResultList();
+    }
+
+    @Override
+    public Customer getCustomerById(Long id) {
+        return em.find(Customer.class, id);
     }
 
     @Override

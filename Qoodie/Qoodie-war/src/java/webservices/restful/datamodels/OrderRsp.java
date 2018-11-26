@@ -1,18 +1,25 @@
 package webservices.restful.datamodels;
 
+import entity.Dish;
 import entity.OrderDish;
 
 public class OrderRsp {
     private Long id;
     private String dishName;
     private Integer amount;
+    private Double subtotal;
+    private String status;
 
     public OrderRsp() {}
 
     public OrderRsp(OrderDish order) {
         setId(order.getId());
-        setAmount(order.getAmount());
-        setDishName(order.getDish().getName());
+        Integer amount = order.getAmount();
+        setAmount(amount);
+        Dish dish = order.getDish();
+        setDishName(dish.getName());
+        setStatus(order.getCustomerOrder().getCustomerOrderType().getName());
+        setSubtotal(dish.getPrice() * amount);
     }
 
     public Long getId() {
@@ -37,5 +44,21 @@ public class OrderRsp {
 
     public void setAmount(Integer amount) {
         this.amount = amount;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Double getSubtotal() {
+        return subtotal;
+    }
+
+    public void setSubtotal(Double subtotal) {
+        this.subtotal = subtotal;
     }
 }

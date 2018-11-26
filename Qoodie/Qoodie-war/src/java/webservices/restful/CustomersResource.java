@@ -7,33 +7,26 @@ package webservices.restful;
 
 import entity.Customer;
 import entity.CustomerOrder;
-import entity.Store;
 import error.CustomerNotFoundException;
 import error.CustomerOrderNotFoundException;
 import error.CustomerOrderTypeNotFoundException;
 import error.OrderDishNotFoundException;
-import java.util.Base64;
-import java.util.List;
-import java.util.StringTokenizer;
-import javax.ejb.EJB;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.Produces;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import session.CustomerOrderSessionBeanLocal;
 import session.CustomerSessionBeanLocal;
 import webservices.restful.helper.Base64AuthenticationHeaderHelper;
 import webservices.restful.helper.Flattener;
 import webservices.restful.helper.PATCH;
+
+import javax.ejb.EJB;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.ws.rs.*;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.Base64;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * REST Web Service
@@ -121,7 +114,7 @@ public class CustomersResource {
         newC.setId(c.getId());
         if (c.getPassword().equals(password)) { //correct credantial. can edit
             try {
-                customerSessionBeanLocal.updateCustoemr(newC);
+                customerSessionBeanLocal.updateCustomer(newC);
                 return Response.status(204).build();
             } catch (CustomerNotFoundException e) {
                 JsonObject exception = Json.createObjectBuilder()
@@ -172,7 +165,7 @@ public class CustomersResource {
             customer.getCustomerOrders().add(o);
             //update both entities
             customerOrderSessionBeanLocal.updateCustomerOrder(o);
-            customerSessionBeanLocal.updateCustoemr(customer);
+            customerSessionBeanLocal.updateCustomer(customer);
             return Response.status(200).entity(Flattener.flatten(customer)).build();
         } catch (CustomerNotFoundException ex) {
             JsonObject exception = Json.createObjectBuilder()
@@ -232,8 +225,7 @@ public class CustomersResource {
     @POST
     @Path("/login")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response login(@HeaderParam("Authorization") String authHeader
-    ) {
+    public Response login(@HeaderParam("Authorization") String authHeader) {
         if (authHeader == null || authHeader.length() == 0) { // CASE: no auth token in the header
             JsonObject exception = Json.createObjectBuilder()
                     .add("message", "authentication informaiton not found")

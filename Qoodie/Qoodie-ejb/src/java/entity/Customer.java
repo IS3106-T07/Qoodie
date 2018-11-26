@@ -9,6 +9,7 @@ import enums.UserType;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -32,9 +33,12 @@ public class Customer implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date created;
     @OneToMany()
-    private List<CustomerOrder> customerOrders;
+    private List<CustomerOrder> customerOrders = new ArrayList<>();
     @Enumerated(EnumType.STRING)
     private UserType userType;
+    private String bankAccountNumber;
+    @OneToOne
+    private FileDirectoryEntity photo;
 
     public Long getId() {
         return id;
@@ -139,5 +143,21 @@ public class Customer implements Serializable {
 
     public void setUserType(UserType userType) {
         this.userType = userType;
+    }
+
+    public String getBankAccountNumber() {
+        return bankAccountNumber;
+    }
+
+    public void setBankAccountNumber(String bankAccountNumber) {
+        this.bankAccountNumber = bankAccountNumber;
+    }
+
+    public FileDirectoryEntity getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(FileDirectoryEntity photo) {
+        this.photo = photo;
     }
 }

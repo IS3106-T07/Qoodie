@@ -1,27 +1,38 @@
 package webservices.restful.datamodels;
 
-import entity.CuisineType;
-import entity.Dish;
-import entity.Store;
+import entity.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class StoreRsp {
-    private Long id;
+    private Long storeId;
     private String name;
     private Long vendorId;
     private String vendorEmail;
     private List<DishRsp> dishes;
     private String cuisineType;
     private Long cuisineTypeId;
+    private String vendorName;
+    private String vendorAddress;
+    private String vendorBankAccountNumber;
+    private String vendorPhotoDir;
 
     public StoreRsp() {}
 
     public StoreRsp(Store store) {
-        setId(store.getId());
+        setStoreId(store.getId());
         setName(store.getName());
-        List<Dish> dishes = store.getDishes();
+
+        List<Dish> storeDishes = store.getDishes();
+        List<Dish> dishes = new ArrayList<>();
+        for (Dish storeDish : storeDishes) {
+            if (storeDish.getIsAvailable()) dishes.add(storeDish);
+            else {
+                System.out.println(storeDish.getIsAvailable());
+            }
+        }
+        System.out.println("# DISHES " + dishes.size());
         List<DishRsp> dishRsps = new ArrayList<>();
         for (Dish dish : dishes) {
             dishRsps.add(new DishRsp(dish));
@@ -30,14 +41,22 @@ public class StoreRsp {
         CuisineType cuisineType = store.getCuisineType();
         setCuisineType(cuisineType == null ? null : cuisineType.getName());
         setCuisineTypeId(cuisineType == null ? null : cuisineType.getId());
+        Customer vendor = store.getVendor();
+        setVendorEmail(vendor.getEmail());
+        setVendorId(vendor.getId());
+        setVendorName(vendor.getName());
+        setVendorAddress(vendor.getAddress());
+        setVendorBankAccountNumber(vendor.getBankAccountNumber());
+        FileDirectoryEntity photo = vendor.getPhoto();
+        if (photo != null) setVendorPhotoDir(photo.getDirectory());
     }
 
-    public Long getId() {
-        return id;
+    public Long getStoreId() {
+        return storeId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setStoreId(Long storeId) {
+        this.storeId = storeId;
     }
 
     public String getName() {
@@ -86,5 +105,37 @@ public class StoreRsp {
 
     public void setVendorId(Long vendorId) {
         this.vendorId = vendorId;
+    }
+
+    public String getVendorName() {
+        return vendorName;
+    }
+
+    public void setVendorName(String vendorName) {
+        this.vendorName = vendorName;
+    }
+
+    public String getVendorAddress() {
+        return vendorAddress;
+    }
+
+    public void setVendorAddress(String vendorAddress) {
+        this.vendorAddress = vendorAddress;
+    }
+
+    public String getVendorBankAccountNumber() {
+        return vendorBankAccountNumber;
+    }
+
+    public void setVendorBankAccountNumber(String vendorBankAccountNumber) {
+        this.vendorBankAccountNumber = vendorBankAccountNumber;
+    }
+
+    public String getVendorPhotoDir() {
+        return vendorPhotoDir;
+    }
+
+    public void setVendorPhotoDir(String vendorPhotoDir) {
+        this.vendorPhotoDir = vendorPhotoDir;
     }
 }

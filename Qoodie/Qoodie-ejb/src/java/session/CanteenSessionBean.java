@@ -7,10 +7,11 @@ package session;
 
 import entity.Canteen;
 import error.CanteenNotFoundException;
-import java.util.List;
+
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 /**
  *
@@ -24,6 +25,7 @@ public class CanteenSessionBean implements CanteenSessionBeanLocal {
     @Override
     public void createCanteen(Canteen c) {
         em.persist(c);
+        System.out.println("CREATED CANTEEN " + c.getName());
     }
 
     @Override
@@ -38,9 +40,7 @@ public class CanteenSessionBean implements CanteenSessionBeanLocal {
 
     @Override
     public void updateCanteen(Canteen newC) throws CanteenNotFoundException {
-        Canteen oldC = readCanteen(newC.getId());
-        oldC.setName(newC.getName());
-        oldC.setStores(newC.getStores());
+        em.merge(newC);
     }
 
     @Override

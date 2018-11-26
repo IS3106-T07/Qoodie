@@ -63,4 +63,22 @@
         <local>session.CustomerSessionBeanLocal</local>
         <ejb-link>Qoodie-ejb.jar#CustomerSessionBean</ejb-link>
     </ejb-local-ref>
+    <ejb-local-ref>
+        <ejb-ref-name>FileDirectorySessionLocal</ejb-ref-name>
+        <ejb-ref-type>Session</ejb-ref-type>
+        <local>session.FileDirectorySessionLocal</local>
+        <ejb-link>Qoodie-ejb.jar#FileDirectorySession</ejb-link>
+    </ejb-local-ref>
+    <ejb-local-ref>
+        <ejb-ref-name>DishTypeSessionBeanLocal</ejb-ref-name>
+        <ejb-ref-type>Session</ejb-ref-type>
+        <local>session.DishTypeSessionBeanLocal</local>
+        <ejb-link>Qoodie-ejb.jar#DishTypeSessionBean</ejb-link>
+    </ejb-local-ref>
+    <ejb-local-ref>
+        <ejb-ref-name>CustomerOrderTypeSessionBean</ejb-ref-name>
+        <ejb-ref-type>Session</ejb-ref-type>
+        <local>session.CustomerOrderTypeSessionBeanLocal</local>
+        <ejb-link>Qoodie-ejb.jar#CustomerOrderTypeSessionBean</ejb-link>
+    </ejb-local-ref>
 </web-app>

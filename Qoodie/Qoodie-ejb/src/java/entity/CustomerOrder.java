@@ -5,17 +5,11 @@
  */
 package entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  *
@@ -35,8 +29,8 @@ public class CustomerOrder implements Serializable {
     Double price = -1.0;
     @ManyToOne
     private Customer customer;
-    @OneToMany
-    private List<OrderDish> orderDishes;
+    @OneToMany(mappedBy = "customerOrder")
+    private List<OrderDish> orderDishes = new ArrayList<>();
     @ManyToOne
     private CustomerOrderType customerOrderType;
 
