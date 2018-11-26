@@ -420,7 +420,8 @@ public class InitializeSessionBean {
                 c.setUserType(UserType.VENDOR);
                 customerSessionBeanLocal.createCustomer(c);
                 s.setVendor(c);
-                s.setCanteen(deck); 
+                s.setCanteen(deck);
+                //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
                 storeSessionBeanLocal.createStore(s);
                 initDish(s, dishes,"braised chicken with potato", 7,"traditional chinese style");
@@ -447,7 +448,8 @@ public class InitializeSessionBean {
                 c.setUserType(UserType.VENDOR);
                 customerSessionBeanLocal.createCustomer(c);
                 s.setVendor(c);
-                s.setCanteen(deck); 
+                s.setCanteen(deck);
+                //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
                 storeSessionBeanLocal.createStore(s);
                 initDish(s, dishes,"Roasted Chicken Rice", 5,"popular item");
@@ -483,7 +485,8 @@ public class InitializeSessionBean {
                 c.setUserType(UserType.VENDOR);
                 customerSessionBeanLocal.createCustomer(c);
                 s.setVendor(c);
-                s.setCanteen(foodClick); 
+                s.setCanteen(foodClick);
+                //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
                 storeSessionBeanLocal.createStore(s);
                 initDish(s, dishes,"Fish and Mushroom ban mian", 6,"you can choose in soup or dried");
@@ -514,7 +517,8 @@ public class InitializeSessionBean {
                 c.setUserType(UserType.VENDOR);
                 customerSessionBeanLocal.createCustomer(c);
                 s.setVendor(c);
-                s.setCanteen(foodClick); 
+                s.setCanteen(foodClick);
+                //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
                 storeSessionBeanLocal.createStore(s);
                 initDish(s, dishes,"apple juice", 0,"");
@@ -545,7 +549,8 @@ public class InitializeSessionBean {
                 customerSessionBeanLocal.createCustomer(c);
                 customerSessionBeanLocal.createCustomer(c);
                 s.setVendor(c);
-                s.setCanteen(foodClick); 
+                s.setCanteen(foodClick);
+                //create a dummy dish in the store 
                 List<Dish> dishes = new ArrayList<>();
                 storeSessionBeanLocal.createStore(s);
                 initDish(s, dishes, "fiery chicken", 20, "actually very spicy");
