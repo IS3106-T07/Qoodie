@@ -5,16 +5,13 @@
 */
 package session;
 
+import entity.Customer;
 import entity.CustomerOrder;
-import entity.OrderDish;
-import error.CustomerOrderAlreadyPaidException;
-import error.CustomerOrderNotFoundException;
-import error.CustomerOrderTypeNotFoundException;
-import error.OrderDishNotFoundException;
-import error.StoreNotFoundException;
+import error.*;
+
+import javax.ejb.Local;
 import java.util.Date;
 import java.util.List;
-import javax.ejb.Local;
 
 /**
  *
@@ -30,6 +27,7 @@ public interface CustomerOrderSessionBeanLocal {
     public void deleteCustomerOrder(CustomerOrder c) throws CustomerOrderNotFoundException, CustomerOrderTypeNotFoundException;
 
     public List<CustomerOrder> readAllCustomerOrder();
+    Customer getCustomerById(Long id);
     
     public double calculateRevenue(Long storeId, Date start, Date end) throws StoreNotFoundException;
     public void payCustomerOrder(CustomerOrder c)

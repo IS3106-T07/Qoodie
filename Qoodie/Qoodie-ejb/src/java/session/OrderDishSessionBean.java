@@ -7,11 +7,12 @@ package session;
 
 import entity.OrderDish;
 import error.OrderDishNotFoundException;
-import java.util.List;
+
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.util.List;
 
 /**
  *
@@ -26,6 +27,7 @@ public class OrderDishSessionBean implements OrderDishSessionBeanLocal {
     @Override
     public void createOrderDish(OrderDish d) {
         em.persist(d);
+        System.out.println("CREATED ORDER DISH " + d.getId());
     }
     
     @Override
@@ -46,20 +48,21 @@ public class OrderDishSessionBean implements OrderDishSessionBeanLocal {
     
     @Override
     public void updateOrderDish(OrderDish d) throws OrderDishNotFoundException {
-        OrderDish oldC = readOrderDish(d.getId());
+        em.merge(d);
+//        OrderDish oldC = readOrderDish(d.getId());
         
-        if (d.getAmount() == 0) {
-            em.remove(this);
-        }
-        if (d.getAmount() != null) {
-            oldC.setAmount(d.getAmount());
-        }
-        if (d.getCustomerOrder() != null) {
-            oldC.setCustomerOrder(d.getCustomerOrder());
-        }
-        if (d.getDish() != null) {
-            oldC.setDish(d.getDish());
-        }
+//        if (d.getAmount() == 0) {
+//            em.remove(this);
+//        }
+//        if (d.getAmount() != null) {
+//            oldC.setAmount(d.getAmount());
+//        }
+//        if (d.getCustomerOrder() != null) {
+//            oldC.setCustomerOrder(d.getCustomerOrder());
+//        }
+//        if (d.getDish() != null) {
+//            oldC.setDish(d.getDish());
+//        }
     }
     
     @Override

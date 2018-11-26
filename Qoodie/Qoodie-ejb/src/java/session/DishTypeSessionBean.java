@@ -7,10 +7,11 @@ package session;
 
 import entity.DishType;
 import error.DishTypeNotFoundException;
-import java.util.List;
+
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 /**
  *
@@ -18,10 +19,10 @@ import javax.persistence.PersistenceContext;
  */
 @Stateless
 public class DishTypeSessionBean implements DishTypeSessionBeanLocal {
-@PersistenceContext(unitName = "Qoodie-ejbPU")
+    @PersistenceContext(unitName = "Qoodie-ejbPU")
     private EntityManager em;
+
     @Override
-    
     public void createDishType(DishType d) {
         em.persist(d);
     }

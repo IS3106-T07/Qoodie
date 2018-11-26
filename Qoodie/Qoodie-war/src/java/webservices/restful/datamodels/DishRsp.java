@@ -1,6 +1,8 @@
 package webservices.restful.datamodels;
 
 import entity.Dish;
+import entity.DishType;
+import entity.FileDirectoryEntity;
 
 public class DishRsp {
     private Long id;
@@ -9,6 +11,7 @@ public class DishRsp {
     private Double price;
     private String description;
     private String dishType;
+    private String photoDir;
 
     public DishRsp() {}
 
@@ -18,7 +21,10 @@ public class DishRsp {
         setAvailable(dish.getIsAvailable());
         setPrice(dish.getPrice());
         setDescription(dish.getDescription());
-        setDishType(dish.getDishType().getName());
+        DishType dishType = dish.getDishType();
+        if (dishType != null) setDishType(dishType.getName());
+        FileDirectoryEntity fileDirectoryEntity = dish.getFileDirectoryEntity();
+        if (fileDirectoryEntity != null) setPhotoDir(fileDirectoryEntity.getDirectory());
     }
 
     public Long getId() {
@@ -67,5 +73,13 @@ public class DishRsp {
 
     public void setDishType(String dishType) {
         this.dishType = dishType;
+    }
+
+    public String getPhotoDir() {
+        return photoDir;
+    }
+
+    public void setPhotoDir(String photoDir) {
+        this.photoDir = photoDir;
     }
 }

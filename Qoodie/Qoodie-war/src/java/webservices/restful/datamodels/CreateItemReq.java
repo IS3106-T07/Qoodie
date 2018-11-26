@@ -3,18 +3,26 @@ package webservices.restful.datamodels;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType(name = "createItemReq", propOrder = {
+        "id",
         "name",
+        "description",
         "price",
         "file",
+        "fileId",
         "storeId",
-        "dishType",
+        "dishTypeId",
+        "vendorId",
 })
 public class CreateItemReq {
+    private Long id;
     private String name;
+    private String description;
     private Double price;
-    private String file;
+    private FileReq file;
+    private Long fileId;
     private Integer storeId;
-    private String dishType;
+    private Long dishTypeId;
+    private Long vendorId;
 
     public String getName() {
         return name;
@@ -32,11 +40,11 @@ public class CreateItemReq {
         this.price = price;
     }
 
-    public String getFile() {
+    public FileReq getFile() {
         return file;
     }
 
-    public void setFile(String file) {
+    public void setFile(FileReq file) {
         this.file = file;
     }
 
@@ -48,11 +56,43 @@ public class CreateItemReq {
         this.storeId = storeId;
     }
 
-    public String getDishType() {
-        return dishType;
+    public Long getFileId() {
+        return fileId;
     }
 
-    public void setDishType(String dishType) {
-        this.dishType = dishType;
+    public void setFileId(Long fileId) {
+        this.fileId = fileId;
+    }
+
+    public Long getVendorId() {
+        return vendorId;
+    }
+
+    public void setVendorId(Long vendorId) {
+        this.vendorId = vendorId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Long getDishTypeId() {
+        return dishTypeId;
+    }
+
+    public void setDishTypeId(Long dishTypeId) {
+        this.dishTypeId = dishTypeId;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

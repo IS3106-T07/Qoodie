@@ -22,7 +22,7 @@ public class Store implements Serializable {
     private String name;
     @OneToOne
     private Customer vendor;
-    @OneToMany
+    @OneToMany(mappedBy = "store")
     private List<Dish> dishes;
     @ManyToOne
     private CuisineType cuisineType;

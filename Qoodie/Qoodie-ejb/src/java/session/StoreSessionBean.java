@@ -28,6 +28,7 @@ public class StoreSessionBean implements StoreSessionBeanLocal {
     @Override
     public void createStore(Store s) {
         em.persist(s);
+        System.out.println("CREATED STORE " + s.getName());
     }
 
     @Override
@@ -41,23 +42,7 @@ public class StoreSessionBean implements StoreSessionBeanLocal {
 
     @Override  //partial stores with null field are possible as a result of PUT
     public void updateStore(Store newS) throws StoreNotFoundException {
-        Store oldS = readStore(newS.getId());
-
-        if (newS.getDishes() != null) {
-            oldS.setDishes(newS.getDishes());
-        }
-        if (newS.getName() != null) {
-            oldS.setName(newS.getName());
-        }
-        if (newS.getVendor().getPassword() != null) {
-             oldS.getVendor().setPassword(newS.getVendor().getPassword());
-        }
-        if (newS.getVendor().getEmail() != null) {
-            oldS.getVendor().setEmail(newS.getVendor().getEmail());
-        }
-        if (newS.getCuisineType()!=null){
-            oldS.setCuisineType(newS.getCuisineType());
-        }
+        em.merge(newS);
     }
 
     @Override
@@ -80,12 +65,21 @@ public class StoreSessionBean implements StoreSessionBeanLocal {
 
     @Override
     public List<Store> readAllStore() {
-        return em.createQuery("SELECT s From Store s").getResultList();
+        Query query = em.createQuery("SELECT s From Store s");
+        return query.getResultList();
     }
 
     @Override
     public Store retrieveStoreById(Long id) {
         return em.find(Store.class, id);
+    }
+
+    @Override
+    public Store retrieveStoreByVendorId(Long id) {
+        List stores = em.createQuery("SELECT s FROM Store s WHERE s.vendor.id = :id").setParameter("id", id)
+                .getResultList();
+        if (stores.isEmpty()) return null;
+        return (Store) stores.get(0);
     }
 
     @Override

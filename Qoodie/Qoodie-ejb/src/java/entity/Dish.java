@@ -5,14 +5,10 @@
 */
 package entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 /**
  *
@@ -32,8 +28,10 @@ public class Dish implements Serializable {
     private Store store;
     @ManyToOne
     private DishType dishType;
-    @OneToMany
-    private List<OrderDish> orderDishes;
+    @OneToMany(mappedBy = "dish")
+    private List<OrderDish> orderDishes = new ArrayList<>();
+    @OneToOne
+    private FileDirectoryEntity fileDirectoryEntity;
 
     public Dish(String name, Double price, String description) {
         this.name = name;
@@ -137,6 +135,12 @@ public class Dish implements Serializable {
         this.orderDishes = orderDishes;
     }
 
-    
-    
+
+    public FileDirectoryEntity getFileDirectoryEntity() {
+        return fileDirectoryEntity;
+    }
+
+    public void setFileDirectoryEntity(FileDirectoryEntity fileDirectoryEntity) {
+        this.fileDirectoryEntity = fileDirectoryEntity;
+    }
 }

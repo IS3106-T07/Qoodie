@@ -7,10 +7,11 @@ package session;
 
 import entity.Dish;
 import error.DishNotFoundException;
-import java.util.List;
+
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 /**
  *
@@ -24,6 +25,7 @@ public class DishSessionBean implements DishSessionBeanLocal {
     @Override
     public void createDish(Dish d) {
         em.persist(d);
+        System.out.println("CREATED DISH " + d.getName());
     }
     
     @Override
@@ -35,14 +37,7 @@ public class DishSessionBean implements DishSessionBeanLocal {
     
     @Override
     public void updateDish(Dish d) throws DishNotFoundException {
-        Dish oldD = readDish(d.getId());
-        oldD.setDescription(d.getDescription());
-        oldD.setDishType(d.getDishType());
-        oldD.setIsAvailable(d.getIsAvailable());
-        oldD.setName(d.getName());
-        oldD.setOrderDishes(d.getOrderDishes());
-        oldD.setPrice(d.getPrice());
-        oldD.setStore(d.getStore());
+        em.merge(d);
     }
     
     @Override
