@@ -23,5 +23,5 @@ public class CORSFilter implements ContainerResponseFilter {
         response.getHeaders().putSingle("Access-Control-Allow-Methods", "OPTIONS, GET, POST, PUT, DELETE, PATCH");
         response.getHeaders().putSingle("Access-Control-Allow-Headers", "*, Content-Type");
     }
-    
+
 }

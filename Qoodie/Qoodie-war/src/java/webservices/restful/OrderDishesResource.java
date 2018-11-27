@@ -81,6 +81,7 @@ public class OrderDishesResource {
             if (customer.getCustomerOrders() != null) {
                 List<CustomerOrder> customerOrders = customer.getCustomerOrders();
                 System.out.printf("before adding to cart, cart size = %d", customerOrders.size());
+                System.out.println(customerOrders.toString());
                 for (CustomerOrder customerOrder : customerOrders) {
                     System.out.printf("an customer order from store %s %s exist in cart\n",
                             customerOrder.getOrderDishes().get(0).getDish().getStore().getId().toString(),
@@ -105,7 +106,7 @@ public class OrderDishesResource {
                         dish.getOrderDishes().add(od);
                         dishSessionBeanLocal.updateDish(dish);
                         System.out.printf("after adding to cart,"
-                                + " the dish (id = %d, name = %s) now have %d order dishes\n", dish.getId(), dish.getName());
+                                + " the dish (id = %d, name = %s) now have %d order dishes\n", dish.getId(), dish.getName(), odList.size());
                         od.setCustomerOrder(customerOrder);
                         orderDishSessionBeanLocal.createOrderDish(od);
                         customerOrderSessionBeanLocal.updateCustomerOrder(customerOrder);
