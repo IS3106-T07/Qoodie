@@ -39,6 +39,7 @@ public class Customer implements Serializable {
     private String bankAccountNumber;
     @OneToOne
     private FileDirectoryEntity photo;
+    private String bookmarkString;
 
     public Long getId() {
         return id;
@@ -159,5 +160,13 @@ public class Customer implements Serializable {
 
     public void setPhoto(FileDirectoryEntity photo) {
         this.photo = photo;
+    }
+
+    public String getBookmarkString() {
+        return bookmarkString;
+    }
+
+    public void setBookmarkString(String bookmarkString) {
+        this.bookmarkString = bookmarkString;
     }
 }
