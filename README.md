@@ -25,7 +25,7 @@ Version: ...
 webpack: Compiled successfully.
 ```
 ### use case
-* [login](https://user-images.githubusercontent.com/24287990/49071241-806dcc00-f268-11e8-802e-f94a1d179357.png)
+* login ![picture alt](https://user-images.githubusercontent.com/24287990/49071241-806dcc00-f268-11e8-802e-f94a1d179357.png)
 * [registration]
 * [view canteen](https://user-images.githubusercontent.com/24287990/49071649-654f8c00-f269-11e8-9da7-dd6f5d967bee.png)
 * [view stores in a canteen]
