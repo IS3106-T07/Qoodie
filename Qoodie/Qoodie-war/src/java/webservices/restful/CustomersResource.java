@@ -5,14 +5,14 @@
  */
 package webservices.restful;
 
-import entity.Customer;
-import entity.CustomerOrder;
+import entity.*;
 import error.CustomerNotFoundException;
 import error.CustomerOrderNotFoundException;
 import error.CustomerOrderTypeNotFoundException;
 import error.OrderDishNotFoundException;
-import session.CustomerOrderSessionBeanLocal;
-import session.CustomerSessionBeanLocal;
+import session.*;
+import webservices.restful.datamodels.CartUpdateReq;
+import webservices.restful.datamodels.UpdateBookmarkReq;
 import webservices.restful.helper.Base64AuthenticationHeaderHelper;
 import webservices.restful.helper.Flattener;
 import webservices.restful.helper.PATCH;
@@ -20,13 +20,20 @@ import webservices.restful.helper.PATCH;
 import javax.ejb.EJB;
 import javax.json.Json;
 import javax.json.JsonObject;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Base64;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import static webservices.restful.util.ResponseHelper.getExceptionDump;
 
 /**
  * REST Web Service
@@ -35,6 +42,11 @@ import java.util.StringTokenizer;
  */
 @Path("customers")
 public class CustomersResource {
+    DecimalFormat decimalFormat = new DecimalFormat("#.00");
+    CustomerOrderTypeSessionBeanLocal customerOrderTypeSessionBean = lookupCustomerOrderTypeSessionBeanLocal();
+    DishSessionBeanLocal dishSessionBean = lookupDishSessionBeanLocal();
+    OrderDishSessionBeanLocal orderDishSessionBeanLocal = lookupOrderDishSessionBeanLocal();
+    private LinkedHashMap<Object, Object> error = new LinkedHashMap<>();
 
     @EJB
     CustomerSessionBeanLocal customerSessionBeanLocal;
@@ -159,7 +171,12 @@ public class CustomersResource {
     ) {
         try {
             customerOrderSessionBeanLocal.createCustomerOrder(o);
+            CustomerOrderType inBasket = customerOrderTypeSessionBean.readCustomerOrderTypeByName("IN BASKET").get(0);
+            o.setCustomerOrderType(inBasket);
             Customer customer = customerSessionBeanLocal.readCustomer(cId);
+            List<CustomerOrder> customerOrders = inBasket.getCustomerOrders();
+            customerOrders.add(o);
+            customerOrderTypeSessionBean.updateCustomerOrderType(inBasket);
             //add association
             o.setCustomer(customer);
             customer.getCustomerOrders().add(o);
@@ -188,6 +205,107 @@ public class CustomersResource {
                     .build();
             return Response.status(404).entity(exception).build();
         }
+    }
+
+    @POST
+    @Path("updateBookmark")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateBookmark(UpdateBookmarkReq updateBookmarkReq) {
+        try {
+            Customer customer = customerSessionBeanLocal.readCustomer(updateBookmarkReq.getCustomerId());
+            if (customer == null) {
+                error.put("message", "Unauthorised user");
+                return Response.status(Response.Status.NOT_ACCEPTABLE).entity(error).build();
+            }
+            customer.setBookmarkString(updateBookmarkReq.getBookmarkString());
+            customerSessionBeanLocal.updateCustomer(customer);
+            return Response.status(Response.Status.NO_CONTENT).build();
+        } catch (Exception ex) {
+            error.put("message", getExceptionDump(ex));
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
+        }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("addItemToCart")
+    public Response addItemToCart(CartUpdateReq cartUpdateReq){
+        try {
+            Customer customer = customerSessionBeanLocal.readCustomer(cartUpdateReq.getCustomerId());
+            if (customer == null) {
+                error.put("message", "Unauthorised user");
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
+            }
+            CustomerOrderType inBasket = customerOrderTypeSessionBean.readCustomerOrderTypeByName("IN BASKET").get(0);
+            List<CustomerOrder> customerOrders = customer.getCustomerOrders();
+            System.out.println("size " + customerOrders.size());
+//            List<CustomerOrder> inBasketCo = customerOrders.stream().filter(co -> co.getCustomerOrderType().getName().equals("IN BASKET")).collect(Collectors.toList());
+            List<CustomerOrder> inBasketCo = new ArrayList<>();
+            for (CustomerOrder customerOrder : customerOrders) {
+                if (customerOrder.getCustomerOrderType().getName().equals("IN BASKET")) {
+                    inBasketCo.add(customerOrder);
+                }
+            }
+            System.out.println("Filter " + inBasketCo.size());
+            CustomerOrder customerOrder = inBasketCo.get(0);
+            Dish dish = dishSessionBean.readDish(cartUpdateReq.getDishId());
+            double price = Double.parseDouble(decimalFormat.format(cartUpdateReq.getQuantity() * dish.getPrice()));
+            if (customerOrder == null) {
+                customerOrder = new CustomerOrder();
+                customerOrder.setCustomerOrderType(inBasket);
+                customerOrder.setCustomer(customer);
+                customerOrder.setCreated(new Date());
+                customerOrder.setLastUpdate(new Date());
+                customerOrder.setPrice(price);
+                customerOrderSessionBeanLocal.createCustomerOrder(customerOrder);
+                OrderDish orderDish = new OrderDish();
+                orderDishSessionBeanLocal.createOrderDish(orderDish);
+                setOrderDish(cartUpdateReq.getQuantity(), customerOrder, dish, orderDish);
+                customerOrders.add(customerOrder);
+            } else {
+                customerOrder.setLastUpdate(new Date());
+                double orgPrice = Math.max(0, customerOrder.getPrice());
+                customerOrder.setPrice(Double.parseDouble(decimalFormat.format(orgPrice + price)));
+                customerOrderSessionBeanLocal.updateCustomerOrder(customerOrder);
+                List<Dish> dishes = customerOrder.getOrderDishes().stream().map(o -> o.getDish()).collect(Collectors.toList());
+                System.out.println(dishes);
+                List<OrderDish> orderDishes = new ArrayList<>();
+                for (OrderDish orderDish : customerOrder.getOrderDishes()) {
+                    if (orderDish.getDish().getId().equals(cartUpdateReq.getDishId())) orderDishes.add(orderDish);
+                }
+                long count = orderDishes.size();
+                System.out.println(count);
+                if (count == 0) {
+                    OrderDish orderDish = new OrderDish();
+                    orderDishSessionBeanLocal.createOrderDish(orderDish);
+                    setOrderDish(cartUpdateReq.getQuantity(), customerOrder, dish, orderDish);
+                } else {
+                    OrderDish orderDish = orderDishes.get(0);
+                    System.out.println(orderDish);
+                    setOrderDish(cartUpdateReq.getQuantity() + orderDish.getAmount(),
+                            customerOrder, dish, orderDish);
+                }
+            }
+            customerOrderSessionBeanLocal.updateCustomerOrder(customerOrder);
+            customer.setCustomerOrders(customerOrders);
+            customerSessionBeanLocal.updateCustomer(customer);
+            return Response.status(Response.Status.NO_CONTENT).build();
+        } catch (Exception ex) {
+            error.put("message", getExceptionDump(ex));
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
+        }
+    }
+
+    private void setOrderDish(Integer amount, CustomerOrder customerOrder, Dish dish, OrderDish orderDish) throws OrderDishNotFoundException {
+        orderDish.setDish(dish);
+        orderDish.setAmount(amount);
+        orderDish.setCustomerOrder(customerOrder);
+        orderDishSessionBeanLocal.updateOrderDish(orderDish);
+        List<OrderDish> orderDishes = customerOrder.getOrderDishes();
+        orderDishes.add(orderDish);
+        customerOrder.setOrderDishes(orderDishes);
     }
 
     /*
@@ -276,17 +394,14 @@ public class CustomersResource {
                 getPasswordOrErrorResponseString(authHeader);
 
         List<Customer> customerList = customerSessionBeanLocal.readCustomerByEmail(email);
-        if (customerList.isEmpty()) //CASE: email not in database
-        {
+        if (customerList.isEmpty()) {
             return getUserNotFoundResponse();
         }
-
         Customer customer = customerList.get(0);
-
         if (customer.getPassword().equals(password)) {//correct credential. perform logic
             List<CustomerOrder> customerOrders = customer.getCustomerOrders();
             for (CustomerOrder customerOrder: customerOrders){
-                customerOrder = Flattener.flatten(customerOrder);
+                Flattener.flatten(customerOrder);
             }
             return Response.ok(new GenericEntity<List<CustomerOrder>>(customerOrders){}).build();
            
@@ -335,4 +450,33 @@ public class CustomersResource {
                 .type(MediaType.APPLICATION_JSON).build();
     }
 
+    private CustomerOrderTypeSessionBeanLocal lookupCustomerOrderTypeSessionBeanLocal() {
+        try {
+            Context c = new InitialContext();
+            return (CustomerOrderTypeSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/CustomerOrderTypeSessionBean!session.CustomerOrderTypeSessionBeanLocal");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
+    }
+
+    private DishSessionBeanLocal lookupDishSessionBeanLocal() {
+        try {
+            Context c = new InitialContext();
+            return (DishSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/DishSessionBean!session.DishSessionBeanLocal");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
+    }
+
+    private OrderDishSessionBeanLocal lookupOrderDishSessionBeanLocal() {
+        try {
+            Context c = new InitialContext();
+            return (OrderDishSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/OrderDishSessionBean!session.OrderDishSessionBeanLocal");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
+    }
 }

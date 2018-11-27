@@ -81,4 +81,28 @@
         <local>session.CustomerOrderTypeSessionBeanLocal</local>
         <ejb-link>Qoodie-ejb.jar#CustomerOrderTypeSessionBean</ejb-link>
     </ejb-local-ref>
+    <ejb-local-ref>
+        <ejb-ref-name>CustomerOrderTypeSessionBean1</ejb-ref-name>
+        <ejb-ref-type>Session</ejb-ref-type>
+        <local>session.CustomerOrderTypeSessionBeanLocal</local>
+        <ejb-link>Qoodie-ejb.jar#CustomerOrderTypeSessionBean</ejb-link>
+    </ejb-local-ref>
+    <ejb-local-ref>
+        <ejb-ref-name>CustomerOrderTypeSessionBean2</ejb-ref-name>
+        <ejb-ref-type>Session</ejb-ref-type>
+        <local>session.CustomerOrderTypeSessionBeanLocal</local>
+        <ejb-link>Qoodie-ejb.jar#CustomerOrderTypeSessionBean</ejb-link>
+    </ejb-local-ref>
+    <ejb-local-ref>
+        <ejb-ref-name>DishSessionBean</ejb-ref-name>
+        <ejb-ref-type>Session</ejb-ref-type>
+        <local>session.DishSessionBeanLocal</local>
+        <ejb-link>Qoodie-ejb.jar#DishSessionBean</ejb-link>
+    </ejb-local-ref>
+    <ejb-local-ref>
+        <ejb-ref-name>OrderDishSessionBean1</ejb-ref-name>
+        <ejb-ref-type>Session</ejb-ref-type>
+        <local>session.OrderDishSessionBeanLocal</local>
+        <ejb-link>Qoodie-ejb.jar#OrderDishSessionBean</ejb-link>
+    </ejb-local-ref>
 </web-app>
