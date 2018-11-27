@@ -170,7 +170,7 @@ public class Customer implements Serializable {
     public void setBookmarkString(String bookmarkString) {
         this.bookmarkString = bookmarkString;
     }
-
+    
     public String getCartString() {
         return cartString;
     }
