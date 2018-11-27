@@ -1,10 +1,12 @@
 # Qoodie
 
-you can signup as a food court vendor or a customer to perform actions.
+You can signup as a food court vendor or a customer to perform actions.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+### devlopment setup
+1. clone & run frontend from: https://github.com/IS3106-T07/frontend/ #master by running command `npm start` after `npm install`
+2. clone & run backend from https://github.com/IS3106-T07/Qoodie #master by running in Netbeans (8.0 and above) 
 
 ### Prerequisites
 
