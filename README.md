@@ -24,9 +24,10 @@ Version: ...
 ...
 webpack: Compiled successfully.
 ```
-###use case
-* login
-![picture alt](https://user-images.githubusercontent.com/24287990/49071241-806dcc00-f268-11e8-802e-f94a1d179357.png "login page")
+### use case
+* login 
+
+[picture alt](https://user-images.githubusercontent.com/24287990/49071241-806dcc00-f268-11e8-802e-f94a1d179357.png "login page")
 * registration
 * 
 
