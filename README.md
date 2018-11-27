@@ -51,10 +51,3 @@ No plans has been made to deploy this on a live system
 * **Hansel**
 * **Le Quang Quan**
 * **Subhodip Mandal**
-
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
