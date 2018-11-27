@@ -29,10 +29,14 @@ webpack: Compiled successfully.
 * [registration]
 * [view canteen](https://user-images.githubusercontent.com/24287990/49071649-654f8c00-f269-11e8-9da7-dd6f5d967bee.png)
 * [view stores in a canteen]
+#### customer
 * [add items to cart]
 * [pay order]
 * [bookmark]
-* []
+* [profile page]
+#### vendor
+* [list new item]
+* [respond to an order]
 
 
 ## Deployment
