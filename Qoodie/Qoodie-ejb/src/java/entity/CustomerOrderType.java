@@ -7,6 +7,7 @@ package entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,7 +22,7 @@ public class CustomerOrderType implements Serializable {
     private Long id;
     private String name;
     @OneToMany(mappedBy = "customerOrderType")
-    private List<CustomerOrder> customerOrders;
+    private List<CustomerOrder> customerOrders = new ArrayList<>();
 
     public List<CustomerOrder> getCustomerOrders() {
         return customerOrders;

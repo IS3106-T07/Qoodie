@@ -5,15 +5,11 @@
  */
 package webservices.restful;
 
-import entity.Customer;
-import entity.CustomerOrder;
-import entity.OrderDish;
-import entity.Store;
+import entity.*;
 import error.CustomerOrderNotFoundException;
+import error.CustomerOrderTypeNotFoundException;
 import error.OrderDishNotFoundException;
-import session.CustomerOrderSessionBeanLocal;
-import session.CustomerSessionBeanLocal;
-import session.StoreSessionBeanLocal;
+import session.*;
 import webservices.restful.helper.Base64AuthenticationHeaderHelper;
 import webservices.restful.helper.Flattener;
 import webservices.restful.helper.PATCH;
@@ -21,12 +17,18 @@ import webservices.restful.helper.PATCH;
 import javax.ejb.EJB;
 import javax.json.Json;
 import javax.json.JsonObject;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * REST Web Service
@@ -36,6 +38,8 @@ import java.util.List;
 @Path("customerOrders")
 
 public class CustomerOrderResource {
+    CustomerOrderTypeSessionBeanLocal customerOrderTypeSessionBean = lookupCustomerOrderTypeSessionBeanLocal();
+    private LinkedHashMap<Object, Object> error = new LinkedHashMap<>();
 
     @EJB
     CustomerSessionBeanLocal customerSessionBeanLocal;
@@ -91,11 +95,12 @@ public class CustomerOrderResource {
     // 21 a customer OR A VENDOR edits his/her customer order(this replaces endpoint 7)
     @PATCH
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("{order_id}")
     public Response updateCustomerOrder(
             @HeaderParam("Authorization") String authHeader,
             @PathParam("order_id") String coId,
-            CustomerOrder customerOrder) throws CustomerOrderNotFoundException {
+            CustomerOrder customerOrder) throws CustomerOrderTypeNotFoundException, CustomerOrderNotFoundException {
         String email = Base64AuthenticationHeaderHelper.
                 getUsernameOrErrorResponseString(authHeader);
         if (email.toLowerCase().contains("not found")) {
@@ -116,6 +121,8 @@ public class CustomerOrderResource {
         if (!isCustomer && !isStore) {
             return getUserNotFoundResponse();
         }
+        CustomerOrderType paid = customerOrderTypeSessionBean.readCustomerOrderTypeByName("PAID").get(0);
+        List<CustomerOrder> customerOrders = paid.getCustomerOrders();
         if (isCustomer) {
             Customer customer = customerList.get(0);
 
@@ -128,7 +135,11 @@ public class CustomerOrderResource {
                     }
                     //correct credantial. perform logic
                     customerOrder.setId(Long.valueOf(coId));
+                    customerOrder.setCustomerOrderType(paid);
                     customerOrderSessionBeanLocal.updateCustomerOrderNonNullFields(customerOrder);
+                    customerOrders.add(customerOrder);
+                    paid.setCustomerOrders(customerOrders);
+                    customerOrderTypeSessionBean.updateCustomerOrderType(paid);
                     return Response.status(204).build();
 
                 } catch (CustomerOrderNotFoundException e) {
@@ -139,16 +150,23 @@ public class CustomerOrderResource {
             }
         } else { //isStore == true
             Store store = storeList.get(0);
+            System.out.println("HERE");
             if (store.getVendor().getPassword().equals(password)) {
                 try {
                     CustomerOrder co = customerOrderSessionBeanLocal.readCustomerOrder(Long.valueOf(coId));
 
                     if (!co.getOrderDishes().get(0).getDish().getStore().getId().equals(store.getId())) { // check if this order belongs to the sotore
+                        System.out.println("HERE 2");
                         return getNoPermissionResponse();
                     }
-                    //correct credantial. perform logic
+                    //correct credential. perform logic
                     customerOrder.setId(Long.valueOf(coId));
+                    customerOrder.setCustomerOrderType(paid);
                     customerOrderSessionBeanLocal.updateCustomerOrderNonNullFields(customerOrder);
+                    customerOrders.add(customerOrder);
+                    paid.setCustomerOrders(customerOrders);
+                    customerOrderTypeSessionBean.updateCustomerOrderType(paid);
+                    System.out.println("HERE 3");
                     return Response.status(204).build();
                 } catch (CustomerOrderNotFoundException e) {
                     return getNotFoundResponse();
@@ -197,5 +215,15 @@ public class CustomerOrderResource {
                 .build();
         return Response.status(403).entity(exception)
                 .type(MediaType.APPLICATION_JSON).build();
+    }
+
+    private CustomerOrderTypeSessionBeanLocal lookupCustomerOrderTypeSessionBeanLocal() {
+        try {
+            Context c = new InitialContext();
+            return (CustomerOrderTypeSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/CustomerOrderTypeSessionBean!session.CustomerOrderTypeSessionBeanLocal");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
     }
 }
