@@ -219,7 +219,12 @@ public class CustomersResource {
                 }
             }
             System.out.println("Filter " + inBasketCo.size());
-            CustomerOrder customerOrder = inBasketCo.get(0);
+            CustomerOrder customerOrder = null;
+            try {
+                customerOrder = inBasketCo.get(0);
+            } catch (Exception e) {
+                customerOrder = null;
+            }
             Dish dish = dishSessionBean.readDish(cartUpdateReq.getDishId());
             double price = Double.parseDouble(decimalFormat.format(cartUpdateReq.getQuantity() * dish.getPrice()));
             if (customerOrder == null) {
@@ -232,7 +237,7 @@ public class CustomersResource {
                 customerOrderSessionBeanLocal.createCustomerOrder(customerOrder);
                 OrderDish orderDish = new OrderDish();
                 orderDishSessionBeanLocal.createOrderDish(orderDish);
-                setOrderDish(cartUpdateReq.getQuantity(), customerOrder, dish, orderDish);
+                setOrderDish(cartUpdateReq.getQuantity(), customerOrder, dish, orderDish, true);
                 customerOrders.add(customerOrder);
             } else {
                 customerOrder.setLastUpdate(new Date());
@@ -248,17 +253,20 @@ public class CustomersResource {
                 long count = orderDishes.size();
                 System.out.println(count);
                 if (count == 0) {
+                    System.out.println("New Dish");
                     OrderDish orderDish = new OrderDish();
                     orderDishSessionBeanLocal.createOrderDish(orderDish);
-                    setOrderDish(cartUpdateReq.getQuantity(), customerOrder, dish, orderDish);
+                    setOrderDish(cartUpdateReq.getQuantity(), customerOrder, dish, orderDish, true);
                 } else {
+                    System.out.println("Old Dish");
                     OrderDish orderDish = orderDishes.get(0);
                     System.out.println(orderDish);
                     setOrderDish(cartUpdateReq.getQuantity() + orderDish.getAmount(),
-                            customerOrder, dish, orderDish);
+                            customerOrder, dish, orderDish, false);
                 }
             }
             customerOrderSessionBeanLocal.updateCustomerOrder(customerOrder);
+            System.out.println("Order Dishes: " + customerOrder.getOrderDishes().size());
             customer.setCustomerOrders(customerOrders);
             customerSessionBeanLocal.updateCustomer(customer);
             return Response.status(Response.Status.NO_CONTENT).build();
@@ -268,14 +276,17 @@ public class CustomersResource {
         }
     }
 
-    private void setOrderDish(Integer amount, CustomerOrder customerOrder, Dish dish, OrderDish orderDish) throws OrderDishNotFoundException {
+    private void setOrderDish(Integer amount, CustomerOrder customerOrder, Dish dish, OrderDish orderDish, boolean isNew)
+            throws OrderDishNotFoundException {
         orderDish.setDish(dish);
         orderDish.setAmount(amount);
         orderDish.setCustomerOrder(customerOrder);
         orderDishSessionBeanLocal.updateOrderDish(orderDish);
-        List<OrderDish> orderDishes = customerOrder.getOrderDishes();
-        orderDishes.add(orderDish);
-        customerOrder.setOrderDishes(orderDishes);
+        if (isNew) {
+            List<OrderDish> orderDishes = customerOrder.getOrderDishes();
+            orderDishes.add(orderDish);
+            customerOrder.setOrderDishes(orderDishes);
+        }
     }
 
     /*
@@ -340,27 +351,36 @@ public class CustomersResource {
     @GET
     @Path("/orders")
     public Response getAllCustomerOrders(@HeaderParam("Authorization") String authHeader) {
-        String email = Base64AuthenticationHeaderHelper.getUsernameOrErrorResponseString(authHeader);
-        if (email.toLowerCase().contains("not found")) {
-            return getAuthNotFoundResponse();
-        }
-        String password = Base64AuthenticationHeaderHelper.getPasswordOrErrorResponseString(authHeader);
-
-        List<Customer> customerList = customerSessionBeanLocal.readCustomerByEmail(email);
-        if (customerList.isEmpty()) {
-            return getUserNotFoundResponse();
-        }
-        Customer customer = customerList.get(0);
-        if (customer.getPassword().equals(password)) {//correct credential. perform logic
-            List<CustomerOrder> customerOrders = customer.getCustomerOrders();
-            for (CustomerOrder customerOrder: customerOrders){
-                Flattener.flatten(customerOrder);
+        try {
+            String email = Base64AuthenticationHeaderHelper.
+                    getUsernameOrErrorResponseString(authHeader);
+            if (email.toLowerCase().contains("not found")) {
+                error.put("message", "No email provided");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(error).build();
             }
-            return Response.ok(new GenericEntity<List<CustomerOrder>>(customerOrders) {
-            }).build();
+            String password = Base64AuthenticationHeaderHelper.
+                    getPasswordOrErrorResponseString(authHeader);
 
-        } else {
-            return getWrongPasswordResponse();// TODO: test this endpoint
+            List<Customer> customerList = customerSessionBeanLocal.readCustomerByEmail(email);
+            if (customerList.isEmpty()) {
+                error.put("message", "Unauthorised User");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(error).build();
+            }
+            Customer customer = customerList.get(0);
+            if (customer.getPassword().equals(password)) {//correct credential. perform logic
+                List<CustomerOrder> customerOrders = customer.getCustomerOrders();
+                for (CustomerOrder customerOrder: customerOrders){
+                    Flattener.flatten(customerOrder);
+                }
+                return Response.ok(new GenericEntity<List<CustomerOrder>>(customerOrders){}).build();
+
+            } else {
+                error.put("message", "Wrong Password");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(error).build();
+            }
+        } catch (Exception ex) {
+            error.put("message", getExceptionDump(ex));
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
         }
     }
 
@@ -388,6 +408,16 @@ public class CustomersResource {
     private Response getNoPermissionResponse() {
         JsonObject exception = Json.createObjectBuilder().add("message", "no permission").build();
         return Response.status(403).entity(exception).type(MediaType.APPLICATION_JSON).build();
+    }
+
+    private CustomerOrderTypeSessionBeanLocal lookupCustomerOrderTypeSessionBeanLocal() {
+        try {
+            Context c = new InitialContext();
+            return (CustomerOrderTypeSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/CustomerOrderTypeSessionBean!session.CustomerOrderTypeSessionBeanLocal");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
     }
 
     private CustomerOrderTypeSessionBeanLocal lookupCustomerOrderTypeSessionBeanLocal() {
