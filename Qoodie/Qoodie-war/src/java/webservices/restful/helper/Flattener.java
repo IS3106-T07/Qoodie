@@ -46,6 +46,7 @@ public class Flattener {
         co.getCustomer().setCustomerOrders(null);
         co.getCustomerOrderType().setCustomerOrders(null);
         List<OrderDish> orderDishes = co.getOrderDishes();
+        System.out.println("Order Dish Size: " + orderDishes.size());
         for (OrderDish od : orderDishes) {
             cleanupOrderDish(od);
         }
