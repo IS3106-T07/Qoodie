@@ -81,6 +81,7 @@ public class CustomerOrderResource {
             List<CustomerOrder> customerOrders = customer.getCustomerOrders();
             List<CustomerOrder> resultCustomerOrders = new ArrayList<>();
             for (CustomerOrder co : customerOrders) {
+                System.out.println("#### CustomerOrderType ####\n" + co.getCustomerOrderType().getName());
                 if (co.getCustomerOrderType().getName().contains("IN BASKET")) {
                     co = Flattener.flatten(co);
                     co.setCustomer(null);
