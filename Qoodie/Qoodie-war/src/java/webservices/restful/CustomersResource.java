@@ -420,16 +420,6 @@ public class CustomersResource {
         }
     }
 
-    private CustomerOrderTypeSessionBeanLocal lookupCustomerOrderTypeSessionBeanLocal() {
-        try {
-            Context c = new InitialContext();
-            return (CustomerOrderTypeSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/CustomerOrderTypeSessionBean!session.CustomerOrderTypeSessionBeanLocal");
-        } catch (NamingException ne) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
-            throw new RuntimeException(ne);
-        }
-    }
-
     private DishSessionBeanLocal lookupDishSessionBeanLocal() {
         try {
             Context c = new InitialContext();
