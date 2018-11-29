@@ -105,4 +105,10 @@
         <local>session.OrderDishSessionBeanLocal</local>
         <ejb-link>Qoodie-ejb.jar#OrderDishSessionBean</ejb-link>
     </ejb-local-ref>
+    <ejb-local-ref>
+        <ejb-ref-name>OrderDishSessionBean2</ejb-ref-name>
+        <ejb-ref-type>Session</ejb-ref-type>
+        <local>session.OrderDishSessionBeanLocal</local>
+        <ejb-link>Qoodie-ejb.jar#OrderDishSessionBean</ejb-link>
+    </ejb-local-ref>
 </web-app>

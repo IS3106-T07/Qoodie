@@ -6,6 +6,7 @@
 package webservices.restful;
 
 import entity.*;
+import enums.OrderDishStatusEnum;
 import enums.UserType;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -55,7 +56,7 @@ public class VendorResource {
     CanteenSessionBeanLocal canteenSessionBeanLocal = lookupCanteenSessionBeanLocal();
     DishSessionBeanLocal dishSessionBeanLocal = lookupDishSessionBeanLocal();
     CustomerOrderSessionBeanLocal customerOrderSessionBeanLocal = lookupCustomerOrderSessionBeanLocal();
-    OrderDishSessionBeanLocal orderDishSessionBean = lookupOrderDishSessionBeanLocal();
+    OrderDishSessionBeanLocal orderDishSessionBeanLocal = lookupOrderDishSessionBeanLocal();
     StoreSessionBeanLocal storeSessionBeanLocal = lookupStoreSessionBeanLocal();
     private LinkedHashMap<Object, Object> error = new LinkedHashMap<>();
     private String storageDir = StorageDir.dir;
@@ -130,52 +131,74 @@ public class VendorResource {
     }
 
     @GET
+    @Path("toggleStatus")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response toggleStatus(@QueryParam("storeId") Long storeId) {
+        try {
+            userTransaction.begin();
+            Store store = storeSessionBeanLocal.retrieveStoreById(storeId);
+            store.setReceivingOrders(!store.isReceivingOrders());
+            storeSessionBeanLocal.updateStore(store);
+            userTransaction.commit();
+            return  Response.status(Response.Status.NO_CONTENT).build();
+        } catch (Exception ex) {
+            try {
+                userTransaction.setRollbackOnly();
+                System.out.println("ROLLED BACK");
+            } catch (SystemException e) {
+                System.out.println("CANNOT ROLL BACK");
+            }
+            error.put("message", getExceptionDump(ex));
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
+        }
+    }
+
+    @GET
     @Path("setOrderToReady")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response setOrderToReady(@QueryParam("storeId") Long storeId,
                                     @QueryParam("orderId") Long orderId) {
         try {
-            Store store = storeSessionBeanLocal.retrieveStoreByVendorId(storeId);
-            OrderDish orderDish = orderDishSessionBean.readOrderDish(orderId);
+            userTransaction.begin();
+            Store store = storeSessionBeanLocal.retrieveStoreById(storeId);
+            if (store == null) {
+                userTransaction.setRollbackOnly();
+                error.put("message", "Unauthorised vendor");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(error).build();
+            }
+            OrderDish orderDish = orderDishSessionBeanLocal.readOrderDish(orderId);
             Dish dish = orderDish.getDish();
             Long sId = dish.getStore().getId();
             if (!sId.equals(storeId)) {
+                userTransaction.setRollbackOnly();
                 error.put("message", "Unauthorised vendor");
                 return Response.status(Response.Status.NOT_ACCEPTABLE).entity(error).build();
             }
-            List<CustomerOrderType> ready = customerOrderTypeSessionLocal.readCustomerOrderTypeByName("READY");
+            orderDish.setOrderDishStatusEnum(OrderDishStatusEnum.READY);
+            orderDishSessionBeanLocal.updateOrderDish(orderDish);
             CustomerOrder customerOrder = orderDish.getCustomerOrder();
-            customerOrder.setCustomerOrderType(ready.get(0));
-            customerOrderSessionBeanLocal.updateCustomerOrder(customerOrder);
-            return  Response.status(Response.Status.NO_CONTENT).build();
-        } catch (Exception ex) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(getExceptionDump(ex)).build();
-        }
-    }
-
-    @GET
-    @Path("setOrderToDelivered")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response setOrderToDelivered(@QueryParam("storeId") Long storeId,
-                                    @QueryParam("orderId") Long orderId) {
-        try {
-            Store store = storeSessionBeanLocal.retrieveStoreByVendorId(storeId);
-            OrderDish orderDish = orderDishSessionBean.readOrderDish(orderId);
-            Dish dish = orderDish.getDish();
-            Long sId = dish.getStore().getId();
-            if (!sId.equals(storeId)) {
-                error.put("message", "Unauthorised vendor");
-                return Response.status(Response.Status.NOT_ACCEPTABLE).entity(error).build();
+            boolean isAllReady = true;
+            for (OrderDish customerOrderOrderDish : customerOrder.getOrderDishes()) {
+                if (customerOrderOrderDish.getOrderDishStatusEnum() != OrderDishStatusEnum.READY) isAllReady = false;
             }
-            List<CustomerOrderType> ready = customerOrderTypeSessionLocal.readCustomerOrderTypeByName("DELIVERED");
-            CustomerOrder customerOrder = orderDish.getCustomerOrder();
-            customerOrder.setCustomerOrderType(ready.get(0));
+            if (isAllReady) {
+                List<CustomerOrderType> ready = customerOrderTypeSessionLocal.readCustomerOrderTypeByName("READY");
+                customerOrder.setCustomerOrderType(ready.get(0));
+            }
             customerOrderSessionBeanLocal.updateCustomerOrder(customerOrder);
+            userTransaction.commit();
             return  Response.status(Response.Status.NO_CONTENT).build();
         } catch (Exception ex) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(getExceptionDump(ex)).build();
+            try {
+                userTransaction.setRollbackOnly();
+                System.out.println("ROLLED BACK");
+            } catch (SystemException e) {
+                System.out.println("CANNOT ROLL BACK");
+            }
+            error.put("message", getExceptionDump(ex));
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
         }
     }
 
@@ -374,7 +397,7 @@ public class VendorResource {
             Store store = storeSessionBeanLocal.retrieveStoreByVendorId(vendorId);
             if (store == null) {
                 userTransaction.setRollbackOnly();
-                error.put("message", "Unauthorise vendor");
+                error.put("message", "Unauthorised vendor");
                 return  Response.status(Response.Status.NOT_ACCEPTABLE).entity(error).build();
             }
             List<OrderRsp> response = new ArrayList<>();

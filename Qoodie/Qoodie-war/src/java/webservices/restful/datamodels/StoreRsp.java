@@ -17,6 +17,7 @@ public class StoreRsp {
     private String vendorAddress;
     private String vendorBankAccountNumber;
     private String vendorPhotoDir;
+    private Boolean isReceivingOrders;
 
     public StoreRsp() {}
 
@@ -49,6 +50,7 @@ public class StoreRsp {
         setVendorBankAccountNumber(vendor.getBankAccountNumber());
         FileDirectoryEntity photo = vendor.getPhoto();
         if (photo != null) setVendorPhotoDir(photo.getDirectory());
+        setReceivingOrders(store.isReceivingOrders());
     }
 
     public Long getStoreId() {
@@ -137,5 +139,13 @@ public class StoreRsp {
 
     public void setVendorPhotoDir(String vendorPhotoDir) {
         this.vendorPhotoDir = vendorPhotoDir;
+    }
+
+    public Boolean getReceivingOrders() {
+        return isReceivingOrders;
+    }
+
+    public void setReceivingOrders(Boolean receivingOrders) {
+        isReceivingOrders = receivingOrders;
     }
 }

@@ -6,13 +6,11 @@
 package webservices.restful;
 
 import entity.*;
+import enums.OrderDishStatusEnum;
 import error.CustomerOrderNotFoundException;
 import error.CustomerOrderTypeNotFoundException;
 import error.OrderDishNotFoundException;
-import session.CustomerOrderSessionBeanLocal;
-import session.CustomerOrderTypeSessionBeanLocal;
-import session.CustomerSessionBeanLocal;
-import session.StoreSessionBeanLocal;
+import session.*;
 import webservices.restful.helper.Base64AuthenticationHeaderHelper;
 import webservices.restful.helper.Flattener;
 import webservices.restful.helper.PATCH;
@@ -45,6 +43,7 @@ import static webservices.restful.util.ResponseHelper.getExceptionDump;
 @Path("customerOrders")
 
 public class CustomerOrderResource {
+    OrderDishSessionBeanLocal orderDishSessionBeanLocal = lookupOrderDishSessionBeanLocal();
     DecimalFormat decimalFormat = new DecimalFormat("#.00");
     CustomerOrderTypeSessionBeanLocal customerOrderTypeSessionBean = lookupCustomerOrderTypeSessionBeanLocal();
     private LinkedHashMap<Object, Object> error = new LinkedHashMap<>();
@@ -152,6 +151,8 @@ public class CustomerOrderResource {
                         double realPrice = 0.0;
                         for (OrderDish od : co.getOrderDishes()) {
                             realPrice += od.getAmount() * od.getDish().getPrice();
+                            od.setOrderDishStatusEnum(OrderDishStatusEnum.PAID);
+                            orderDishSessionBeanLocal.updateOrderDish(od);
                         }
                         System.out.println("**** updating the price : " + realPrice);
                         co.setPrice(Double.parseDouble(decimalFormat.format(realPrice)));
@@ -244,6 +245,16 @@ public class CustomerOrderResource {
         try {
             Context c = new InitialContext();
             return (CustomerOrderTypeSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/CustomerOrderTypeSessionBean!session.CustomerOrderTypeSessionBeanLocal");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
+    }
+
+    private OrderDishSessionBeanLocal lookupOrderDishSessionBeanLocal() {
+        try {
+            Context c = new InitialContext();
+            return (OrderDishSessionBeanLocal) c.lookup("java:global/Qoodie/Qoodie-ejb/OrderDishSessionBean!session.OrderDishSessionBeanLocal");
         } catch (NamingException ne) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
             throw new RuntimeException(ne);

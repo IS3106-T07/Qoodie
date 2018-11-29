@@ -9,6 +9,7 @@ public class OrderRsp {
     private Integer amount;
     private Double subtotal;
     private String status;
+    private Long created;
 
     public OrderRsp() {}
 
@@ -18,8 +19,9 @@ public class OrderRsp {
         setAmount(amount);
         Dish dish = order.getDish();
         setDishName(dish.getName());
-        setStatus(order.getCustomerOrder().getCustomerOrderType().getName());
+        setStatus(order.getOrderDishStatusEnum().toString());
         setSubtotal(dish.getPrice() * amount);
+        setCreated(order.getCustomerOrder().getCreated().getTime());
     }
 
     public Long getId() {
@@ -60,5 +62,13 @@ public class OrderRsp {
 
     public void setSubtotal(Double subtotal) {
         this.subtotal = subtotal;
+    }
+
+    public Long getCreated() {
+        return created;
+    }
+
+    public void setCreated(Long created) {
+        this.created = created;
     }
 }

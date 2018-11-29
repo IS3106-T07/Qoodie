@@ -28,6 +28,8 @@ public class Store implements Serializable {
     private CuisineType cuisineType;
     @ManyToOne
     private Canteen canteen;
+    private boolean isReceivingOrders = true;
+
     public Long getId() {
         return id;
     }
@@ -99,5 +101,13 @@ public class Store implements Serializable {
 
     public void setVendor(Customer vendor) {
         this.vendor = vendor;
+    }
+
+    public boolean isReceivingOrders() {
+        return isReceivingOrders;
+    }
+
+    public void setReceivingOrders(boolean receivingOrders) {
+        isReceivingOrders = receivingOrders;
     }
 }
