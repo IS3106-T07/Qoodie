@@ -5,6 +5,8 @@
 */
 package entity;
 
+import enums.OrderDishStatusEnum;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -23,6 +25,8 @@ public class OrderDish implements Serializable {
     private Integer amount;
     @ManyToOne
     private CustomerOrder customerOrder;
+    @Enumerated(EnumType.STRING)
+    private OrderDishStatusEnum orderDishStatusEnum = OrderDishStatusEnum.CARTED;
     
     public Long getId() {
         return id;
@@ -80,5 +84,12 @@ public class OrderDish implements Serializable {
     public void setCustomerOrder(CustomerOrder customerOrder) {
         this.customerOrder = customerOrder;
     }
-    
+
+    public OrderDishStatusEnum getOrderDishStatusEnum() {
+        return orderDishStatusEnum;
+    }
+
+    public void setOrderDishStatusEnum(OrderDishStatusEnum orderDishStatusEnum) {
+        this.orderDishStatusEnum = orderDishStatusEnum;
+    }
 }

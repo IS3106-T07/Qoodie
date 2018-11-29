@@ -6,10 +6,8 @@
 package webservices.restful;
 
 import entity.*;
-import error.CustomerNotFoundException;
-import error.CustomerOrderNotFoundException;
-import error.CustomerOrderTypeNotFoundException;
-import error.OrderDishNotFoundException;
+import enums.OrderDishStatusEnum;
+import error.*;
 import session.*;
 import webservices.restful.datamodels.CartUpdateReq;
 import webservices.restful.datamodels.UpdateBookmarkReq;
@@ -44,7 +42,7 @@ import static webservices.restful.util.ResponseHelper.getExceptionDump;
 public class CustomersResource {
     DecimalFormat decimalFormat = new DecimalFormat("#.00");
     CustomerOrderTypeSessionBeanLocal customerOrderTypeSessionBean = lookupCustomerOrderTypeSessionBeanLocal();
-    DishSessionBeanLocal dishSessionBean = lookupDishSessionBeanLocal();
+    DishSessionBeanLocal dishSessionBeanLocal = lookupDishSessionBeanLocal();
     OrderDishSessionBeanLocal orderDishSessionBeanLocal = lookupOrderDishSessionBeanLocal();
     private LinkedHashMap<Object, Object> error = new LinkedHashMap<>();
 
@@ -177,6 +175,26 @@ public class CustomersResource {
         }
     }
 
+    @GET
+    @Path("setCollected")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response setCollected(@QueryParam("id") Long id) {
+        try {
+            CustomerOrder customerOrder = customerOrderSessionBeanLocal.readCustomerOrder(id);
+            List<CustomerOrderType> ready = customerOrderTypeSessionBean.readCustomerOrderTypeByName("DELIVERED");
+            customerOrder.setCustomerOrderType(ready.get(0));
+            customerOrderSessionBeanLocal.updateCustomerOrder(customerOrder);
+            for (OrderDish orderDish : customerOrder.getOrderDishes()) {
+                orderDish.setOrderDishStatusEnum(OrderDishStatusEnum.DELIVERED);
+                orderDishSessionBeanLocal.updateOrderDish(orderDish);
+            }
+            return  Response.status(Response.Status.NO_CONTENT).build();
+        } catch (Exception ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(getExceptionDump(ex)).build();
+        }
+    }
+
     @POST
     @Path("updateBookmark")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -219,13 +237,13 @@ public class CustomersResource {
                 }
             }
             System.out.println("Filter " + inBasketCo.size());
-            CustomerOrder customerOrder = null;
+            CustomerOrder customerOrder;
             try {
                 customerOrder = inBasketCo.get(0);
             } catch (Exception e) {
                 customerOrder = null;
             }
-            Dish dish = dishSessionBean.readDish(cartUpdateReq.getDishId());
+            Dish dish = dishSessionBeanLocal.readDish(cartUpdateReq.getDishId());
             double price = Double.parseDouble(decimalFormat.format(cartUpdateReq.getQuantity() * dish.getPrice()));
             if (customerOrder == null) {
                 customerOrder = new CustomerOrder();
@@ -239,6 +257,7 @@ public class CustomersResource {
                 orderDishSessionBeanLocal.createOrderDish(orderDish);
                 setOrderDish(cartUpdateReq.getQuantity(), customerOrder, dish, orderDish, true);
                 customerOrders.add(customerOrder);
+                updateDishWithNewOrderDish(dish, orderDish);
             } else {
                 customerOrder.setLastUpdate(new Date());
                 double orgPrice = Math.max(0, customerOrder.getPrice());
@@ -257,6 +276,7 @@ public class CustomersResource {
                     OrderDish orderDish = new OrderDish();
                     orderDishSessionBeanLocal.createOrderDish(orderDish);
                     setOrderDish(cartUpdateReq.getQuantity(), customerOrder, dish, orderDish, true);
+                    updateDishWithNewOrderDish(dish, orderDish);
                 } else {
                     System.out.println("Old Dish");
                     OrderDish orderDish = orderDishes.get(0);
@@ -274,6 +294,12 @@ public class CustomersResource {
             error.put("message", getExceptionDump(ex));
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
         }
+    }
+
+    private void updateDishWithNewOrderDish(Dish dish, OrderDish orderDish) throws DishNotFoundException {
+        List<OrderDish> orderDishes = dish.getOrderDishes();
+        orderDishes.add(orderDish);
+        dishSessionBeanLocal.updateDish(dish);
     }
 
     private void setOrderDish(Integer amount, CustomerOrder customerOrder, Dish dish, OrderDish orderDish, boolean isNew)
